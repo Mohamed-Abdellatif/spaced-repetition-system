@@ -1,0 +1,10 @@
+.list{
+    display: flex;
+    justify-content: center;
+}
+
+.NoData{
+    margin: 50px auto;
+    text-align: center;
+    
+}

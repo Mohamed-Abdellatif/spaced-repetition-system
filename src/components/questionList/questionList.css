@@ -1,0 +1,40 @@
+.heading{
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    
+
+}
+
+.searchInput{
+    width: 800px;
+    height: 45px;
+    margin-right: 20px;
+    
+}
+
+.loadMoreButton{
+    display: block;
+    
+    margin: 50px auto;
+}
+
+.addBtn{
+    height: 45px;
+}
+
+.form-label{
+    font-size: larger;
+}
+.form-control{
+    width: 1000px
+}
+
+textarea{
+    height:300px
+}
+.btn-container{
+    width: 1000px;
+    display: flex;
+    justify-content: flex-end;
+}

@@ -1,0 +1,12 @@
+.questionCard{
+    width:950px
+}
+
+
+
+
+
+.crud{
+    display: flex;
+    justify-content: flex-end;
+}
