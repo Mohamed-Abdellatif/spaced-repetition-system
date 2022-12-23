@@ -7,7 +7,7 @@ const QuestionCard = ({ questionObj, setToDelete,setToEdit }) => {
   const { id, question, created } = questionObj;
   return (
     <>
-      <div className="list">
+      <div className="list" onClick={()=> console.log('hi')}>
         <div className="card  questionCard  mb-3">
           <div className="card-body">
             <h5 className="card-title">Card {id}</h5>

@@ -81,6 +81,7 @@ const EditModal = ({ questionObj, updateInput, handleSubmit }) => {
                 </div>
                 <div className="btn-container"></div>
               </div>
+              
             </>
           </div>
           <div className="modal-footer">

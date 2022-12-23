@@ -14,6 +14,7 @@ const List = ({ questions, setToDelete,setToEdit,toEdit }) => {
               questionObj={question}
               setToDelete={setToDelete}
               key={question.id}
+              
               />
             ))
         ) : (

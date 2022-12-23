@@ -1,1 +1,9 @@
+.modal-body{
+    overflow-y: scroll;
+    
+}
+
+.modal-content{
+    height: 90vh;
+}
 

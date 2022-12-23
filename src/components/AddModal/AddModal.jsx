@@ -1,7 +1,8 @@
 import "./AddModal.css";
 
 const AddModal = ({ questionObj, updateInput, handleSubmit }) => {
-  return (
+  return (<>
+    
     <div
       className="modal fade"
       id="addModal"
@@ -9,8 +10,10 @@ const AddModal = ({ questionObj, updateInput, handleSubmit }) => {
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
+      
       <div className="modal-dialog modal-xl">
         <div className="modal-content">
+        <header>
           <div className="modal-header">
             <h1 className="modal-title fs-5" id="exampleModalLabel">
               Add Question
@@ -21,7 +24,8 @@ const AddModal = ({ questionObj, updateInput, handleSubmit }) => {
               data-bs-dismiss="modal"
               aria-label="Close"
             ></button>
-          </div>
+          </div></header>
+
           <div className="modal-body">
             <>
              
@@ -79,7 +83,7 @@ const AddModal = ({ questionObj, updateInput, handleSubmit }) => {
                 <div className="btn-container"></div>
               </div>
             </>
-          </div>
+          </div><footer>
           <div className="modal-footer">
             <button
               type="button"
@@ -95,10 +99,10 @@ const AddModal = ({ questionObj, updateInput, handleSubmit }) => {
             >
               Add Question
             </button>
-          </div>
+          </div></footer>
         </div>
       </div>
-    </div>
+    </div></>
   );
 };
 

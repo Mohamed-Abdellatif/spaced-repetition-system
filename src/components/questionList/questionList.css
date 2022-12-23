@@ -1,9 +1,19 @@
+.fixedHeading{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    background-color: whitesmoke;
+}
+
+
+
 .heading{
     margin-top: 50px;
     display: flex;
     justify-content: center;
     
-
 }
 
 .searchInput{
@@ -31,10 +41,18 @@
 }
 
 textarea{
-    height:300px
+    height:150px
 }
 .btn-container{
     width: 1000px;
     display: flex;
     justify-content: flex-end;
+}
+
+.Count{
+    color:black;
+    font-size: 16px;
+    text-align: start;
+    margin-left: 200px;
+    padding: 0;
 }
