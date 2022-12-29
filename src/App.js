@@ -1,19 +1,20 @@
+import { Route, Routes } from "react-router-dom";
+import "./App.css";
+import NavBar from "./components/navbar/navbar";
 
-import { Route, Routes } from 'react-router-dom';
-import './App.css';
-
-
-import QuestionList from './components/questionList/questionList';
+import QuestionList from "./components/questionList/questionList";
+import Authentication from "./HH/authentication/authentication.component";
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<QuestionList/>}/>
-      
-    </Routes>
-    
-
+    <>
+      <NavBar />
+      <Routes>
+        <Route path="/" element={<QuestionList />} />
+        <Route path="/login" element={<Authentication />} />
+      </Routes>
+    </>
   );
-}
+};
 
 export default App;

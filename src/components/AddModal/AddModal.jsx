@@ -1,6 +1,7 @@
 import "./AddModal.css";
 
 const AddModal = ({ questionObj, updateInput, handleSubmit }) => {
+  
   return (<>
     
     <div

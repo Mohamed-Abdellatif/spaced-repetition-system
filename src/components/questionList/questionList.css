@@ -1,4 +1,16 @@
+body{
+    padding-top: 40px;
+}
+
+.spinner{
+    margin-top: 130px;
+    text-align: center;
+    
+}
+
+
 .fixedHeading{
+    margin-top:20px;
     position: fixed;
     top: 0;
     left: 0;
@@ -53,6 +65,6 @@ textarea{
     color:black;
     font-size: 16px;
     text-align: start;
-    margin-left: 200px;
+    margin-left: 205px;
     padding: 0;
 }

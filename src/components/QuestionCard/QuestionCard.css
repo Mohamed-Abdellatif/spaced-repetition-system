@@ -4,7 +4,9 @@
 
 
 
-
+.card-content :hover{
+    cursor: pointer;
+}
 
 .crud{
     display: flex;
