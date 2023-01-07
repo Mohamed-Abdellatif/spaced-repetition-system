@@ -1,7 +1,7 @@
-.modal-body{
+.modal-edit-body{
     overflow-y: scroll;
     
 }
-.modal-content{
+.modal-edit-content{
     height: 90vh;
 }

@@ -1,0 +1,14 @@
+.container{
+    margin-top: 40px;
+}
+
+.answer-card{
+    background-color:  white;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+
+.answer-card:hover{
+    cursor: pointer;
+}
+

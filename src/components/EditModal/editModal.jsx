@@ -13,7 +13,7 @@ const EditModal = ({ questionObj, updateInput, handleSubmit }) => {
       aria-hidden="true"
     >
       <div className="modal-dialog modal-xl">
-        <div className="modal-content">
+        <div className="modal-content modal-edit-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5" id="exampleModalLabel">
             Edit Question
@@ -25,10 +25,27 @@ const EditModal = ({ questionObj, updateInput, handleSubmit }) => {
               aria-label="Close"
             ></button>
           </div>
-          <div className="modal-body">
+          <div className="modal-body modal-edit-body">
             <>
              
               <div className="">
+              <div className="mb-3 ">
+                  <label
+                    htmlFor="exampleFormControlInput1"
+                    className="form-label"
+                  >
+                    Genre
+                  </label>
+                  <input
+                    value={questionObj.genre}
+                    onChange={updateInput}
+                    name="genre"
+                    type="text"
+                    className="form-control"
+                    id="exampleFormControlInput1"
+                    placeholder="Ex: Biology"
+                  />
+                </div>
                 <div className="mb-3 ">
                   <label
                     htmlFor="exampleFormControlInput1"

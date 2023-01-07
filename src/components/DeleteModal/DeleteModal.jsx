@@ -1,3 +1,5 @@
+import "./DeleteModal.css";
+
 const DeleteModal = ({deleteQuestion,toDelete}) => {
     return(
         <div
@@ -8,7 +10,7 @@ const DeleteModal = ({deleteQuestion,toDelete}) => {
         aria-hidden="true"
       >
         <div className="modal-dialog">
-          <div className="modal-content">
+          <div className="modal-content modal-del-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
                 Deletion Confirmation
@@ -20,7 +22,7 @@ const DeleteModal = ({deleteQuestion,toDelete}) => {
                 aria-label="Close"
               ></button>
             </div>
-            <div className="modal-body">
+            <div className="modal-body modal-del-body">
               Are you sure you want to delete this <br />{" "}
               <strong>{toDelete.question}</strong>?
             </div>

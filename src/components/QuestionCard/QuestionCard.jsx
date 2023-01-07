@@ -3,14 +3,14 @@ import "./QuestionCard.css";
 
 const QuestionCard = ({ questionObj, setToDelete, setToEdit }) => {
   const [isClicked,setIsClicked] = useState(false)
-  const { id, question, created, answer } = questionObj;
+  const { id, question, created, answer,genre } = questionObj;
   return (
     <>
       <div className="list">
         <div className="card  questionCard  mb-3">
           <div className="card-body">
             <div className="card-content" >
-              <h5 className="card-title">Card {id}</h5>
+              <h5 className="card-title"> {genre}</h5>
               <p className="card-text">{!isClicked ? question:`Answer : ${answer}`}</p>
               <p>{created.slice(0, 10)}</p>
             </div>

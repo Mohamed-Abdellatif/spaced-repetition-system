@@ -1,31 +1,36 @@
 import { useState, useEffect } from "react";
-
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
 import axios from "axios";
 import "./questionList.css";
 
 import AddModal from "../AddModal/AddModal";
 
 import Spinner from "../Spinner/spinner";
-import List from "../List/List";
+import List from "../ViewQuestionsList/List";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import NotificationToast from "../Toast/toast";
 
 import EditModal from "../EditModal/editModal";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
+
 const dataURL = "http://localhost:3001";
 
 const QuestionList = () => {
-  const {currentUser} = useContext(UserContext)
+  const { currentUser } = useContext(UserContext);
+
   const [loading, setLoading] = useState(true);
   const [toEdit, setToEdit] = useState({
     question: "",
     difficulty: "",
     answer: "",
+    genre: "",
   });
   const [response, setResponse] = useState("");
   const [toDelete, setToDelete] = useState({});
   const [questions, setQuestions] = useState([]);
+  const [allQuestions, setAllQuestions] = useState([]);
   const [questionsToShow, setQuestionsToShow] = useState(10);
   const [query, setQuery] = useState({ text: "" });
   const [questionsLength, setQuestionsLength] = useState(0);
@@ -34,39 +39,49 @@ const QuestionList = () => {
     question: "",
     difficulty: "",
     answer: "",
-    userId:''
+    userId: "",
+    genre: "",
   });
-
-  
-
-  
+  const [currentGenre, setCurrentGenre] = useState("All");
 
   const handleSearchUpdate = (e) => {
     setQuery({ text: e.target.value });
   };
-  
+
   const handleSearchClick = async () => {
-    if(currentUser){
-    try {
-      const response = await axios.post(
-        `${dataURL}/searchQuestions/${query.text}`,{userId:currentUser.uid}
-      );
-      setQuestions(response.data);
-    } catch (err) {
-      console.log(err);
-    }}
+    if (currentUser) {
+      try {
+        const response = await axios.post(
+          `${dataURL}/searchQuestions/${query.text}`,
+          { userId: currentUser.uid }
+        );
+        setQuestions(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
   };
-  
 
   const getData = async () => {
     try {
       setLoading(true);
-      const response = await axios.post(
-        `${dataURL}/getQuestions`,{questionsNumber:questionsToShow,userId:currentUser.uid}
-      );
-      const lengthResponse = await axios.post(`${dataURL}/questionsLength`,{userId:currentUser.uid});
+      const response = await axios.post(`${dataURL}/getQuestions`, {
+        questionsNumber: questionsToShow,
+        userId: currentUser.uid,
+      });
+      const lengthResponse = await axios.post(`${dataURL}/questionsLength`, {
+        userId: currentUser.uid,
+      });
       setQuestionsLength(lengthResponse.data);
-      setQuestions(response.data);
+      setAllQuestions(response.data)
+      if (currentGenre === "All") {
+        setQuestions(response.data);
+      } else {
+        setQuestions(
+          response.data.filter((question) => currentGenre === question.genre)
+        );
+      }
+
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -76,6 +91,10 @@ const QuestionList = () => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    getData();
+    
+  }, [currentGenre]);
   useEffect(() => {
     if (query.text.length > 0) {
       handleSearchClick();
@@ -135,30 +154,38 @@ const QuestionList = () => {
     }
   };
   //
-  
+
   //add
 
   const updateAddInput = (e) => {
     setQuestionObj({
       ...questionObj,
       [e.target.name]: e.target.value,
-      userId:currentUser.uid
-      
+      userId: currentUser.uid,
     });
   };
 
   const handleAddSubmit = async () => {
     const response = await axios.post(`${dataURL}/questions`, questionObj);
-    
+
     getData();
     setQuestionObj({
       question: "",
       difficulty: "",
       answer: "",
+      genre: "",
     });
     setResponse(response.data);
     setIsNotificationVisible(true);
   };
+
+  const genres = [].concat(allQuestions.map((question) => question.genre));
+  let filteredArray = [];
+  for (let i = 0; i < genres.length; i++) {
+    if (!filteredArray.includes(genres[i])) {
+      filteredArray.push(genres[i]);
+    }
+  }
 
   return (
     <>
@@ -194,6 +221,20 @@ const QuestionList = () => {
         </div>
         <div className="Count">
           {questions.length} from {questionsLength}
+          <DropdownButton
+            id="dropdown-basic-button"
+            title={currentGenre}
+            className="ms-3"
+          >
+            {questions &&
+              filteredArray.map((genre) => (
+                <Dropdown.Item onClick={() => setCurrentGenre(genre)}>
+                  {genre}
+                </Dropdown.Item>
+              ))}
+            <Dropdown.Divider />
+            <Dropdown.Item onClick={() => setCurrentGenre('All')}>All</Dropdown.Item>
+          </DropdownButton>
         </div>
       </div>
 
@@ -206,11 +247,15 @@ const QuestionList = () => {
             setToDelete={setToDelete}
           />
         </>
-      ) : currentUser ? (<div className="spinner"><Spinner /></div>
-        
-      ):<h3 className="spinner">Please Sign In</h3>}
+      ) : currentUser ? (
+        <div className="spinner">
+          <Spinner />
+        </div>
+      ) : (
+        <h3 className="spinner">Please Sign In</h3>
+      )}
 
-      {questions.length < 10 ? (
+      {questions.length < 10 || questionsLength===questions.length ? (
         ""
       ) : (
         <button

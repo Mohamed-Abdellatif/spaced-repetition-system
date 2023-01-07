@@ -3,6 +3,7 @@ import "./App.css";
 import NavBar from "./components/navbar/navbar";
 
 import QuestionList from "./components/questionList/questionList";
+import QuestionsQuiz from "./components/QuestionsQuiz/questionsQuiz";
 import Authentication from "./HH/authentication/authentication.component";
 
 const App = () => {
@@ -12,6 +13,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<QuestionList />} />
         <Route path="/login" element={<Authentication />} />
+        <Route path="/quiz/:genre" element={<QuestionsQuiz />} />
       </Routes>
     </>
   );

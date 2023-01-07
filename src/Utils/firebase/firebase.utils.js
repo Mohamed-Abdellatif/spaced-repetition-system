@@ -6,7 +6,8 @@ import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  
 } from "firebase/auth";
 
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
@@ -20,6 +21,7 @@ const firebaseConfig = {
   appId: "1:546063263217:web:567019fce9de2248fb9050",
 };
 
+// eslint-disable-next-line
 const firebaseApp = initializeApp(firebaseConfig);
 
 const googleProvider = new GoogleAuthProvider();
@@ -69,3 +71,7 @@ export const signInAuthUserWithEmailAndPassword= async(email,password)=>{
 
 
 export const signOutUser = async() => await signOut(auth)
+
+
+
+

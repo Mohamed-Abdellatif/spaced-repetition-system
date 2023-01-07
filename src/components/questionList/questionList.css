@@ -62,6 +62,7 @@ textarea{
 }
 
 .Count{
+    display: flex;
     color:black;
     font-size: 16px;
     text-align: start;
