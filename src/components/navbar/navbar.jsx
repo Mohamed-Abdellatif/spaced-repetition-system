@@ -64,9 +64,9 @@ const NavBar = () => {
             >
               <button
                 className="btn text-light"
-                
+                onClick={() => navigate("/schedule")}
               >
-                Quiz
+                Schedule
               </button>
               <Nav.Link href="#action2">Link</Nav.Link>
               <NavDropdown onClick={()=>setIsClicked(!isClicked)} title="Choose Genre" id="navbarScrollingDropdown">

@@ -93,23 +93,29 @@ const QuestionsQuiz = () => {
 
     const currentQuestionIndex = questions.indexOf(currentQuestion);
     const { nextTest, lastTested } = currentQuestion;
-    const daysBeforeNextTest = moment(nextTest).diff(moment(), "days");
+    const daysBeforeNextTest = moment(nextTest).format("Do MMMM YYYY");
     if (currentAnswer.toLowerCase() === currentQuestion.answer.toLowerCase()) {
       setIsChecked({});
       setIsNotificationVisible(true);
       setCurrentAnswer("");
       setResponse("Right Answer");
-      if (currentQuestion.nextTest && daysBeforeNextTest === 0) {
+      if (nextTest && daysBeforeNextTest === moment().format("Do MMMM YYYY")) {
         const nextTestDate = moment(nextTest).diff(moment(lastTested), "days");
-
+        
         await axios.put(`${dataURL}/questions/${currentQuestion.id}`, {
           nextTest: moment()
             .add(nextTestDate * 2, "days")
             .format(),
         });
-      } else {
+        await axios.put(`${dataURL}/questions/${currentQuestion.id}`, {
+          lastTested: moment().format(),
+        });
+      } else if(nextTest===null) {
         await axios.put(`${dataURL}/questions/${currentQuestion.id}`, {
           nextTest: moment().add(2, "days").format(),
+        });
+        await axios.put(`${dataURL}/questions/${currentQuestion.id}`, {
+          lastTested: moment().format(),
         });
       }
       if (currentQuestionIndex + 1 < questions.length) {
@@ -127,10 +133,14 @@ const QuestionsQuiz = () => {
         setIsNotificationVisible(true);
         setResponse("All Questions Are Done");
       }
+      await axios.put(`${dataURL}/questions/${currentQuestion.id}`, {
+        nextTest: moment().add(2, "days").format(),
+      });
+      await axios.put(`${dataURL}/questions/${currentQuestion.id}`, {
+        lastTested: moment().format(),
+      });
     }
-    await axios.put(`${dataURL}/questions/${currentQuestion.id}`, {
-      lastTested: new Date(),
-    });
+    
   };
 
   const handleRadioClick = (answer) => {
