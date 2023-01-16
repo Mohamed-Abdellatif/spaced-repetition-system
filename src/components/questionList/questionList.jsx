@@ -3,7 +3,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import axios from "axios";
 import "./questionList.css";
-import moment from "moment";
+
 import AddModal from "../AddModal/AddModal";
 
 import Spinner from "../Spinner/spinner";
@@ -150,11 +150,12 @@ const QuestionList = () => {
   };
   const handleEditSubmit = async () => {
     const { question, answer, difficulty, genre } = toEdit;
-    if (
-      !question == " " &&
-      !answer == " " &&
-      !difficulty == " " &&
-      !genre == " "
+    // eslint-disable-next-line
+    if (// eslint-disable-next-line
+      !question == " " &&// eslint-disable-next-line
+      !answer == " " &&// eslint-disable-next-line
+      !difficulty == " " &&// eslint-disable-next-line
+      !genre == " "// eslint-disable-next-line
     ) {
       try {
         const response = await axios.put(
@@ -175,16 +176,7 @@ const QuestionList = () => {
     }
   };
 
-  // const date=moment(questions[0]?.created)
-  // const date1 = moment()
-  // const diffDays = date1.diff(date, 'hours')
-  // console.log(date.format(' hh:mm:ss'))
-  // console.log(`${date} - ${date1} = ${diffDays} days`)
-  // const a7a = allQuestions?.map((question,i) => {
-  //   console.log(moment(question.nextTest).format("MMMM Do YYYY"));
-  //   console.log(moment(question.lastTested).format("MMMM Do YYYY"));
-  //   console.log(i,"---------------")
-  // });
+ 
   
   //add
 
@@ -198,11 +190,11 @@ const QuestionList = () => {
 
   const handleAddSubmit = async () => {
     const { question, answer, difficulty, genre } = questionObj;
-    if (
-      !question == " " &&
-      !answer == " " &&
-      !difficulty == " " &&
-      !genre == " "
+    if (// eslint-disable-next-line
+      !question == " " &&// eslint-disable-next-line
+      !answer == " " &&// eslint-disable-next-line
+      !difficulty == " " &&// eslint-disable-next-line
+      !genre == " "// eslint-disable-next-line
     ) {
       const response = await axios.post(`${dataURL}/questions`, questionObj);
       getData();

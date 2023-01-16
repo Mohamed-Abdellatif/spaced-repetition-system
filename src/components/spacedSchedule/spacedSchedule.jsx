@@ -26,12 +26,8 @@ const SpacedSchedule = () => {
 
       setQuestionsNextTest(
         nextTestResponse.data
-          .filter((kk) => kk.nextTest !== null)
-          .map((question) => {
-            if (question.nextTest) {
-              return question.nextTest;
-            }
-          })
+          .filter((question) => question.nextTest !== null)
+          .map((question) => question.nextTest)
       );
     } catch (err) {
       console.log(err);
@@ -54,14 +50,13 @@ const SpacedSchedule = () => {
   const nextTestDates = [...filteredArray].sort(
     (a, b) => a.slice(0, 2) - b.slice(0, 2)
   );
- 
+
   return (
     <>
       <div className="container">
         {nextTestDates.length &&
           nextTestDates.map((nextTest) => (
             <>
-              
               <div className="mb-3 date bg-success text-light">
                 {nextTest === moment().format("D MMMM YYYY")
                   ? "Today"
@@ -82,23 +77,12 @@ const SpacedSchedule = () => {
               <hr />
             </>
           ))}
-          <div className="mb-3 bg-success date text-light">
-                    Not Yet Detrmined
-                  </div>
-                  
+        <div className="mb-3 bg-success date text-light">Not Yet Detrmined</div>
+
         {questions.length &&
-          questions.map((question) => {
-            if (question.nextTest === null) {
-              return (
-                <>
-                  
-                  
-                  <div>{question.question}</div>
-                  
-                </>
-              );
-            }<hr />
-          })}
+          questions
+            .filter((question) => question.nextTest === null)
+            .map((question) => <div>{question.question}</div>)}
       </div>
     </>
   );
