@@ -72,7 +72,7 @@ const NavBar = () => {
               <NavDropdown onClick={()=>setIsClicked(!isClicked)} title="Choose Genre" id="navbarScrollingDropdown">
                 {questions &&
                   filteredArray.map((genre) => (
-                    <NavDropdown.Item onClick={()=>navigate(`/quiz/${genre}`)}>
+                    <NavDropdown.Item key={genre} onClick={()=>navigate(`/quiz/${genre}`)}>
                       {genre}
                     </NavDropdown.Item>
                   ))}

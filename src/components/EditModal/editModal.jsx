@@ -1,8 +1,23 @@
 import "./editModal.css";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import MCQInput from "../MCQInput/MCQInput";
 
 
-const EditModal = ({ questionObj, updateInput, handleSubmit }) => {
-  
+const EditModal = ({ questionObj, updateInput, handleSubmit,setQuestionObj }) => {
+  const { question, answer, difficulty, genre, questionType, choices } =
+  questionObj;
+  const handleQuestionTypeChange = (questionType) => {
+    setQuestionObj({ ...questionObj, questionType: questionType });
+  };
+  const updateChoices = (e) => {
+    
+    setQuestionObj({
+      ...questionObj,
+      choices: { ...choices, [e.target.name]: e.target.value },
+    });
+    
+  };
   
   return (<>
     <div
@@ -64,6 +79,40 @@ const EditModal = ({ questionObj, updateInput, handleSubmit }) => {
                   />
                 </div>
                 <div className="mb-3 ">
+                    <label
+                      htmlFor="exampleFormControlInput1"
+                      className="form-label"
+                    >
+                      Question Type
+                    </label>
+                    <DropdownButton
+                      id="dropdown-basic-button"
+                      title={questionObj.questionType}
+                      className="ms-3"
+                    >
+                      {questionObj.questionType==="MCQ"?"":<Dropdown.Item
+                        onClick={() => handleQuestionTypeChange("MCQ")}
+                      >
+                        MCQ
+                      </Dropdown.Item>}
+                      {questionObj.questionType==="Short Response"?"":<Dropdown.Item
+                        onClick={() => handleQuestionTypeChange("Short Response")}
+                      >
+                        Short Response
+                      </Dropdown.Item>}
+                      {questionObj.questionType==="Complete"?"":<Dropdown.Item
+                        onClick={() => handleQuestionTypeChange("Complete")}
+                      >
+                        Complete
+                      </Dropdown.Item>}
+                      {questionObj.questionType==="True or false"?"":<Dropdown.Item
+                        onClick={() => handleQuestionTypeChange("True or false")}
+                      >
+                        True or false
+                      </Dropdown.Item>}
+                    </DropdownButton>
+                  </div>
+                <div className="mb-3 ">
                   <label
                     htmlFor="exampleFormControlInput1"
                     className="form-label"
@@ -95,6 +144,9 @@ const EditModal = ({ questionObj, updateInput, handleSubmit }) => {
                     id="exampleFormControlTextarea1"
                     rows="3"
                   ></textarea>
+                  {questionType === "MCQ" && (
+                     <MCQInput updateChoices={updateChoices} choices={choices}/>
+                    )}
                 </div>
                 <div className="btn-container"></div>
               </div>
@@ -111,7 +163,14 @@ const EditModal = ({ questionObj, updateInput, handleSubmit }) => {
             </button>
             <button
               className="btn btn-primary"
-              data-bs-dismiss="modal"
+              data-bs-dismiss={
+                !question == "" &&
+                !answer == "" &&
+                !difficulty == "" &&
+                !genre == ""
+                  ? "modal"
+                  : ""
+              }
               onClick={ handleSubmit}
             >
               Edit Question

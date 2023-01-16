@@ -1,9 +1,10 @@
+import moment from "moment/moment";
 import { useState } from "react";
 import "./QuestionCard.css";
 
 const QuestionCard = ({ questionObj, setToDelete, setToEdit }) => {
   const [isClicked,setIsClicked] = useState(false)
-  const { id, question, created, answer,genre } = questionObj;
+  const {  question, created, answer,genre } = questionObj;
   return (
     <>
       <div className="list">
@@ -12,7 +13,7 @@ const QuestionCard = ({ questionObj, setToDelete, setToEdit }) => {
             <div className="card-content" >
               <h5 className="card-title"> {genre}</h5>
               <p className="card-text">{!isClicked ? question:`Answer : ${answer}`}</p>
-              <p>{created.slice(0, 10)}</p>
+              <p>{moment(created).format('MMMM Do YYYY')}</p>
             </div>
 
             <div className="crud">

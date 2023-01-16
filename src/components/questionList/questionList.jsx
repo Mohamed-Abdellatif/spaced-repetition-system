@@ -3,7 +3,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import axios from "axios";
 import "./questionList.css";
-
+import moment from "moment";
 import AddModal from "../AddModal/AddModal";
 
 import Spinner from "../Spinner/spinner";
@@ -26,6 +26,7 @@ const QuestionList = () => {
     difficulty: "",
     answer: "",
     genre: "",
+    questionType: "",
   });
   const [response, setResponse] = useState("");
   const [toDelete, setToDelete] = useState({});
@@ -41,6 +42,12 @@ const QuestionList = () => {
     answer: "",
     userId: "",
     genre: "",
+    questionType: "MCQ",
+    choices: {
+      choice1: "",
+      choice2: "",
+      choice3: "",
+    },
   });
   const [currentGenre, setCurrentGenre] = useState("All");
 
@@ -69,16 +76,19 @@ const QuestionList = () => {
         questionsNumber: questionsToShow,
         userId: currentUser.uid,
       });
+      const allResponse = await axios.post(`${dataURL}/getQuestions`, {
+        userId: currentUser.uid,
+      });
       const lengthResponse = await axios.post(`${dataURL}/questionsLength`, {
         userId: currentUser.uid,
       });
       setQuestionsLength(lengthResponse.data);
-      setAllQuestions(response.data)
+      setAllQuestions(allResponse.data);
       if (currentGenre === "All") {
         setQuestions(response.data);
       } else {
         setQuestions(
-          response.data.filter((question) => currentGenre === question.genre)
+          allResponse.data.filter((question) => currentGenre === question.genre)
         );
       }
 
@@ -93,7 +103,7 @@ const QuestionList = () => {
   }, []);
   useEffect(() => {
     getData();
-    
+    // eslint-disable-next-line
   }, [currentGenre]);
   useEffect(() => {
     if (query.text.length > 0) {
@@ -139,22 +149,43 @@ const QuestionList = () => {
     });
   };
   const handleEditSubmit = async () => {
-    try {
-      const response = await axios.put(
-        `${dataURL}/questions/${toEdit.id}`,
-        toEdit
-      );
-      setResponse(response.data);
-      getData();
-      setIsNotificationVisible(true);
-    } catch (err) {
-      console.log(err);
-      setResponse("Error please try again later");
+    const { question, answer, difficulty, genre } = toEdit;
+    if (
+      !question == " " &&
+      !answer == " " &&
+      !difficulty == " " &&
+      !genre == " "
+    ) {
+      try {
+        const response = await axios.put(
+          `${dataURL}/questions/${toEdit.id}`,
+          toEdit
+        );
+        setResponse(response.data);
+        getData();
+        setIsNotificationVisible(true);
+      } catch (err) {
+        console.log(err);
+        setResponse("Error please try again later");
+        setIsNotificationVisible(true);
+      }
+    } else {
+      setResponse("Please complete the blanks");
       setIsNotificationVisible(true);
     }
   };
-  //
 
+  // const date=moment(questions[0]?.created)
+  // const date1 = moment()
+  // const diffDays = date1.diff(date, 'hours')
+  // console.log(date.format(' hh:mm:ss'))
+  // console.log(`${date} - ${date1} = ${diffDays} days`)
+  // const a7a = allQuestions?.map((question,i) => {
+  //   console.log(moment(question.nextTest).format("MMMM Do YYYY"));
+  //   console.log(moment(question.lastTested).format("MMMM Do YYYY"));
+  //   console.log(i,"---------------")
+  // });
+  
   //add
 
   const updateAddInput = (e) => {
@@ -166,17 +197,33 @@ const QuestionList = () => {
   };
 
   const handleAddSubmit = async () => {
-    const response = await axios.post(`${dataURL}/questions`, questionObj);
-
-    getData();
-    setQuestionObj({
-      question: "",
-      difficulty: "",
-      answer: "",
-      genre: "",
-    });
-    setResponse(response.data);
-    setIsNotificationVisible(true);
+    const { question, answer, difficulty, genre } = questionObj;
+    if (
+      !question == " " &&
+      !answer == " " &&
+      !difficulty == " " &&
+      !genre == " "
+    ) {
+      const response = await axios.post(`${dataURL}/questions`, questionObj);
+      getData();
+      setQuestionObj({
+        question: "",
+        difficulty: "",
+        answer: "",
+        genre: "",
+        questionType: "MCQ",
+        choices: {
+          choice1: "",
+          choice2: "",
+          choice3: "",
+        },
+      });
+      setResponse(response.data);
+      setIsNotificationVisible(true);
+    } else {
+      setResponse("Please complete the blanks");
+      setIsNotificationVisible(true);
+    }
   };
 
   const genres = [].concat(allQuestions.map((question) => question.genre));
@@ -233,7 +280,9 @@ const QuestionList = () => {
                 </Dropdown.Item>
               ))}
             <Dropdown.Divider />
-            <Dropdown.Item onClick={() => setCurrentGenre('All')}>All</Dropdown.Item>
+            <Dropdown.Item onClick={() => setCurrentGenre("All")}>
+              All
+            </Dropdown.Item>
           </DropdownButton>
         </div>
       </div>
@@ -255,7 +304,7 @@ const QuestionList = () => {
         <h3 className="spinner">Please Sign In</h3>
       )}
 
-      {questions.length < 10 || questionsLength===questions.length ? (
+      {questions.length < 10 || questionsLength === questions.length ? (
         ""
       ) : (
         <button
@@ -267,6 +316,7 @@ const QuestionList = () => {
       )}
 
       <AddModal
+        setQuestionObj={setQuestionObj}
         questionObj={questionObj}
         handleSubmit={handleAddSubmit}
         updateInput={updateAddInput}
@@ -278,6 +328,7 @@ const QuestionList = () => {
         response={response}
       />
       <EditModal
+        setQuestionObj={setToEdit}
         questionObj={toEdit}
         handleSubmit={handleEditSubmit}
         updateInput={updateInput}
