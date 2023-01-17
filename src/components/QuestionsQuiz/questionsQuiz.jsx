@@ -45,7 +45,7 @@ const QuestionsQuiz = () => {
   const getData = async () => {
     try {
       const response = await axios.post(`${dataURL}/getQuestions`, {
-        userId: currentUser.uid,
+        userId: currentUser?.uid,
       });
       if (genre === "all") {
         setQuestions(shuffle(response.data));
@@ -100,8 +100,10 @@ const QuestionsQuiz = () => {
       setCurrentAnswer("");
       setResponse("Right Answer");
       if (nextTest && daysBeforeNextTest === moment().format("Do MMMM YYYY")) {
-        const nextTestDate = moment(nextTest).diff(moment(lastTested), "days");
-        
+        const nextTestDate = moment(
+          moment(nextTest).format("D MMMM YYYY")
+        ).diff(moment(moment(lastTested).format("D MMMM YYYY")), "days");
+
         await axios.put(`${dataURL}/questions/${currentQuestion.id}`, {
           nextTest: moment()
             .add(nextTestDate * 2, "days")
@@ -110,7 +112,7 @@ const QuestionsQuiz = () => {
         await axios.put(`${dataURL}/questions/${currentQuestion.id}`, {
           lastTested: moment().format(),
         });
-      } else if(nextTest===null) {
+      } else if (nextTest === null) {
         await axios.put(`${dataURL}/questions/${currentQuestion.id}`, {
           nextTest: moment().add(2, "days").format(),
         });
@@ -140,7 +142,6 @@ const QuestionsQuiz = () => {
         lastTested: moment().format(),
       });
     }
-    
   };
 
   const handleRadioClick = (answer) => {

@@ -14,12 +14,12 @@ const SpacedSchedule = () => {
   const getData = async () => {
     try {
       const response = await axios.post(`${dataURL}/getQuestions`, {
-        userId: currentUser.uid,
+        userId: currentUser?.uid,
       });
       const nextTestResponse = await axios.post(
         `${dataURL}/questionsNextTest`,
         {
-          userId: currentUser.uid,
+          userId: currentUser?.uid,
         }
       );
       setQuestions(response.data);
@@ -51,18 +51,22 @@ const SpacedSchedule = () => {
     (a, b) => a.slice(0, 2) - b.slice(0, 2)
   );
 
+  const notDeterminedQuestions = questions.filter(
+    (question) => question.nextTest === null
+  );
+
   return (
     <>
       <div className="container">
-        {nextTestDates.length &&
-          nextTestDates.map((nextTest) => (
+        {nextTestDates.length!==0 &&
+          nextTestDates.map((nextTest,i) => (
             <>
-              <div className="mb-3 date bg-success text-light">
+              <div key={i} className="mb-3 date bg-success text-light">
                 {nextTest === moment().format("D MMMM YYYY")
                   ? "Today"
                   : moment(nextTest).format("MMMM Do YYYY")}
               </div>
-              {questions.length &&
+              {questions.length !==0 &&
                 questions
                   .filter(
                     (question) =>
@@ -77,12 +81,12 @@ const SpacedSchedule = () => {
               <hr />
             </>
           ))}
-        <div className="mb-3 bg-success date text-light">Not Yet Detrmined</div>
+        {notDeterminedQuestions.length!==0 && <div className="mb-3 bg-success date text-light">Not Yet Detrmined</div>}
 
-        {questions.length &&
-          questions
-            .filter((question) => question.nextTest === null)
-            .map((question) => <div>{question.question}</div>)}
+        {questions.length!==0 &&
+          notDeterminedQuestions.map((question) => (
+            <div>{question.question}</div>
+          ))}
       </div>
     </>
   );

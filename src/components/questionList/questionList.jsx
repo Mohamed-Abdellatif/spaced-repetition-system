@@ -60,7 +60,7 @@ const QuestionList = () => {
       try {
         const response = await axios.post(
           `${dataURL}/searchQuestions/${query.text}`,
-          { userId: currentUser.uid }
+          { userId: currentUser?.uid }
         );
         setQuestions(response.data);
       } catch (err) {
@@ -74,13 +74,13 @@ const QuestionList = () => {
       setLoading(true);
       const response = await axios.post(`${dataURL}/getQuestions`, {
         questionsNumber: questionsToShow,
-        userId: currentUser.uid,
+        userId: currentUser?.uid,
       });
       const allResponse = await axios.post(`${dataURL}/getQuestions`, {
-        userId: currentUser.uid,
+        userId: currentUser?.uid,
       });
       const lengthResponse = await axios.post(`${dataURL}/questionsLength`, {
-        userId: currentUser.uid,
+        userId: currentUser?.uid,
       });
       setQuestionsLength(lengthResponse.data);
       setAllQuestions(allResponse.data);
@@ -184,7 +184,7 @@ const QuestionList = () => {
     setQuestionObj({
       ...questionObj,
       [e.target.name]: e.target.value,
-      userId: currentUser.uid,
+      userId: currentUser?.uid,
     });
   };
 
@@ -267,7 +267,7 @@ const QuestionList = () => {
           >
             {questions &&
               filteredArray.map((genre) => (
-                <Dropdown.Item onClick={() => setCurrentGenre(genre)}>
+                <Dropdown.Item key={genre} onClick={() => setCurrentGenre(genre)}>
                   {genre}
                 </Dropdown.Item>
               ))}
