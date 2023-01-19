@@ -24,6 +24,7 @@ const NavBar = () => {
   };
 
   const getData = async () => {
+    if(!currentUser)return
     try {
       const response = await axios.post(`${dataURL}/getQuestions`, {
         userId: currentUser?.uid,

@@ -14,11 +14,15 @@ import NotificationToast from "../Toast/toast";
 import EditModal from "../EditModal/editModal";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../Utils/firebase/firebase.utils";
+
 
 const dataURL = "http://localhost:3001";
 
 const QuestionList = () => {
-  const { currentUser } = useContext(UserContext);
+  
+  const { currentUser,setCurrentUser } = useContext(UserContext);
 
   const [loading, setLoading] = useState(true);
   const [toEdit, setToEdit] = useState({
@@ -70,6 +74,7 @@ const QuestionList = () => {
   };
 
   const getData = async () => {
+    if(!currentUser)return
     try {
       setLoading(true);
       const response = await axios.post(`${dataURL}/getQuestions`, {
@@ -135,11 +140,28 @@ const QuestionList = () => {
       setQuestionsToShow(questionsToShow + 5);
     }
   };
-
   useEffect(() => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [questionsToShow]);
+  
+  useEffect(() => {
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser]);
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        // User present
+        setCurrentUser(currentUser)
+        // redirect to home if user is on /login page 
+      } else {
+        // User not logged in
+        // redirect to login if on a protected page 
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // edit
   const updateInput = (e) => {

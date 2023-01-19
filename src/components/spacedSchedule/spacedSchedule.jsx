@@ -1,17 +1,20 @@
 import axios from "axios";
+import { onAuthStateChanged } from "firebase/auth";
 import moment from "moment";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../contexts/user.context";
+import { auth } from "../../Utils/firebase/firebase.utils";
 import "./spacedSchedule.css";
 
 const dataURL = "http://localhost:3001";
 
 const SpacedSchedule = () => {
-  const { currentUser } = useContext(UserContext);
+  const { currentUser,setCurrentUser } = useContext(UserContext);
   const [questions, setQuestions] = useState([]);
   const [questionsNextTest, setQuestionsNextTest] = useState([]);
 
   const getData = async () => {
+    if(!currentUser)return
     try {
       const response = await axios.post(`${dataURL}/getQuestions`, {
         userId: currentUser?.uid,
@@ -33,6 +36,26 @@ const SpacedSchedule = () => {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser]);
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        // User present
+        setCurrentUser(currentUser)
+        // redirect to home if user is on /login page 
+      } else {
+        // User not logged in
+        // redirect to login if on a protected page 
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   useEffect(() => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,8 +83,8 @@ const SpacedSchedule = () => {
       <div className="container">
         {nextTestDates.length!==0 &&
           nextTestDates.map((nextTest,i) => (
-            <>
-              <div key={i} className="mb-3 date bg-success text-light">
+            <div key={i}>
+              <div  className="mb-3 date bg-success text-light">
                 {nextTest === moment().format("D MMMM YYYY")
                   ? "Today"
                   : moment(nextTest).format("MMMM Do YYYY")}
@@ -79,13 +102,13 @@ const SpacedSchedule = () => {
                     </div>
                   ))}
               <hr />
-            </>
+            </div>
           ))}
         {notDeterminedQuestions.length!==0 && <div className="mb-3 bg-success date text-light">Not Yet Detrmined</div>}
 
         {questions.length!==0 &&
           notDeterminedQuestions.map((question) => (
-            <div>{question.question}</div>
+            <div key ={question.id}>{question.question}</div>
           ))}
       </div>
     </>

@@ -8,12 +8,14 @@ import { useParams } from "react-router-dom";
 import NotificationToast from "../Toast/toast";
 import ChoicesList from "../ChoicesList/ChoicesList";
 import moment from "moment/moment";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../Utils/firebase/firebase.utils";
 
 const dataURL = "http://localhost:3001";
 
 const QuestionsQuiz = () => {
   const { genre } = useParams();
-  const { currentUser } = useContext(UserContext);
+  const { currentUser,setCurrentUser } = useContext(UserContext);
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState([]);
   const [currentAnswer, setCurrentAnswer] = useState("");
@@ -43,6 +45,7 @@ const QuestionsQuiz = () => {
   }
 
   const getData = async () => {
+    if(!currentUser)return
     try {
       const response = await axios.post(`${dataURL}/getQuestions`, {
         userId: currentUser?.uid,
@@ -73,6 +76,23 @@ const QuestionsQuiz = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [questions]);
+  useEffect(() => {
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser]);
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        // User present
+        setCurrentUser(currentUser)
+        // redirect to home if user is on /login page 
+      } else {
+        // User not logged in
+        // redirect to login if on a protected page 
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (currentQuestion && currentQuestion.questionType === "MCQ") {
