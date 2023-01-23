@@ -7,7 +7,7 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
-import { signOutUser } from "../../Utils/firebase/firebase.utils";
+import { getDisplayNameFromDocument, signOutUser } from "../../Utils/firebase/firebase.utils";
 import "./navbar.css";
 
 const dataURL = "http://localhost:3001";
@@ -16,6 +16,8 @@ const NavBar = () => {
   const { currentUser, setCurrentUser } = useContext(UserContext);
   const [isClicked, setIsClicked] = useState(false);
   const [questions, setQuestions] = useState([]);
+  const [listNames, setListNames] = useState([]);
+  const [displayName, setDisplayName] = useState('');
 
   const signOutHandler = async () => {
     await signOutUser();
@@ -26,9 +28,12 @@ const NavBar = () => {
   const getData = async () => {
     if(!currentUser)return
     try {
+
       const response = await axios.post(`${dataURL}/getQuestions`, {
         userId: currentUser?.uid,
       });
+      const listResponse = await axios.post(`${dataURL}/getLists`)
+      setListNames([].concat(listResponse.data.map(list=>list.listName)))
 
       setQuestions(response.data);
     } catch (error) {
@@ -48,13 +53,20 @@ const NavBar = () => {
     }
     
   }
+  const getDisplayName=async()=>{const displayName = await  getDisplayNameFromDocument()
+  setDisplayName( displayName[currentUser?.email])}
+  useEffect(() => {
+    getDisplayName()
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser]);
+  
   return (
     <>
       <Navbar fixed="top" bg="primary" expand="lg" variant="dark">
         <Container fluid>
           <Navbar.Brand className="brand" onClick={() => navigate("/")}>
-            SPACED REPETITION SYSTEM{" "}
+            SPACED REPETITION SYSTEM
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
@@ -82,12 +94,17 @@ const NavBar = () => {
                   All
                 </NavDropdown.Item>
               </NavDropdown>
-              <Nav.Link href="#" disabled>
-                Link
-              </Nav.Link>
+              <NavDropdown onClick={()=>setIsClicked(!isClicked)} title="Lists" id="navbarScrollingDropdown">
+                {listNames &&
+                  listNames.map((listName) => (
+                    <NavDropdown.Item key={listName} onClick={()=>navigate(`/list/${listName}`)}>
+                      {listName}
+                    </NavDropdown.Item>
+                  ))}
+              </NavDropdown>
             </Nav>
             <div className="d-flex">
-              <div className="btn">{currentUser && currentUser.email}</div>
+              <div className="btn">{currentUser && displayName}</div>
               {currentUser ? (
                 <button
                   className="btn text-light"

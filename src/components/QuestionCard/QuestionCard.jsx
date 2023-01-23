@@ -2,7 +2,7 @@ import moment from "moment/moment";
 import { useState } from "react";
 import "./QuestionCard.css";
 
-const QuestionCard = ({ questionObj, setToDelete, setToEdit }) => {
+const QuestionCard = ({ questionObj, setToDelete, setToEdit,addToList }) => {
   const [isClicked,setIsClicked] = useState(false)
   const {  question, created, answer,genre } = questionObj;
   return (
@@ -18,10 +18,16 @@ const QuestionCard = ({ questionObj, setToDelete, setToEdit }) => {
 
             <div className="crud">
             <button
-                onClick={()=> setIsClicked(!isClicked)}
-                className="btn btn-secondary"
+                onClick={()=> addToList(questionObj)}
+                className="btn btn-success"
               >
-                <i className="fa-solid fa-eye"/>
+                Add To List
+           </button>
+            <button
+                onClick={()=> setIsClicked(!isClicked)}
+                className="btn btn-secondary ms-3"
+              >
+                <i className="fa-solid fa-eye "/>
               </button>
               <button
                 onClick={() => setToEdit(questionObj)}

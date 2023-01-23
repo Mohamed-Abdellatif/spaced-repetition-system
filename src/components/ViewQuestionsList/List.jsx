@@ -1,7 +1,7 @@
 import QuestionCard from "../QuestionCard/QuestionCard";
 import "./List.css";
 
-const List = ({ questions, setToDelete,setToEdit,toEdit }) => {
+const List = ({ questions, setToDelete,setToEdit,toEdit,addToList }) => {
   return (
     <>
       <div className="cards-container">
@@ -9,6 +9,8 @@ const List = ({ questions, setToDelete,setToEdit,toEdit }) => {
           questions
             .map((question) => (
               <QuestionCard
+              
+              addToList={addToList}
               setToEdit={setToEdit}
               toEdit={toEdit}
               questionObj={question}

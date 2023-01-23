@@ -17,12 +17,10 @@ import { UserContext } from "../../contexts/user.context";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../Utils/firebase/firebase.utils";
 
-
 const dataURL = "http://localhost:3001";
 
 const QuestionList = () => {
-  
-  const { currentUser,setCurrentUser } = useContext(UserContext);
+  const { currentUser, setCurrentUser } = useContext(UserContext);
 
   const [loading, setLoading] = useState(true);
   const [toEdit, setToEdit] = useState({
@@ -33,6 +31,7 @@ const QuestionList = () => {
     questionType: "",
   });
   const [response, setResponse] = useState("");
+
   const [toDelete, setToDelete] = useState({});
   const [questions, setQuestions] = useState([]);
   const [allQuestions, setAllQuestions] = useState([]);
@@ -74,7 +73,7 @@ const QuestionList = () => {
   };
 
   const getData = async () => {
-    if(!currentUser)return
+    if (!currentUser) return;
     try {
       setLoading(true);
       const response = await axios.post(`${dataURL}/getQuestions`, {
@@ -144,7 +143,7 @@ const QuestionList = () => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [questionsToShow]);
-  
+
   useEffect(() => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -153,13 +152,13 @@ const QuestionList = () => {
     onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         // User present
-        setCurrentUser(currentUser)
-        // redirect to home if user is on /login page 
+        setCurrentUser(currentUser);
+        // redirect to home if user is on /login page
       } else {
         // User not logged in
-        // redirect to login if on a protected page 
+        // redirect to login if on a protected page
       }
-    })
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -173,13 +172,15 @@ const QuestionList = () => {
   const handleEditSubmit = async () => {
     const { question, answer, difficulty, genre } = toEdit;
     // eslint-disable-next-line
-    if (// eslint-disable-next-line
-      !question == " " &&// eslint-disable-next-line
-      !answer == " " &&// eslint-disable-next-line
-      !difficulty == " " &&// eslint-disable-next-line
-      !genre == " "// eslint-disable-next-line
+    if (
+      // eslint-disable-next-line
+      !question == " " && // eslint-disable-next-line
+      !answer == " " && // eslint-disable-next-line
+      !difficulty == " " && // eslint-disable-next-line
+      !genre == " " // eslint-disable-next-line
     ) {
       try {
+        
         const response = await axios.put(
           `${dataURL}/questions/${toEdit.id}`,
           toEdit
@@ -198,8 +199,6 @@ const QuestionList = () => {
     }
   };
 
- 
-  
   //add
 
   const updateAddInput = (e) => {
@@ -212,11 +211,12 @@ const QuestionList = () => {
 
   const handleAddSubmit = async () => {
     const { question, answer, difficulty, genre } = questionObj;
-    if (// eslint-disable-next-line
-      !question == " " &&// eslint-disable-next-line
-      !answer == " " &&// eslint-disable-next-line
-      !difficulty == " " &&// eslint-disable-next-line
-      !genre == " "// eslint-disable-next-line
+    if (
+      // eslint-disable-next-line
+      !question == " " && // eslint-disable-next-line
+      !answer == " " && // eslint-disable-next-line
+      !difficulty == " " && // eslint-disable-next-line
+      !genre == " " // eslint-disable-next-line
     ) {
       const response = await axios.post(`${dataURL}/questions`, questionObj);
       getData();
@@ -247,6 +247,38 @@ const QuestionList = () => {
       filteredArray.push(genres[i]);
     }
   }
+  //add to list
+  const addToList = async (question) => {
+    try {
+      const response = await axios.post(`${dataURL}/getListQuestions`, { listName: "hhh "});
+
+      if (response.data[0].questions !== null) {
+        if (Array.isArray(response.data[0].questions) === false) {
+          if (response.data[0].questions.id !== question.id) {
+            await axios.put(`${dataURL}/lists/20`, {
+              questions: [response.data[0].questions, question],
+            });
+          }
+        } else {
+          if (
+            ![]
+              .concat(response.data[0].questions.map((question) => question.id))
+              .includes(question.id)
+          ) {
+            const requestions = response.data[0].questions;
+
+            await axios.put(`${dataURL}/lists/20`, {
+              questions: requestions.concat(question),
+            });
+          }
+        }
+      } else {
+        await axios.put(`${dataURL}/lists/20`, { questions: question });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <>
@@ -289,7 +321,10 @@ const QuestionList = () => {
           >
             {questions &&
               filteredArray.map((genre) => (
-                <Dropdown.Item key={genre} onClick={() => setCurrentGenre(genre)}>
+                <Dropdown.Item
+                  key={genre}
+                  onClick={() => setCurrentGenre(genre)}
+                >
                   {genre}
                 </Dropdown.Item>
               ))}
@@ -304,6 +339,7 @@ const QuestionList = () => {
       {!loading && currentUser ? (
         <>
           <List
+            addToList={addToList}
             setToEdit={setToEdit}
             toEdit={toEdit}
             questions={questions}

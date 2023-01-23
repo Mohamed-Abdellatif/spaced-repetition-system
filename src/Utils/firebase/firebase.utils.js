@@ -8,9 +8,10 @@ import {
   signInWithEmailAndPassword,
   signOut,
   
+  
 } from "firebase/auth";
 
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCLzv0JpUUtahk7z1hlu8gkwKMQzdETQKI",
@@ -48,11 +49,13 @@ export const createUserDocumentFromAuth = async(userAuth,additionalInfo) => {
         const createdAt = new Date();
         try{
             await setDoc(userDocRef,{
-                displayName,
+                displayName:displayName,
                 email,
                 createdAt,
                 ...additionalInfo
             })
+           
+              
         }catch(err){
             console.log(err)
         }
@@ -69,9 +72,24 @@ export const signInAuthUserWithEmailAndPassword= async(email,password)=>{
     return await signInWithEmailAndPassword(auth,email,password)
 }
 
+export const getDisplayNameFromDocument = async () => {
+    const collectionRef = collection(db, 'users');
+    const q = query(collectionRef);
+  
+    const querySnapshot = await getDocs(q);
+    const  categoryMap =   querySnapshot.docs.reduce((acc, docSnapshot) => {
+        const { displayName,email} =  docSnapshot.data();
+        acc[email] = displayName;
+        return  acc
+      },{})
+     
+    return  categoryMap
+  }
+
 
 export const signOutUser = async() => await signOut(auth)
 
 
 
 
+ 
