@@ -1,15 +1,15 @@
 import axios from "axios";
-import { onAuthStateChanged } from "firebase/auth";
+
 import moment from "moment";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../contexts/user.context";
-import { auth } from "../../Utils/firebase/firebase.utils";
+
 import "./spacedSchedule.css";
 
 const dataURL = "http://localhost:3001";
 
 const SpacedSchedule = () => {
-  const { currentUser,setCurrentUser } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const [questions, setQuestions] = useState([]);
   const [questionsNextTest, setQuestionsNextTest] = useState([]);
 
@@ -41,19 +41,7 @@ const SpacedSchedule = () => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
-  useEffect(() => {
-    onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        // User present
-        setCurrentUser(currentUser)
-        // redirect to home if user is on /login page 
-      } else {
-        // User not logged in
-        // redirect to login if on a protected page 
-      }
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  
 
 
   useEffect(() => {

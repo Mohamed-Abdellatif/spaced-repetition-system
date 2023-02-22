@@ -8,6 +8,8 @@ const AddModal = ({
   updateInput,
   handleSubmit,
   setQuestionObj,
+  handleImageChange,
+  
 }) => {
   const { question, answer, difficulty, genre, questionType, choices } =
     questionObj;
@@ -15,14 +17,12 @@ const AddModal = ({
     setQuestionObj({ ...questionObj, questionType: questionType });
   };
   const updateChoices = (e) => {
-    
     setQuestionObj({
       ...questionObj,
       choices: { ...choices, [e.target.name]: e.target.value },
     });
-    
   };
-  
+
   return (
     <>
       <div
@@ -174,11 +174,20 @@ const AddModal = ({
                       rows="3"
                     ></textarea>
                     {questionType === "MCQ" && (
-                      <MCQInput updateChoices={updateChoices} choices={choices}/>
+                      <MCQInput
+                        updateChoices={updateChoices}
+                        choices={choices}
+                      />
                     )}
                   </div>
                   <div className="btn-container"></div>
                 </div>
+                
+                  <input type="file" 
+                  onChange={handleImageChange} 
+                  />
+                  
+                
               </>
             </div>
             <footer>
@@ -192,10 +201,11 @@ const AddModal = ({
                 </button>
                 <button
                   className="btn btn-primary"
-                  data-bs-dismiss={// eslint-disable-next-line
-                    !question == "" &&// eslint-disable-next-line
-                    !answer == "" &&// eslint-disable-next-line
-                    !difficulty == "" &&// eslint-disable-next-line
+                  data-bs-dismiss={
+                    // eslint-disable-next-line
+                    !question == "" && // eslint-disable-next-line
+                    !answer == "" && // eslint-disable-next-line
+                    !difficulty == "" && // eslint-disable-next-line
                     !genre == ""
                       ? "modal"
                       : ""

@@ -7,8 +7,9 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
-import { getDisplayNameFromDocument, signOutUser } from "../../Utils/firebase/firebase.utils";
+import { auth, getDisplayNameFromDocument, signOutUser } from "../../Utils/firebase/firebase.utils";
 import "./navbar.css";
+import { onAuthStateChanged } from "firebase/auth";
 
 const dataURL = "http://localhost:3001";
 const NavBar = () => {
@@ -18,6 +19,7 @@ const NavBar = () => {
   const [questions, setQuestions] = useState([]);
   const [listNames, setListNames] = useState([]);
   const [displayName, setDisplayName] = useState('');
+  
 
   const signOutHandler = async () => {
     await signOutUser();
@@ -32,7 +34,7 @@ const NavBar = () => {
       const response = await axios.post(`${dataURL}/getQuestions`, {
         userId: currentUser?.uid,
       });
-      const listResponse = await axios.post(`${dataURL}/getLists`)
+      const listResponse = await axios.post(`${dataURL}/getLists`,{userId:currentUser?.uid})
       setListNames([].concat(listResponse.data.map(list=>list.listName)))
 
       setQuestions(response.data);
@@ -60,6 +62,20 @@ const NavBar = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        // User present
+        setCurrentUser(currentUser);
+        // redirect to home if user is on /login page
+      } else {
+        // User not logged in
+        // redirect to login if on a protected page
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   return (
     <>
@@ -83,7 +99,7 @@ const NavBar = () => {
               </button>
               <Nav.Link href="#action2">Link</Nav.Link>
               <NavDropdown onClick={()=>setIsClicked(!isClicked)} title="Choose Genre" id="navbarScrollingDropdown">
-                {questions &&
+                {questions.length>0 &&
                   filteredArray.map((genre) => (
                     <NavDropdown.Item key={genre} onClick={()=>navigate(`/quiz/${genre}`)}>
                       {genre}
@@ -95,7 +111,7 @@ const NavBar = () => {
                 </NavDropdown.Item>
               </NavDropdown>
               <NavDropdown onClick={()=>setIsClicked(!isClicked)} title="Lists" id="navbarScrollingDropdown">
-                {listNames &&
+                {listNames.length>0 &&
                   listNames.map((listName) => (
                     <NavDropdown.Item key={listName} onClick={()=>navigate(`/list/${listName}`)}>
                       {listName}
@@ -104,7 +120,7 @@ const NavBar = () => {
               </NavDropdown>
             </Nav>
             <div className="d-flex">
-              <div className="btn">{currentUser && displayName}</div>
+              <div className="btn displayName">{currentUser && displayName}</div>
               {currentUser ? (
                 <button
                   className="btn text-light"

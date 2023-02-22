@@ -1,0 +1,9 @@
+.modal-list-body{
+    overflow-y: scroll;
+    
+}
+
+.modal-list-content{
+    height: 70vh;
+}
+

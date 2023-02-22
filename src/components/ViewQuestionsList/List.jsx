@@ -4,7 +4,7 @@ import "./List.css";
 const List = ({ questions, setToDelete,setToEdit,toEdit,addToList }) => {
   return (
     <>
-      <div className="cards-container">
+      <div className="">
         {questions.length > 0 ? (
           questions
             .map((question) => (

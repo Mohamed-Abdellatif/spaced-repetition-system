@@ -1,3 +1,7 @@
 .brand:hover{
     cursor: pointer;
 }
+
+.displayName{
+    text-transform: capitalize;
+}

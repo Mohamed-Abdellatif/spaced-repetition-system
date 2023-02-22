@@ -1,0 +1,15 @@
+.question-cards{
+margin-top:50px;
+}
+.listName{
+    text-align: center;
+    text-transform: capitalize;
+    display: flex;
+    justify-content: center;
+    
+
+}
+.editBtn{
+    border: 0cm;
+    background-color: whitesmoke;
+}

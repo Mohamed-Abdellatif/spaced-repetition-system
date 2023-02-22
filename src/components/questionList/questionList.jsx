@@ -14,14 +14,14 @@ import NotificationToast from "../Toast/toast";
 import EditModal from "../EditModal/editModal";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../Utils/firebase/firebase.utils";
+import AddToListModal from "../AddToListModal/AddToListModal";
 
 const dataURL = "http://localhost:3001";
 
 const QuestionList = () => {
-  const { currentUser, setCurrentUser } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
+  const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [toEdit, setToEdit] = useState({
     question: "",
@@ -33,6 +33,10 @@ const QuestionList = () => {
   const [response, setResponse] = useState("");
 
   const [toDelete, setToDelete] = useState({});
+  const [toBeAdded, setToBeAdded] = useState({});
+
+  const [lists, setLists] = useState({});
+  const [newListName, setNewListName] = useState("");
   const [questions, setQuestions] = useState([]);
   const [allQuestions, setAllQuestions] = useState([]);
   const [questionsToShow, setQuestionsToShow] = useState(10);
@@ -51,6 +55,7 @@ const QuestionList = () => {
       choice2: "",
       choice3: "",
     },
+    
   });
   const [currentGenre, setCurrentGenre] = useState("All");
 
@@ -88,6 +93,10 @@ const QuestionList = () => {
       });
       setQuestionsLength(lengthResponse.data);
       setAllQuestions(allResponse.data);
+      const listResponse = await axios.post(`${dataURL}/getLists`, {
+        userId: currentUser?.uid,
+      });
+      setLists(listResponse.data);
       if (currentGenre === "All") {
         setQuestions(response.data);
       } else {
@@ -98,7 +107,10 @@ const QuestionList = () => {
 
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      if ("Network Error" === error.message) {
+        setLoading(false);
+      }
+      console.log(error.message);
     }
   };
   useEffect(() => {
@@ -148,19 +160,14 @@ const QuestionList = () => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
-  useEffect(() => {
-    onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        // User present
-        setCurrentUser(currentUser);
-        // redirect to home if user is on /login page
-      } else {
-        // User not logged in
-        // redirect to login if on a protected page
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //insert image
+  const handleImageSubmit = async (question) => {
+    
+    const formData = new FormData();
+    formData.append("image", image);
+    const res=await axios.post(`${dataURL}/upload/${question}`, formData);
+    console.log(res.data)
+  };
 
   // edit
   const updateInput = (e) => {
@@ -180,12 +187,13 @@ const QuestionList = () => {
       !genre == " " // eslint-disable-next-line
     ) {
       try {
-        
         const response = await axios.put(
           `${dataURL}/questions/${toEdit.id}`,
           toEdit
         );
         setResponse(response.data);
+        if(image!==null){handleImageSubmit(question)}
+        setImage(null)
         getData();
         setIsNotificationVisible(true);
       } catch (err) {
@@ -219,7 +227,10 @@ const QuestionList = () => {
       !genre == " " // eslint-disable-next-line
     ) {
       const response = await axios.post(`${dataURL}/questions`, questionObj);
+      handleImageSubmit(question)
+      setImage(null)
       getData();
+      
       setQuestionObj({
         question: "",
         difficulty: "",
@@ -231,7 +242,9 @@ const QuestionList = () => {
           choice2: "",
           choice3: "",
         },
+       
       });
+       
       setResponse(response.data);
       setIsNotificationVisible(true);
     } else {
@@ -248,37 +261,54 @@ const QuestionList = () => {
     }
   }
   //add to list
-  const addToList = async (question) => {
+  const addToList = async (listName) => {
+    const { id } = toBeAdded;
     try {
-      const response = await axios.post(`${dataURL}/getListQuestions`, { listName: "hhh "});
+      const response = await axios.post(`${dataURL}/getListQuestions`, {
+        listName: listName,
+        userId: currentUser?.uid,
+      });
 
       if (response.data[0].questions !== null) {
-        if (Array.isArray(response.data[0].questions) === false) {
-          if (response.data[0].questions.id !== question.id) {
-            await axios.put(`${dataURL}/lists/20`, {
-              questions: [response.data[0].questions, question],
-            });
-          }
-        } else {
-          if (
-            ![]
-              .concat(response.data[0].questions.map((question) => question.id))
-              .includes(question.id)
-          ) {
-            const requestions = response.data[0].questions;
+        if (!response.data[0].questions.includes(id)) {
+          const requestions = response.data[0].questions;
 
-            await axios.put(`${dataURL}/lists/20`, {
-              questions: requestions.concat(question),
-            });
-          }
+          await axios.put(`${dataURL}/lists/${listName}`, {
+            questions: requestions.concat(id),
+            userId: currentUser?.uid,
+          });
         }
       } else {
-        await axios.put(`${dataURL}/lists/20`, { questions: question });
+        await axios.put(`${dataURL}/lists/${listName}`, {
+          questions: [id],
+          userId: currentUser?.uid,
+        });
       }
     } catch (err) {
       console.log(err);
     }
   };
+  const updateNewListInput = (e) => {
+    setNewListName(e.target.value);
+  };
+  const createNewList = async (newListName) => {
+    try {
+      setNewListName("");
+      await axios.post(`${dataURL}/lists`, {
+        listName: newListName,
+        userId: currentUser?.uid,
+      });
+      getData();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleImageChange = (event) => {
+    setImage(event.target.files[0]);
+  };
+
+  
 
   return (
     <>
@@ -338,13 +368,15 @@ const QuestionList = () => {
 
       {!loading && currentUser ? (
         <>
-          <List
-            addToList={addToList}
-            setToEdit={setToEdit}
-            toEdit={toEdit}
-            questions={questions}
-            setToDelete={setToDelete}
-          />
+          <div className="cards-container">
+            <List
+              addToList={setToBeAdded}
+              setToEdit={setToEdit}
+              toEdit={toEdit}
+              questions={questions}
+              setToDelete={setToDelete}
+            />
+          </div>
         </>
       ) : currentUser ? (
         <div className="spinner">
@@ -366,6 +398,8 @@ const QuestionList = () => {
       )}
 
       <AddModal
+        handleImageChange={handleImageChange}
+        
         setQuestionObj={setQuestionObj}
         questionObj={questionObj}
         handleSubmit={handleAddSubmit}
@@ -378,10 +412,18 @@ const QuestionList = () => {
         response={response}
       />
       <EditModal
+      handleImageChange={handleImageChange}
         setQuestionObj={setToEdit}
         questionObj={toEdit}
         handleSubmit={handleEditSubmit}
         updateInput={updateInput}
+      />
+      <AddToListModal
+        addToList={addToList}
+        lists={lists}
+        updateInput={updateNewListInput}
+        newListName={newListName}
+        createNewList={createNewList}
       />
     </>
   );

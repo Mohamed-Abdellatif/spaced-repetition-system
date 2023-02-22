@@ -1,18 +1,24 @@
 import axios from "axios";
 import { useContext, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
+import AddToListModal from "../AddToListModal/AddToListModal";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import EditModal from "../EditModal/editModal";
 import NotificationToast from "../Toast/toast";
 import List from "../ViewQuestionsList/List";
+import "./viewList.css";
 
 const dataURL = "http://localhost:3001";
 
 const ViewList = () => {
+  const navigate=useNavigate()
   const { listName } = useParams();
-  console.log(listName);
-  const { currentUser, setCurrentUser } = useContext(UserContext);
+  const [toBeAdded, setToBeAdded] = useState({});
+  const [lists, setLists] = useState({});
+  const [isClicked, setIsClicked] = useState(false);
+  const [editListName, setEditListName] = useState(listName);
+  const { currentUser } = useContext(UserContext);
   const [questions, setQuestions] = useState([]);
   const [toEdit, setToEdit] = useState({
     question: "",
@@ -22,6 +28,7 @@ const ViewList = () => {
     questionType: "",
   });
   const [toDelete, setToDelete] = useState({});
+  const [newListName, setNewListName] = useState("");
   const [response, setResponse] = useState("");
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
 
@@ -30,11 +37,18 @@ const ViewList = () => {
     try {
       const response = await axios.post(`${dataURL}/getListQuestions`, {
         listName: listName,
+        userId: currentUser?.uid,
       });
-      setQuestions(response.data[0].questions);
-      console.log(response.data[0].questions)
+      const listResponse = await axios.post(`${dataURL}/getLists`, {
+        userId: currentUser?.uid,
+      });
+      setLists(listResponse.data);
+      const res = await axios.post(`${dataURL}/getQuestionsById`, {
+        questionsList: response.data[0].questions,
+      });
+      setQuestions(res.data);
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
     }
   };
   useEffect(() => {
@@ -42,16 +56,26 @@ const ViewList = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listName]);
+
   //delete
   const deleteQuestion = async () => {
     try {
-      const response = await axios.delete(
-        `${dataURL}/questions/${toDelete.id}`
+      const response = await axios.post(`${dataURL}/getListQuestions`, {
+        listName: listName,
+        userId: currentUser?.uid,
+      });
+      const filtered = response.data[0].questions.filter(
+        (id) => id !== toDelete.id
       );
+      await axios.put(`${dataURL}/lists/${listName}`, {
+        questions: filtered,
+        userId: currentUser?.uid,
+      });
       getData();
       setIsNotificationVisible(true);
-      setResponse(response.data);
-    } catch {
+      setResponse("Deleted from the list");
+    } catch (err) {
+      console.log(err);
       setResponse("Error please try again later");
       setIsNotificationVisible(true);
     }
@@ -76,24 +100,6 @@ const ViewList = () => {
       !genre == " " // eslint-disable-next-line
     ) {
       try {
-        const listResponse = await axios.post(`${dataURL}/getListQuestions`, {
-          listName: "hhh ",
-        });
-        if(Array.isArray(listResponse.data[0].questions) === true){
-          const filtered = listResponse.data[0].questions.filter(
-            (question) => question.id !== toEdit.id
-          );
-          await axios.put(`${dataURL}/lists/20`, {
-            questions: filtered.concat(toEdit),
-          });
-        }else{
-          await axios.put(`${dataURL}/lists/20`, {
-            questions: toEdit,
-          });
-        }
-
-        
-
         const response = await axios.put(
           `${dataURL}/questions/${toEdit.id}`,
           toEdit
@@ -113,48 +119,103 @@ const ViewList = () => {
   };
 
   //add to list
-  const addToList = async (question) => {
+  const addToList = async (listNameToAdd) => {
+    const { id } = toBeAdded;
     try {
       const response = await axios.post(`${dataURL}/getListQuestions`, {
-        listName: "hhh ",
+        listName: listNameToAdd,
+        userId: currentUser?.uid,
       });
 
       if (response.data[0].questions !== null) {
-        if (Array.isArray(response.data[0].questions) === false) {
-          if (response.data[0].questions.id !== question.id) {
-            await axios.put(`${dataURL}/lists/20`, {
-              questions: [response.data[0].questions, question],
-            });
-          }
-        } else {
-          if (
-            ![]
-              .concat(response.data[0].questions.map((question) => question.id))
-              .includes(question.id)
-          ) {
-            const requestions = response.data[0].questions;
+        if (!response.data[0].questions.includes(id)) {
+          const requestions = response.data[0].questions;
 
-            await axios.put(`${dataURL}/lists/20`, {
-              questions: requestions.concat(question),
-            });
-          }
+          await axios.put(`${dataURL}/lists/${listNameToAdd}`, {
+            questions: requestions.concat(id),
+            userId: currentUser?.uid,
+          });
         }
       } else {
-        await axios.put(`${dataURL}/lists/20`, { questions: question });
+        await axios.put(`${dataURL}/lists/${listNameToAdd}`, {
+          questions: [id],
+          userId: currentUser?.uid,
+        });
       }
     } catch (err) {
       console.log(err);
     }
   };
+  const updateNewListInput = (e) => {
+    setNewListName(e.target.value);
+  };
+  const createNewList = async (newListName) => {
+    try {
+      setNewListName("");
+      await axios.post(`${dataURL}/lists`, {
+        listName: newListName,
+        userId: currentUser?.uid,
+      });
+      getData();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const updateListName = (e) => {
+    setEditListName(e.target.value);
+  };
+
+  const changeListName=async()=>{
+  await axios.put(`${dataURL}/lists/${listName}`, {
+    newListName:editListName,
+    userId: currentUser?.uid,
+  });
+  navigate(`/list/${editListName}`)
+  setIsClicked(!isClicked)
+  }
   return (
     <>
-      <List
-        addToList={addToList}
-        setToEdit={setToEdit}
-        toEdit={toEdit}
-        questions={questions}
-        setToDelete={setToDelete}
-      />
+      <div className="question-cards">
+        {!isClicked ? (
+          <div className="listName">
+            <h1>{listName}</h1>
+            <button
+              onClick={() => setIsClicked(!isClicked)}
+              className="editBtn text-primary"
+            >
+              Rename
+            </button>
+          </div>
+        ) : (
+          <div className="listName mb-3">
+            <input
+              type="text"
+              onChange={updateListName}
+              value={editListName}
+            />
+            <button
+              onClick={() => changeListName()}
+              className="btn btn-outline-primary ms-3"
+            >
+             Edit
+            </button>
+            <button
+              onClick={() => setIsClicked(!isClicked)}
+              className="btn btn-outline-secondary ms-3"
+            >
+             Cancel
+            </button>
+          </div>
+        )}
+        <List
+          addToList={setToBeAdded}
+          setToEdit={setToEdit}
+          toEdit={toEdit}
+          questions={questions}
+          setToDelete={setToDelete}
+        />
+      </div>
       <DeleteModal deleteQuestion={deleteQuestion} toDelete={toDelete} />
       <NotificationToast
         setShow={setIsNotificationVisible}
@@ -166,6 +227,13 @@ const ViewList = () => {
         questionObj={toEdit}
         handleSubmit={handleEditSubmit}
         updateInput={updateInput}
+      />
+      <AddToListModal
+        addToList={addToList}
+        lists={lists}
+        updateInput={updateNewListInput}
+        newListName={newListName}
+        createNewList={createNewList}
       />
     </>
   );
