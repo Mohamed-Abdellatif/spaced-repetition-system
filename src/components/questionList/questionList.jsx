@@ -62,7 +62,7 @@ const QuestionList = () => {
   const handleSearchUpdate = (e) => {
     setQuery({ text: e.target.value });
   };
-
+ 
   const handleSearchClick = async () => {
     if (currentUser) {
       try {
@@ -163,10 +163,11 @@ const QuestionList = () => {
   //insert image
   const handleImageSubmit = async (question) => {
     
-    const formData = new FormData();
+    if(image){const formData = new FormData();
     formData.append("image", image);
+    // eslint-disable-next-line
     const res=await axios.post(`${dataURL}/upload/${question}`, formData);
-    console.log(res.data)
+    }
   };
 
   // edit
@@ -312,6 +313,7 @@ const QuestionList = () => {
 
   return (
     <>
+    <button type="button" className="btn btn-primary">Primary</button>
       <div className="fixedHeading">
         <div className="heading">
           <div className="input-group mb-3 searchInput">

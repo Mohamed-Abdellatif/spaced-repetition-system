@@ -36,9 +36,10 @@ const ViewList = () => {
     if (!currentUser) return;
     try {
       const response = await axios.post(`${dataURL}/getListQuestions`, {
-        listName: listName,
+         listName: listName,
         userId: currentUser?.uid,
       });
+      
       const listResponse = await axios.post(`${dataURL}/getLists`, {
         userId: currentUser?.uid,
       });
@@ -53,9 +54,11 @@ const ViewList = () => {
   };
   useEffect(() => {
     getData();
+    
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listName]);
+  
 
   //delete
   const deleteQuestion = async () => {
@@ -71,7 +74,7 @@ const ViewList = () => {
         questions: filtered,
         userId: currentUser?.uid,
       });
-      getData();
+      await getData();
       setIsNotificationVisible(true);
       setResponse("Deleted from the list");
     } catch (err) {
@@ -79,6 +82,7 @@ const ViewList = () => {
       setResponse("Error please try again later");
       setIsNotificationVisible(true);
     }
+    
   };
 
   //edit
@@ -104,8 +108,9 @@ const ViewList = () => {
           `${dataURL}/questions/${toEdit.id}`,
           toEdit
         );
-        setResponse(response.data);
-        getData();
+        
+        await setResponse(response.data);
+        await getData();
         setIsNotificationVisible(true);
       } catch (err) {
         console.log(err);
@@ -116,6 +121,7 @@ const ViewList = () => {
       setResponse("Please complete the blanks");
       setIsNotificationVisible(true);
     }
+    
   };
 
   //add to list

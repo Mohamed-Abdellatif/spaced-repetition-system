@@ -9,7 +9,6 @@ import NotificationToast from "../Toast/toast";
 import ChoicesList from "../ChoicesList/ChoicesList";
 import moment from "moment/moment";
 
-
 const dataURL = "http://localhost:3001";
 
 const QuestionsQuiz = () => {
@@ -44,7 +43,7 @@ const QuestionsQuiz = () => {
   }
 
   const getData = async () => {
-    if(!currentUser)return
+    if (!currentUser) return;
     try {
       const response = await axios.post(`${dataURL}/getQuestions`, {
         userId: currentUser?.uid,
@@ -60,6 +59,7 @@ const QuestionsQuiz = () => {
       console.log(error);
     }
   };
+  
   useEffect(() => {
     getData();
 
@@ -79,7 +79,6 @@ const QuestionsQuiz = () => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
-  
 
   useEffect(() => {
     if (currentQuestion && currentQuestion.questionType === "MCQ") {
@@ -101,16 +100,18 @@ const QuestionsQuiz = () => {
     const currentQuestionIndex = questions.indexOf(currentQuestion);
     const { nextTest, lastTested } = currentQuestion;
     const daysBeforeNextTest = moment(nextTest).format("Do MMMM YYYY");
+    const diffBetweenNextandToday = moment(
+      moment(nextTest).format("D MMMM YYYY")
+    ).diff(moment(moment().format("D MMMM YYYY")), "days");
     if (currentAnswer.toLowerCase() === currentQuestion.answer.toLowerCase()) {
       setIsChecked({});
       setIsNotificationVisible(true);
       setCurrentAnswer("");
       setResponse("Right Answer");
-      if (nextTest && daysBeforeNextTest === moment().format("Do MMMM YYYY")) {
+      if (nextTest && diffBetweenNextandToday <= 0) {
         const nextTestDate = moment(
           moment(nextTest).format("D MMMM YYYY")
         ).diff(moment(moment(lastTested).format("D MMMM YYYY")), "days");
-
         await axios.put(`${dataURL}/questions/${currentQuestion.id}`, {
           nextTest: moment()
             .add(nextTestDate * 2, "days")
@@ -127,6 +128,7 @@ const QuestionsQuiz = () => {
           lastTested: moment().format(),
         });
       }
+      
       if (currentQuestionIndex + 1 < questions.length) {
         setCurrentQuestion(questions[currentQuestionIndex + 1]);
       } else {

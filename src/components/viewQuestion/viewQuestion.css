@@ -1,0 +1,15 @@
+.questionContainer{
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.img-left {
+    flex-basis: 50%;
+  }
+  
+.list-right {
+    flex-basis: 50%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }

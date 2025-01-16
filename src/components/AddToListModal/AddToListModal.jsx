@@ -2,11 +2,15 @@ import "./AddToListModal.css";
 import { useState } from "react";
 
 const AddToListModal = ({ addToList, lists, updateInput, newListName,createNewList }) => {
-  const [listName, setListName] = useState("");
+  const [listName, setListName] = useState(null);
   const [isClicked, setIsClicked] = useState(false);
   const handleClick=()=>{
     createNewList(newListName)
     setIsClicked(false)
+  }
+  const addQustionToList = () =>{
+    addToList(listName)
+    setListName(null)
   }
   
   return (
@@ -99,7 +103,8 @@ const AddToListModal = ({ addToList, lists, updateInput, newListName,createNewLi
                 <button
                   className="btn btn-primary"
                   data-bs-dismiss="modal"
-                  onClick={()=>addToList(listName)}
+                  onClick={()=>addQustionToList()}
+                  disabled={listName===null}
                 >
                   Add Question To{" "}
                   <span className="text-warning">{listName}</span>

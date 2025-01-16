@@ -1,29 +1,16 @@
 import moment from "moment/moment";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./QuestionCard.css";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 const QuestionCard = ({ questionObj, setToDelete, setToEdit,addToList }) => {
   const [isClicked,setIsClicked] = useState(false)
-  const {  question, created, answer,genre } = questionObj;
-  const [imaged, setImaged] = useState(null);
-  const [response, setResponse] = useState(null);
+  const {  question, created, answer,genre,id } = questionObj;
+  const navigate=useNavigate()
   
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const resp = await axios.get(`http://localhost:3001/images/${question}`);
-      const res = await fetch(`http://localhost:3001/images/${question}`);
-      
-      setResponse(resp.data)
-      if (res.ok) {
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        setImaged(url);
-      }
-    };
-    fetchData();
-  }, [question]);
+  
+  
   
   return (
     <>
@@ -34,7 +21,6 @@ const QuestionCard = ({ questionObj, setToDelete, setToEdit,addToList }) => {
               <h5 className="card-title"> {genre}</h5>
               <p className="card-text">{!isClicked ? question:`Answer : ${answer}`}</p>
               <p>{moment(created).format('MMMM Do YYYY')}</p>
-             {response !== "no image"?<img src={imaged} width={"200px"} alt="lll"/>:""}
             </div>
 
             <div className="crud">
@@ -47,7 +33,7 @@ const QuestionCard = ({ questionObj, setToDelete, setToEdit,addToList }) => {
                 Add To List
            </button>
             <button
-                onClick={()=> setIsClicked(!isClicked)}
+                onClick={()=> navigate(`/question/${id}`)}
                 className="btn btn-secondary ms-3"
               >
                 <i className="fa-solid fa-eye "/>

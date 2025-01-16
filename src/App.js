@@ -7,6 +7,7 @@ import QuestionsQuiz from "./components/QuestionsQuiz/questionsQuiz";
 import SpacedSchedule from "./components/spacedSchedule/spacedSchedule";
 import ViewList from "./components/ViewList/viewList";
 import Authentication from "./HH/authentication/authentication.component";
+import ViewQuestion from "./components/viewQuestion/viewQuestion";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/quiz/:genre" element={<QuestionsQuiz />} />
         <Route path="/schedule" element={<SpacedSchedule />} />
         <Route path="/list/:listName" element={<ViewList />} />
+        <Route path="/question/:questionId" element={<ViewQuestion />} />
       </Routes>
     </>
   );
