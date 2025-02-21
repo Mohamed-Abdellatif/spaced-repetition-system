@@ -96,7 +96,7 @@ const QuestionsQuiz = () => {
 
   const handleSumbit = async (e) => {
     e.preventDefault();
-
+    setCurrentAnswer("")
     const currentQuestionIndex = questions.indexOf(currentQuestion);
     const { nextTest, lastTested } = currentQuestion;
     const daysBeforeNextTest = moment(nextTest).format("Do MMMM YYYY");
@@ -106,7 +106,6 @@ const QuestionsQuiz = () => {
     if (currentAnswer.toLowerCase() === currentQuestion.answer.toLowerCase()) {
       setIsChecked({});
       setIsNotificationVisible(true);
-      setCurrentAnswer("");
       setResponse("Right Answer");
       if (nextTest && diffBetweenNextandToday <= 0) {
         const nextTestDate = moment(

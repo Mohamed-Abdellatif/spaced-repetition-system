@@ -12,7 +12,7 @@ const MCQInput=({ updateChoices,choices})=>{
               <input
                 value={choices[number-1]}
                 onChange={updateChoices}
-                name={number-1}
+                name={`choice ${number}`}
                 type="text"
                 className="form-control"
                 id="exampleFormControlInput1"
@@ -24,3 +24,4 @@ const MCQInput=({ updateChoices,choices})=>{
 }
 
 export default MCQInput
+
