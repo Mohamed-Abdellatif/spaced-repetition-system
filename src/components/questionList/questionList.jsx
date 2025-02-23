@@ -161,12 +161,12 @@ const QuestionList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
   //insert image
-  const handleImageSubmit = async (question) => {
+  const handleImageSubmit = async (questionID) => {
     
     if(image){const formData = new FormData();
     formData.append("image", image);
     // eslint-disable-next-line
-    const res=await axios.post(`${dataURL}/upload/${question}`, formData);
+    const res=await axios.put(`${dataURL}/upload/${questionID}`, formData);
     }
   };
 
@@ -193,7 +193,7 @@ const QuestionList = () => {
           toEdit
         );
         setResponse(response.data);
-        if(image!==null){handleImageSubmit(question)}
+        if(image!==null){handleImageSubmit(toEdit.id)}
         setImage(null)
         getData();
         setIsNotificationVisible(true);

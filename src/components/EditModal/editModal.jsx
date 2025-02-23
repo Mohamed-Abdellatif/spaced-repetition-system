@@ -90,11 +90,6 @@ const EditModal = ({ questionObj, updateInput, handleSubmit,setQuestionObj,handl
                       title={questionObj.questionType}
                       className="ms-3"
                     >
-                      {questionObj.questionType==="MCQ"?"":<Dropdown.Item
-                        onClick={() => handleQuestionTypeChange("MCQ")}
-                      >
-                        MCQ
-                      </Dropdown.Item>}
                       {questionObj.questionType==="Short Response"?"":<Dropdown.Item
                         onClick={() => handleQuestionTypeChange("Short Response")}
                       >
