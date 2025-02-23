@@ -5,22 +5,27 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
-import { auth, getDisplayNameFromDocument, signOutUser } from "../../Utils/firebase/firebase.utils";
+import {
+  auth,
+  getDisplayNameFromDocument,
+  signOutUser,
+} from "../../Utils/firebase/firebase.utils";
 import "./navbar.css";
 import { onAuthStateChanged } from "firebase/auth";
 
 const dataURL = "http://localhost:3001";
 const NavBar = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useContext(UserContext);
   const [isClicked, setIsClicked] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [listNames, setListNames] = useState([]);
-  const [displayName, setDisplayName] = useState('');
-  
+  const [displayName, setDisplayName] = useState("");
 
+  const currentPath = location.pathname.slice(1);
   const signOutHandler = async () => {
     await signOutUser();
     setCurrentUser(null);
@@ -28,14 +33,15 @@ const NavBar = () => {
   };
 
   const getData = async () => {
-    if(!currentUser)return
+    if (!currentUser) return;
     try {
-
       const response = await axios.post(`${dataURL}/getQuestions`, {
         userId: currentUser?.uid,
       });
-      const listResponse = await axios.post(`${dataURL}/getLists`,{userId:currentUser?.uid})
-      setListNames([].concat(listResponse.data.map(list=>list.listName)))
+      const listResponse = await axios.post(`${dataURL}/getLists`, {
+        userId: currentUser?.uid,
+      });
+      setListNames([].concat(listResponse.data.map((list) => list.listName)));
 
       setQuestions(response.data);
     } catch (error) {
@@ -47,18 +53,19 @@ const NavBar = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isClicked]);
-  const genres=[].concat(questions.map(question=> question.genre))
+  const genres = [].concat(questions.map((question) => question.genre));
   let filteredArray = [];
   for (let i = 0; i < genres.length; i++) {
     if (!filteredArray.includes(genres[i])) {
       filteredArray.push(genres[i]);
     }
-    
   }
-  const getDisplayName=async()=>{const displayName = await  getDisplayNameFromDocument()
-  setDisplayName( displayName[currentUser?.email])}
+  const getDisplayName = async () => {
+    const displayName = await getDisplayNameFromDocument();
+    setDisplayName(displayName[currentUser?.email]);
+  };
   useEffect(() => {
-    getDisplayName()
+    getDisplayName();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
@@ -74,9 +81,10 @@ const NavBar = () => {
         // redirect to login if on a protected page
       }
     });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   return (
     <>
       <Navbar fixed="top" bg="primary" expand="lg" variant="dark">
@@ -92,35 +100,78 @@ const NavBar = () => {
               navbarScroll
             >
               <button
-                className="btn text-light"
+                className={
+                  currentPath === "schedule"
+                    ? "btn text-light active py-2"
+                    : "btn text-light py-2"
+                }
                 onClick={() => navigate("/schedule")}
               >
                 Schedule
               </button>
-              <Nav.Link href="#action2">Link</Nav.Link>
-              <NavDropdown onClick={()=>setIsClicked(!isClicked)} title="Choose Genre" id="navbarScrollingDropdown">
-                {questions.length>0 &&
+              <NavDropdown
+                onClick={() => setIsClicked(!isClicked)}
+                title={
+                  filteredArray
+                    .concat("General")
+                    .includes(currentPath.slice(5)) ? (
+                    <span className="text-white">{currentPath.slice(5,)}</span>
+                  ) : (
+                    <span className="text-white">Choose Quiz Genre</span>
+                    
+                  )
+                }
+                id="navbarScrollingDropdown"
+                className={
+                  currentPath.includes("quiz") &&
+                  "btn text-light  active p-0 m-0"
+                }
+              >
+                {questions.length > 0 &&
                   filteredArray.map((genre) => (
-                    <NavDropdown.Item key={genre} onClick={()=>navigate(`/quiz/${genre}`)}>
+                    <NavDropdown.Item
+                      key={genre}
+                      onClick={() => navigate(`/quiz/${genre}`)}
+                    >
                       {genre}
                     </NavDropdown.Item>
                   ))}
                 <NavDropdown.Divider />
-                <NavDropdown.Item onClick={()=>navigate(`/quiz/all`)}>
+                <NavDropdown.Item onClick={() => navigate(`/quiz/General`)}>
                   All
                 </NavDropdown.Item>
               </NavDropdown>
-              <NavDropdown onClick={()=>setIsClicked(!isClicked)} title="Lists" id="navbarScrollingDropdown">
-                {listNames.length>0 &&
+              <NavDropdown
+                onClick={() => setIsClicked(!isClicked)}
+                title={
+                  listNames
+                    .includes(currentPath.slice(5)) ? (
+                    <span className="text-white">{currentPath.slice(5,)}</span>
+                  ) : (
+                    <span className="text-white">Lists</span>
+                  )
+                }
+                className={
+                  currentPath.includes("list") &&
+                  "btn text-light  active p-0 m-0"
+                }
+                id="navScrollingDropdown"
+              >
+                {listNames.length > 0 &&
                   listNames.map((listName) => (
-                    <NavDropdown.Item key={listName} onClick={()=>navigate(`/list/${listName}`)}>
+                    <NavDropdown.Item
+                      key={listName}
+                      onClick={() => navigate(`/list/${listName}`)}
+                    >
                       {listName}
                     </NavDropdown.Item>
                   ))}
               </NavDropdown>
             </Nav>
             <div className="d-flex">
-              <div className="btn displayName">{currentUser && displayName}</div>
+              <div className="btn displayName">
+                {currentUser && displayName}
+              </div>
               {currentUser ? (
                 <button
                   className="btn text-light"

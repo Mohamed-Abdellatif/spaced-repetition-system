@@ -313,7 +313,6 @@ const QuestionList = () => {
 
   return (
     <>
-    <button type="button" className="btn btn-primary">Primary</button>
       <div className="fixedHeading">
         <div className="heading">
           <div className="input-group mb-3 searchInput">

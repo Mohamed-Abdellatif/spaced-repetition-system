@@ -26,7 +26,7 @@ const QuestionsQuiz = () => {
         });
 
         let filteredQuestions =
-          genre === "all"
+          genre === "General"
             ? res.data
             : res.data.filter((q) => q.genre === genre);
         setQuestions(shuffle(filteredQuestions));
@@ -65,7 +65,6 @@ const QuestionsQuiz = () => {
     );
   
     // Get last test date (if null, set to today)
-    const lastTestedDate = moment(question.lastTested || moment());
     const prevInterval = question.interval || 2; // Default interval is 2 days
     const stability = question.stability || 2.5; // Initial stability factor
   
