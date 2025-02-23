@@ -1,14 +1,121 @@
-.container{
-    margin-top: 40px;
-}
-
-.answer-card{
-    background-color:  white;
+/* Ensure styles only apply inside the quiz */
+.quiz-container {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .quiz-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  /* Make sure progress bar styling doesn’t get overridden */
+  .quiz-container .progress-bar {
+    width: 60%;
+    margin: 10px auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .quiz-container progress {
+    width: 100%;
+    height: 10px;
+    border-radius: 5px;
+    appearance: none;
+  }
+  
+  /* Flip card container */
+  .quiz-container .card-container {
+    display: flex;
+    justify-content: center;
     margin-top: 20px;
-    margin-left: 20px;
-}
-
-.answer-card:hover{
-    cursor: pointer;
-}
-
+  }
+  
+  .quiz-container .flip-card {
+    width: 400px;
+    height: 250px;
+    perspective: 1000px;
+  }
+  
+  .quiz-container .flip-card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: transform 0.6s ease-in-out;
+    transform-style: preserve-3d;
+  }
+  
+  .quiz-container .flipped .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+  
+  /* Front & Back card styling */
+  .quiz-container .flip-card-front,
+  .quiz-container .flip-card-back {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  
+  /* Front side */
+  .quiz-container .flip-card-front {
+    background-color: #fff;
+    border: 2px solid #007bff;
+  }
+  
+  /* Back side */
+  .quiz-container .flip-card-back {
+    background-color: #007bff;
+    color: white;
+    transform: rotateY(180deg);
+  }
+  
+  .quiz-container .question-text {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .quiz-container .feedback-text {
+    font-size: 1.3rem;
+    font-weight: 500;
+  }
+  
+  /* Make sure only the input inside the quiz gets styled */
+  .quiz-container .answer-input {
+    width: 80%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 2px solid #007bff;
+    border-radius: 6px;
+    font-size: 1rem;
+    text-align: center;
+  }
+  
+  /* Style only the quiz button */
+  .quiz-container .submit-btn {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    padding: 10px 20px;
+    border-radius: 8px;
+  }
+  
+  /* Prevent Bootstrap from overriding */
+  .quiz-container button.btn {
+    font-size: 1.1rem;
+    padding: 10px 20px;
+    border-radius: 8px;
+  }
+  
