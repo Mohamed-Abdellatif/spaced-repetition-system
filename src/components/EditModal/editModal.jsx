@@ -4,7 +4,7 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import MCQInput from "../MCQInput/MCQInput";
 
 
-const EditModal = ({ questionObj, updateInput, handleSubmit,setQuestionObj,handleImageChange, }) => {
+const EditModal = ({ questionObj, updateInput, handleSubmit,setQuestionObj,handleImageChange, image}) => {
   const { question, answer, difficulty, genre, questionType, choices } =
   questionObj;
   const handleQuestionTypeChange = (questionType) => {
@@ -147,6 +147,7 @@ const EditModal = ({ questionObj, updateInput, handleSubmit,setQuestionObj,handl
               </div>
               <input type="file" 
                   onChange={handleImageChange} 
+                  
                   />
             </>
           </div>

@@ -1,12 +1,11 @@
 import moment from "moment/moment";
-import { useState } from "react";
 import "./QuestionCard.css";
 import { useNavigate } from "react-router-dom";
 
 
 const QuestionCard = ({ questionObj, setToDelete, setToEdit,addToList }) => {
-  const [isClicked,setIsClicked] = useState(false)
-  const {  question, created, answer,genre,id } = questionObj;
+  
+  const {  question, created, genre,id } = questionObj;
   const navigate=useNavigate()
   
   
@@ -19,7 +18,7 @@ const QuestionCard = ({ questionObj, setToDelete, setToEdit,addToList }) => {
           <div className="card-body">
             <div className="card-content" >
               <h5 className="card-title"> {genre}</h5>
-              <p className="card-text">{!isClicked ? question:`Answer : ${answer}`}</p>
+              <p className="card-text"> {question}</p>
               <p>{moment(created).format('MMMM Do YYYY')}</p>
             </div>
 

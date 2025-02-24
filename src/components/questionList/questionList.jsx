@@ -418,6 +418,7 @@ const QuestionList = () => {
         questionObj={toEdit}
         handleSubmit={handleEditSubmit}
         updateInput={updateInput}
+        image={image}
       />
       <AddToListModal
         addToList={addToList}

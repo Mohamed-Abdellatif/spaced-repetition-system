@@ -9,22 +9,22 @@ const dataURL = "http://localhost:3001";
 const ViewQuestion = () => {
    const {questionId} = useParams()
    const [questionObj,setQuestionObj] = useState({})
-   const [imageURL,setImageURL] = useState({})
+   const [imageURL,setImageURL] = useState(null)
    const [response,setResponse] = useState();
    const [isNotificationVisible,setIsNotificationVisible] = useState(false);
    const getData = async () => {
     try {
       const response = await axios.get(`${dataURL}/question/${questionId}`);
       setQuestionObj(response.data);
-  
+      if(response.data.img){
       const imgResponse = await axios.get(`${dataURL}/questionsImg/${questionId}`, {
         responseType: "blob", // Ensure binary data is returned
       });
-  
+      
       if (imgResponse.status === 200) { // Correct way to check response success
         const url = URL.createObjectURL(imgResponse.data);
         setImageURL(url);
-      }
+      }}
     } catch (err) {
       setResponse("Error please try again later");
       setIsNotificationVisible(true);
@@ -46,7 +46,7 @@ const ViewQuestion = () => {
           height={"300px"}
           alt={"question diagram"}
         />
-        <ul class="list-right px-5">
+        <ul className="list-right px-5">
           <li>Question : {question}</li>
           <li>Answer : {answer}</li>
           <li>Difficulty: {difficulty}</li>
