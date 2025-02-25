@@ -6,7 +6,7 @@ import QuestionList from "./components/questionList/questionList";
 import QuestionsQuiz from "./components/QuestionsQuiz/questionsQuiz";
 import SpacedSchedule from "./components/spacedSchedule/spacedSchedule";
 import ViewList from "./components/ViewList/viewList";
-import Authentication from "./HH/authentication/authentication.component";
+import Authentication from "./Authentication/authentication/authentication.component";
 import ViewQuestion from "./components/viewQuestion/viewQuestion";
 
 const App = () => {

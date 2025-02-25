@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
-import Dropdown from "react-bootstrap/Dropdown";
-import DropdownButton from "react-bootstrap/DropdownButton";
+import { Row, Col, Button, DropdownButton, Dropdown, Spinner, Container } from "react-bootstrap";
 import axios from "axios";
 import "./questionList.css";
 
 import AddModal from "../AddModal/AddModal";
 
-import Spinner from "../Spinner/spinner";
 import List from "../ViewQuestionsList/List";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import NotificationToast from "../Toast/toast";
@@ -55,14 +53,14 @@ const QuestionList = () => {
       choice2: "",
       choice3: "",
     },
-    
+
   });
   const [currentGenre, setCurrentGenre] = useState("All");
 
   const handleSearchUpdate = (e) => {
     setQuery({ text: e.target.value });
   };
- 
+
   const handleSearchClick = async () => {
     if (currentUser) {
       try {
@@ -162,11 +160,12 @@ const QuestionList = () => {
   }, [currentUser]);
   //insert image
   const handleImageSubmit = async (questionID) => {
-    
-    if(image){const formData = new FormData();
-    formData.append("image", image);
-    // eslint-disable-next-line
-    const res=await axios.put(`${dataURL}/upload/${questionID}`, formData);
+
+    if (image) {
+      const formData = new FormData();
+      formData.append("image", image);
+      // eslint-disable-next-line
+      const res = await axios.put(`${dataURL}/upload/${questionID}`, formData);
     }
   };
 
@@ -193,7 +192,7 @@ const QuestionList = () => {
           toEdit
         );
         setResponse(response.data);
-        if(image!==null){handleImageSubmit(toEdit.id)}
+        if (image !== null) { handleImageSubmit(toEdit.id) }
         setImage(null)
         getData();
         setIsNotificationVisible(true);
@@ -231,7 +230,7 @@ const QuestionList = () => {
       handleImageSubmit(question)
       setImage(null)
       getData();
-      
+
       setQuestionObj({
         question: "",
         difficulty: "",
@@ -243,9 +242,9 @@ const QuestionList = () => {
           choice2: "",
           choice3: "",
         },
-       
+
       });
-       
+
       setResponse(response.data);
       setIsNotificationVisible(true);
     } else {
@@ -309,79 +308,89 @@ const QuestionList = () => {
     setImage(event.target.files[0]);
   };
 
-  
+
 
   return (
     <>
       <div className="fixedHeading">
-        <div className="heading">
-          <div className="input-group mb-3 searchInput">
-            <input
-              value={query.text}
-              onChange={handleSearchUpdate}
-              type="text"
-              className="form-control "
-              placeholder="Search"
-              aria-label="Recipient's username"
-              aria-describedby="button-addon2"
-            />
-            <button
-              className="btn  btn-info"
-              onClick={() => handleSearchClick()}
-              type="button"
-              id="button-addon2"
-            >
-              <i className="fa fa-solid fa-magnifying-glass" />
-            </button>
-          </div>
-          <button
-            data-bs-toggle="modal"
-            data-bs-target="#addModal"
-            type="button"
-            className="btn btn-success addBtn"
-          >
-            Create New <i className="fa-solid fa-plus" />
-          </button>
-        </div>
-        <div className="Count">
-          {questions.length} from {questionsLength}
-          <DropdownButton
-            id="dropdown-basic-button"
-            title={currentGenre}
-            className="ms-3"
-          >
-            {questions &&
-              filteredArray.map((genre) => (
-                <Dropdown.Item
-                  key={genre}
-                  onClick={() => setCurrentGenre(genre)}
+        <Container className="mt-5">
+          <Row className="mb-3 justify-content-between">
+            <Col sm={8} md={9} lg={9}>
+              <div className="input-group searchInput">
+                <input
+                  value={query.text}
+                  onChange={handleSearchUpdate}
+                  type="text"
+                  className="form-control"
+                  placeholder="Search"
+                  aria-label="Recipient's username"
+                  aria-describedby="button-addon2"
+                />
+                <Button
+                  variant="info"
+                  onClick={() => handleSearchClick()}
+                  type="button"
+                  id="button-addon2"
                 >
-                  {genre}
-                </Dropdown.Item>
-              ))}
-            <Dropdown.Divider />
-            <Dropdown.Item onClick={() => setCurrentGenre("All")}>
-              All
-            </Dropdown.Item>
-          </DropdownButton>
-        </div>
+                  <i className="fa fa-solid fa-magnifying-glass" />
+                </Button>
+              </div>
+            </Col>
+            <Col sm={4} md={3} lg={2} className="d-flex justify-content-end">
+              <Button
+                data-bs-toggle="modal"
+                data-bs-target="#addModal"
+                type="button"
+                className="btn btn-success addBtn"
+              >
+                Create New <i className="fa-solid fa-plus" />
+              </Button>
+            </Col>
+          </Row>
+
+          <Row className="">
+            <Col sm={8} md={9} lg={10}>
+              {questions.length} from {questionsLength}
+            </Col>
+            <Col sm={4} md={3} lg={2}>
+              <DropdownButton
+                id="dropdown-basic-button"
+                title={currentGenre}
+                className="ms-3"
+              >
+                {questions &&
+                  filteredArray.map((genre) => (
+                    <Dropdown.Item key={genre} onClick={() => setCurrentGenre(genre)}>
+                      {genre}
+                    </Dropdown.Item>
+                  ))}
+                <Dropdown.Divider />
+                <Dropdown.Item onClick={() => setCurrentGenre("All")}>All</Dropdown.Item>
+              </DropdownButton>
+            </Col>
+          </Row>
+        </Container>
       </div>
 
       {!loading && currentUser ? (
         <>
           <div className="cards-container">
-            <List
-              addToList={setToBeAdded}
-              setToEdit={setToEdit}
-              toEdit={toEdit}
-              questions={questions}
-              setToDelete={setToDelete}
-            />
+            <Row>
+              <Col sm={12} md={6} lg={4} xl={3}>
+                <List
+                  addToList={setToBeAdded}
+                  setToEdit={setToEdit}
+                  toEdit={toEdit}
+                  questions={questions}
+                  setToDelete={setToDelete}
+                />
+              </Col>
+            </Row>
           </div>
         </>
       ) : currentUser ? (
         <div className="spinner">
-          <Spinner />
+          <Spinner animation="border" />
         </div>
       ) : (
         <h3 className="spinner">Please Sign In</h3>
@@ -390,36 +399,40 @@ const QuestionList = () => {
       {questions.length < 10 || questionsLength === questions.length ? (
         ""
       ) : (
-        <button
-          className="loadMoreButton btn btn-primary"
+        <Button
+          variant="primary"
+          className="loadMoreButton"
           onClick={() => loadMoreData()}
         >
           Load More...
-        </button>
+        </Button>
       )}
 
       <AddModal
         handleImageChange={handleImageChange}
-        
         setQuestionObj={setQuestionObj}
         questionObj={questionObj}
         handleSubmit={handleAddSubmit}
         updateInput={updateAddInput}
       />
+
       <DeleteModal deleteQuestion={deleteQuestion} toDelete={toDelete} />
+
       <NotificationToast
         setShow={setIsNotificationVisible}
         show={isNotificationVisible}
         response={response}
       />
+
       <EditModal
-      handleImageChange={handleImageChange}
+        handleImageChange={handleImageChange}
         setQuestionObj={setToEdit}
         questionObj={toEdit}
         handleSubmit={handleEditSubmit}
         updateInput={updateInput}
         image={image}
       />
+
       <AddToListModal
         addToList={addToList}
         lists={lists}

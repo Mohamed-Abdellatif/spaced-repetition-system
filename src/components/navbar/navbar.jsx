@@ -111,6 +111,7 @@ const NavBar = () => {
               </button>
               <NavDropdown
                 onClick={() => setIsClicked(!isClicked)}
+                disabled={!questions.length > 0}
                 title={
                   filteredArray
                     .concat("General")
@@ -153,8 +154,9 @@ const NavBar = () => {
                 }
                 className={
                   currentPath.includes("list") &&
-                  "btn text-light  active p-0 m-0"
+                  "btn text-light active p-0 m-0"
                 }
+                disabled={!listNames.length>0}
                 id="navScrollingDropdown"
               >
                 {listNames.length > 0 &&
