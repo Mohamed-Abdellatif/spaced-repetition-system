@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route,  Routes } from "react-router-dom";
 import "./App.css";
 import NavBar from "./components/navbar/navbar";
 
@@ -12,14 +12,15 @@ import ViewQuestion from "./components/viewQuestion/viewQuestion";
 const App = () => {
   return (
     <>
-      <NavBar />
       <Routes>
-        <Route path="/" element={<QuestionList />} />
-        <Route path="/login" element={<Authentication />} />
-        <Route path="/quiz/:genre" element={<QuestionsQuiz />} />
-        <Route path="/schedule" element={<SpacedSchedule />} />
-        <Route path="/list/:listName" element={<ViewList />} />
-        <Route path="/question/:questionId" element={<ViewQuestion />} />
+        <Route path="/" element={<NavBar />}>
+          <Route index element={<QuestionList />} />
+          <Route path="login" element={<Authentication />} />
+          <Route path="quiz/:genre" element={<QuestionsQuiz />} />
+          <Route path="schedule" element={<SpacedSchedule />} />
+          <Route path="list/:listName" element={<ViewList />} />
+          <Route path="question/:questionId" element={<ViewQuestion />} />
+        </Route>
       </Routes>
     </>
   );

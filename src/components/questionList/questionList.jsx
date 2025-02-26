@@ -227,7 +227,7 @@ const QuestionList = () => {
       !genre == " " // eslint-disable-next-line
     ) {
       const response = await axios.post(`${dataURL}/questions`, questionObj);
-      handleImageSubmit(question)
+      handleImageSubmit(response.data.id)
       setImage(null)
       getData();
 
@@ -245,7 +245,7 @@ const QuestionList = () => {
 
       });
 
-      setResponse(response.data);
+      setResponse(response.data.message);
       setIsNotificationVisible(true);
     } else {
       setResponse("Please complete the blanks");
@@ -315,7 +315,7 @@ const QuestionList = () => {
       <div className="fixedHeading">
         <Container className="mt-5">
           <Row className="mb-3 justify-content-between">
-            <Col sm={8} md={9} lg={9}>
+            <Col sm={12} md={9} lg={9}>
               <div className="input-group searchInput">
                 <input
                   value={query.text}
@@ -330,7 +330,7 @@ const QuestionList = () => {
                   variant="info"
                   onClick={() => handleSearchClick()}
                   type="button"
-                  id="button-addon2"
+                  
                 >
                   <i className="fa fa-solid fa-magnifying-glass" />
                 </Button>
@@ -349,12 +349,12 @@ const QuestionList = () => {
           </Row>
 
           <Row className="">
-            <Col sm={8} md={9} lg={10}>
+            <Col sm={8} md={9} lg={2}>
               {questions.length} from {questionsLength}
             </Col>
-            <Col sm={4} md={3} lg={2}>
+            <Col sm={4} md={3} lg={2}  >
               <DropdownButton
-                id="dropdown-basic-button"
+                
                 title={currentGenre}
                 className="ms-3"
               >
@@ -375,8 +375,8 @@ const QuestionList = () => {
       {!loading && currentUser ? (
         <>
           <div className="cards-container">
-            <Row>
-              <Col sm={12} md={6} lg={4} xl={3}>
+            <Row className="justify-content-center">
+              <Col sm={12} md={10} >
                 <List
                   addToList={setToBeAdded}
                   setToEdit={setToEdit}

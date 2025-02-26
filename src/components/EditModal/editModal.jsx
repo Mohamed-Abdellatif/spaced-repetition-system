@@ -46,7 +46,7 @@ const EditModal = ({ questionObj, updateInput, handleSubmit,setQuestionObj,handl
               <div className="">
               <div className="mb-3 ">
                   <label
-                    htmlFor="exampleFormControlInput1"
+                     
                     className="form-label"
                   >
                     Genre
@@ -57,13 +57,13 @@ const EditModal = ({ questionObj, updateInput, handleSubmit,setQuestionObj,handl
                     name="genre"
                     type="text"
                     className="form-control"
-                    id="exampleFormControlInput1"
+                     
                     placeholder="Ex: Biology"
                   />
                 </div>
                 <div className="mb-3 ">
                   <label
-                    htmlFor="exampleFormControlInput1"
+                     
                     className="form-label"
                   >
                     Question
@@ -74,19 +74,19 @@ const EditModal = ({ questionObj, updateInput, handleSubmit,setQuestionObj,handl
                     name="question"
                     type="text"
                     className="form-control"
-                    id="exampleFormControlInput1"
+                     
                     placeholder="How to spell my name?"
                   />
                 </div>
                 <div className="mb-3 ">
                     <label
-                      htmlFor="exampleFormControlInput1"
+                       
                       className="form-label"
                     >
                       Question Type
                     </label>
                     <DropdownButton
-                      id="dropdown-basic-button"
+                      id="dropdown"
                       title={questionObj.questionType}
                       className="ms-3"
                     >
@@ -109,7 +109,7 @@ const EditModal = ({ questionObj, updateInput, handleSubmit,setQuestionObj,handl
                   </div>
                 <div className="mb-3 ">
                   <label
-                    htmlFor="exampleFormControlInput1"
+                     
                     className="form-label"
                   >
                     Difficulty Level
@@ -120,13 +120,13 @@ const EditModal = ({ questionObj, updateInput, handleSubmit,setQuestionObj,handl
                     name="difficulty"
                     type="number"
                     className="form-control"
-                    id="exampleFormControlInput1"
+                     
                     placeholder="0"
                   />
                 </div>
                 <div className="mb-3">
                   <label
-                    htmlFor="exampleFormControlTextarea1"
+                   
                     className="form-label"
                   >
                     Answer
@@ -136,7 +136,7 @@ const EditModal = ({ questionObj, updateInput, handleSubmit,setQuestionObj,handl
                     onChange={updateInput}
                     name="answer"
                     className="form-control"
-                    id="exampleFormControlTextarea1"
+                    
                     rows="3"
                   ></textarea>
                   {questionType === "MCQ" && (

@@ -29,14 +29,14 @@ const AddModal = ({
         className="modal fade"
         id="addModal"
         tabIndex="-1"
-        aria-labelledby="exampleModalLabel"
+        aria-labelledby="exampleMod"
         aria-hidden="true"
       >
         <div className="modal-dialog modal-xl">
           <div className="modal-content modal-add-content">
             <header>
               <div className="modal-header">
-                <h1 className="modal-title fs-5" id="exampleModalLabel">
+                <h1 className="modal-title fs-5" id="exampleMod">
                   Add Question
                 </h1>
                 <button
@@ -53,7 +53,7 @@ const AddModal = ({
                 <div className="">
                   <div className="mb-3 ">
                     <label
-                      htmlFor="exampleFormControlInput1"
+                       
                       className="form-label"
                     >
                       Genre
@@ -64,14 +64,14 @@ const AddModal = ({
                       name="genre"
                       type="text"
                       className="form-control"
-                      id="exampleFormControlInput1"
+                       
                       placeholder="Ex: Biology"
                     />
                   </div>
 
                   <div className="mb-3 ">
                     <label
-                      htmlFor="exampleFormControlInput1"
+                       
                       className="form-label"
                     >
                       Question
@@ -83,19 +83,19 @@ const AddModal = ({
                       name="question"
                       type="text"
                       className="form-control"
-                      id="exampleFormControlInput1"
+                       
                       placeholder="How to spell my name?"
                     />
                   </div>
                   <div className="mb-3 ">
                     <label
-                      htmlFor="exampleFormControlInput1"
+                       
                       className="form-label"
                     >
                       Question Type
                     </label>
                     <DropdownButton
-                      id="dropdown-basic-button"
+                      
                       title={questionObj.questionType}
                       className="ms-3"
                     >
@@ -143,7 +143,7 @@ const AddModal = ({
                   </div>
                   <div className="mb-3 ">
                     <label
-                      htmlFor="exampleFormControlInput1"
+                       
                       className="form-label"
                     >
                       Difficulty Level
@@ -154,13 +154,13 @@ const AddModal = ({
                       name="difficulty"
                       type="number"
                       className="form-control"
-                      id="exampleFormControlInput1"
+                       
                       placeholder="0"
                     />
                   </div>
                   <div className="mb-3">
                     <label
-                      htmlFor="exampleFormControlTextarea1"
+                      
                       className="form-label"
                     >
                       Answer
@@ -170,7 +170,7 @@ const AddModal = ({
                       onChange={updateInput}
                       name="answer"
                       className="form-control "
-                      id="exampleFormControlTextarea1"
+                      
                       rows="3"
                     ></textarea>
                     {questionType === "MCQ" && (

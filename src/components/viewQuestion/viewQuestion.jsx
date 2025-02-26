@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "./viewQuestion.css"
+import "./viewQuestion.css";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import NotificationToast from "../Toast/toast";
@@ -7,40 +7,45 @@ import NotificationToast from "../Toast/toast";
 const dataURL = "http://localhost:3001";
 
 const ViewQuestion = () => {
-   const {questionId} = useParams()
-   const [questionObj,setQuestionObj] = useState({})
-   const [imageURL,setImageURL] = useState(null)
-   const [response,setResponse] = useState();
-   const [isNotificationVisible,setIsNotificationVisible] = useState(false);
-   const getData = async () => {
+  const { questionId } = useParams();
+  const [questionObj, setQuestionObj] = useState({});
+  const [imageURL, setImageURL] = useState(null);
+  const [response, setResponse] = useState();
+  const [isNotificationVisible, setIsNotificationVisible] = useState(false);
+  const getData = async () => {
     try {
       const response = await axios.get(`${dataURL}/question/${questionId}`);
       setQuestionObj(response.data);
-      if(response.data.img){
-      const imgResponse = await axios.get(`${dataURL}/questionsImg/${questionId}`, {
-        responseType: "blob", // Ensure binary data is returned
-      });
-      
-      if (imgResponse.status === 200) { // Correct way to check response success
-        const url = URL.createObjectURL(imgResponse.data);
-        setImageURL(url);
-      }}
+
+      const imgResponse = await axios.get(
+        `${dataURL}/questionsImg/${questionId}`
+      );
+
+      if (imgResponse.status === 200) {
+        // Correct way to check response success
+        setImageURL(imgResponse.data.url);
+      }
     } catch (err) {
       setResponse("Error please try again later");
       setIsNotificationVisible(true);
     }
   };
-  
-   useEffect(()=>{
-      getData()
-      // eslint-disable-next-line
-   },[questionId])
-   const {question, answer, difficulty} = questionObj
+
+  useEffect(() => {
+    getData();
+
+    // eslint-disable-next-line
+  }, [questionId]);
+  const { question, answer, difficulty } = questionObj;
   return (
     <>
       <div className="questionContainer">
         <img
-          src={imageURL?imageURL:"https://placehold.co/400x400?text=PlaceHolder"}
+          src={
+            imageURL
+              ? imageURL
+              : "https://placehold.co/400x400?text=PlaceHolder"
+          }
           className="img-left px-3"
           width={"300px"}
           height={"300px"}

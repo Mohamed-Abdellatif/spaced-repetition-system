@@ -19,14 +19,14 @@ const AddToListModal = ({ addToList, lists, updateInput, newListName,createNewLi
         className="modal fade"
         id="AddToListModal"
         tabIndex="-1"
-        aria-labelledby="exampleModalLabel"
+        aria-labelledby="addtolist"
         aria-hidden="true"
       >
         <div className="modal-dialog modal-xl">
           <div className="modal-content modal-list-content">
             <header>
               <div className="modal-header">
-                <h1 className="modal-title fs-5" id="exampleModalLabel">
+                <h1 className="modal-title fs-5" id="addtolist">
                   Add Question To List
                 </h1>
                 <button
@@ -72,7 +72,7 @@ const AddToListModal = ({ addToList, lists, updateInput, newListName,createNewLi
                       onChange={updateInput}
                       type="text"
                       className="form-control mb-3"
-                      id="exampleFormControlInput1"
+                      id="exampleFormControlInput10"
                       placeholder="LIST NAME"
                     />
                     <button

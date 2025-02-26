@@ -5,7 +5,7 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
 import {
   auth,
@@ -14,6 +14,7 @@ import {
 } from "../../Utils/firebase/firebase.utils";
 import "./navbar.css";
 import { onAuthStateChanged } from "firebase/auth";
+import { Col, Row } from "react-bootstrap";
 
 const dataURL = "http://localhost:3001";
 const NavBar = () => {
@@ -87,12 +88,18 @@ const NavBar = () => {
 
   return (
     <>
-      <Navbar fixed="top" bg="primary" expand="lg" variant="dark">
-        <Container fluid>
-          <Navbar.Brand className="brand" onClick={() => navigate("/")}>
-            SPACED REPETITION SYSTEM
+    
+      <Navbar fixed="top" bg="primary" expand="lg" variant="dark" >
+        <Container fluid >
+          
+            
+          <Navbar.Brand className="brand " onClick={() => navigate("/")}>
+            SRS
           </Navbar.Brand>
+          
+          
           <Navbar.Toggle aria-controls="navbarScroll" />
+          
           <Navbar.Collapse id="navbarScroll">
             <Nav
               className="me-auto my-2 my-lg-0"
@@ -191,8 +198,11 @@ const NavBar = () => {
               )}
             </div>
           </Navbar.Collapse>
+          
         </Container>
       </Navbar>
+      
+      <Outlet/>
     </>
   );
 };

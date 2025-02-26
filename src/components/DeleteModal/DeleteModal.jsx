@@ -12,7 +12,7 @@ const DeleteModal = ({deleteQuestion,toDelete}) => {
         <div className="modal-dialog">
           <div className="modal-content modal-del-content">
             <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
+              <h1 className="modal-title fs-5" id="exampleLabel">
                 Deletion Confirmation
               </h1>
               <button
