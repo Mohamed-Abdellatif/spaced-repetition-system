@@ -9,7 +9,7 @@ body{
     text-align: center;
     
 }
-
+ 
 
 .fixedHeading{
     margin-top:20px;
@@ -18,7 +18,7 @@ body{
     left: 0;
     right: 0;
     z-index: 1;
-    background-color: whitesmoke;
+    background-color: rgb(252, 252, 252);
 }
 
 
@@ -74,5 +74,6 @@ textarea{
 
 .cards-container{
     margin-top: 140px;
+    
     
 }

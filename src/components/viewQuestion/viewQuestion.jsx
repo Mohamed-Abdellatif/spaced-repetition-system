@@ -3,6 +3,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import NotificationToast from "../Toast/toast";
 import { motion } from "framer-motion";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./viewQuestion.css";
 
 const dataURL = "http://localhost:3001";
@@ -24,6 +25,7 @@ const ViewQuestion = () => {
       if (imgResponse.status === 200) {
         setImageURL(imgResponse.data.url);
       }
+      
     } catch (err) {
       setResponse("Error, please try again later");
       setIsNotificationVisible(true);
@@ -34,35 +36,54 @@ const ViewQuestion = () => {
     getData();
   }, [questionId]);
 
-  const { question, answer, difficulty } = questionObj;
+  const { question, answer, difficulty,img } = questionObj;
 
   return (
-    <div className="flashcard-container" onClick={() => setIsFlipped(!isFlipped)}>
-      <motion.div
-        className="flashcard"
-        animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        {!isFlipped ? (
-          <div className="front">
-            <img
-              src={imageURL || "https://placehold.co/400x400?text=Placeholder"}
-              className="flashcard-image"
-              alt="question diagram"
-              height={300}
-              width={300}
-            />
-            <p className="question-text">{question}</p>
-            <span className="difficulty-tag">{difficulty}</span>
-          </div>
-        ) : (
-          <div className="back">
-            <p className="answer-text">{answer}</p>
-          </div>
+    <div className="container mt-5 d-flex justify-content-center">
+  <motion.div
+    className="card flashcard"
+    animate={{ rotateY: isFlipped ? 180 : 0 }}
+    transition={{ duration: 0.6 }}
+    onClick={() => setIsFlipped(!isFlipped)}
+  >
+    {!isFlipped ? (
+      <div className="card-body front text-center">
+        {img && (
+          <img
+            src={imageURL}
+            className="card-img-top flashcard-image"
+            alt="question diagram"
+            width={"300px"}
+            height={"300px"}
+          />
         )}
-      </motion.div>
-      <NotificationToast setShow={setIsNotificationVisible} show={isNotificationVisible} response={response} />
-    </div>
+        <h5 className={`card-title ${!img ? "mt-3" : "mt-3"}`}>Question: {question}</h5>
+        <span
+          className={`badge ${
+            difficulty === "hard"
+              ? "bg-danger"
+              : difficulty === "medium"
+              ? "bg-warning"
+              : "bg-success"
+          }`}
+        >
+          {difficulty}
+        </span>
+      </div>
+    ) : (
+      <div className="card-body back text-center d-flex align-items-center justify-content-center">
+        <p className="answer-text">Answer: {answer}</p>
+      </div>
+    )}
+  </motion.div>
+  <NotificationToast
+    setShow={setIsNotificationVisible}
+    show={isNotificationVisible}
+    response={response}
+  />
+</div>
+
+  
   );
 };
 

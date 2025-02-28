@@ -55,7 +55,7 @@ const QuestionList = () => {
     },
 
   });
-  const [currentGenre, setCurrentGenre] = useState("All");
+  const [currentGenre, setCurrentGenre] = useState("ALL GENRES");
 
   const handleSearchUpdate = (e) => {
     setQuery({ text: e.target.value });
@@ -95,7 +95,7 @@ const QuestionList = () => {
         userId: currentUser?.uid,
       });
       setLists(listResponse.data);
-      if (currentGenre === "All") {
+      if (currentGenre === "ALL GENRES") {
         setQuestions(response.data);
       } else {
         setQuestions(
@@ -365,7 +365,7 @@ const QuestionList = () => {
                     </Dropdown.Item>
                   ))}
                 <Dropdown.Divider />
-                <Dropdown.Item onClick={() => setCurrentGenre("All")}>All</Dropdown.Item>
+                <Dropdown.Item onClick={() => setCurrentGenre("All GENRES")}>All GENRES</Dropdown.Item>
               </DropdownButton>
             </Col>
           </Row>
