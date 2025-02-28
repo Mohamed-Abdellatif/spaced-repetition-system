@@ -14,7 +14,7 @@ import {
 } from "../../Utils/firebase/firebase.utils";
 import "./navbar.css";
 import { onAuthStateChanged } from "firebase/auth";
-import { Col, Row } from "react-bootstrap";
+
 
 const dataURL = "http://localhost:3001";
 const NavBar = () => {
