@@ -70,7 +70,7 @@ const QuestionsQuiz = () => {
   
     let newInterval;
     let newStability = stability;
-  
+    const today = new Date().toISOString().split("T")[0];
     if (isCorrect) {
       // Increase interval exponentially based on stability
       newInterval = Math.round(prevInterval * newStability);
@@ -84,12 +84,13 @@ const QuestionsQuiz = () => {
     const nextTestDate = moment().add(newInterval, "days").format();
   
     // Update question data
+    if((question.nextTest === today||question.nextTest === null)){
     await axios.put(`${dataURL}/questions/${question.id}`, {
       nextTest: nextTestDate,
       lastTested: moment().format(),
       interval: newInterval, // Store interval for better adaptation
       stability: newStability, // Store stability factor
-    });
+    });}
   
     setCurrentAnswer("");
   

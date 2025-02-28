@@ -354,7 +354,7 @@ const QuestionList = () => {
             </Col>
             <Col sm={4} md={3} lg={2}  >
               <DropdownButton
-                
+                disabled={!questions.length}
                 title={currentGenre}
                 className="ms-3"
               >
