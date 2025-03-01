@@ -1,121 +1,297 @@
 /* Ensure styles only apply inside the quiz */
 .quiz-container {
-    text-align: center;
-    padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+  min-height: calc(100vh - 76px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 1rem;
+}
+
+.quiz-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  text-align: center;
+  background: linear-gradient(120deg, #2563eb, #1d4ed8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Make sure progress bar styling doesn't get overridden */
+.progress-bar {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0 1rem;
+  animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+  background: none;
+  height: auto;
+}
+
+.progress-bar progress {
+  flex-grow: 1;
+  height: 10px;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--bs-gray-200);
+}
+
+.progress-bar progress::-webkit-progress-bar {
+  background-color: var(--bs-gray-200);
+  border-radius: 8px;
+}
+
+.progress-bar progress::-webkit-progress-value {
+  background: linear-gradient(90deg, var(--bs-primary), var(--bs-primary-dark));
+  border-radius: 8px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-bar span {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--bs-gray-700);
+  min-width: 80px;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.progress-bar {
+  animation-delay: 0.1s;
+}
+
+/* Flip card container */
+.card-container {
+  margin: 0.5rem 0;
+  width: 100%;
+  padding: 0 1rem;
+  animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+  display: flex;
+  justify-content: center;
+}
+
+.card-container {
+  animation-delay: 0.2s;
+}
+
+.flip-card {
+  width: 100%;
+  max-width: 600px;
+  height: 320px;
+  perspective: 1000px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Front & Back card styling */
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.1),
+    0 1px 8px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease;
+}
+
+.flip-card-front {
+  background-color: white;
+  border: 2px solid var(--bs-gray-200);
+}
+
+.flip-card-back {
+  background: linear-gradient(135deg, var(--bs-primary), var(--bs-primary-dark));
+  color: white;
+  transform: rotateY(180deg);
+  border: none;
+}
+
+.flip-card-back .feedback-text {
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.flipped .flip-card-back {
+  background: linear-gradient(135deg, var(--bs-primary), var(--bs-primary-dark));
+  color: white;
+}
+
+.question-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--bs-gray-900);
+  margin-bottom: 1.5rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.feedback-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* Make sure only the input inside the quiz gets styled */
+.answer-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.875rem 1.25rem;
+  margin-top: 1rem;
+  border: 2px solid var(--bs-gray-200);
+  border-radius: 0.75rem;
+  font-size: 1.125rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  background-color: var(--bs-gray-50);
+}
+
+.answer-input:focus {
+  outline: none;
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 4px rgba(var(--bs-primary-rgb), 0.15);
+  background-color: white;
+}
+
+/* Style only the quiz button */
+.submit-btn {
+  margin-top: 1.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  padding: 0.875rem 2.25rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, var(--bs-primary), var(--bs-primary-dark));
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.3);
+}
+
+.submit-btn:disabled {
+  background: var(--bs-gray-400);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.feedback-icon {
+  margin-bottom: 1.5rem;
+  animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  color: white;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.feedback-icon.success {
+  color: #4ADE80;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.feedback-icon.error {
+  color: #FB7185;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.restart-btn {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  padding: 0.875rem 2rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.restart-btn:hover {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 576px) {
+  .quiz-container {
+    padding: 0.5rem;
+    padding-top: 0.75rem;
   }
   
   .quiz-title {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 15px;
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
   }
   
-  /* Make sure progress bar styling doesn’t get overridden */
-  .quiz-container .progress-bar {
-    width: 60%;
-    margin: 10px auto;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .flip-card {
+    height: 300px;
   }
   
-  .quiz-container progress {
-    width: 100%;
-    height: 10px;
-    border-radius: 5px;
-    appearance: none;
+  .question-text {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
   }
   
-  /* Flip card container */
-  .quiz-container .card-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
+  .answer-input {
+    padding: 0.75rem 1rem;
   }
   
-  .quiz-container .flip-card {
-    width: 400px;
-    height: 250px;
-    perspective: 1000px;
+  .submit-btn {
+    padding: 0.75rem 2rem;
+    margin-top: 1.25rem;
   }
-  
-  .quiz-container .flip-card-inner {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    transition: transform 0.6s ease-in-out;
-    transform-style: preserve-3d;
-  }
-  
-  .quiz-container .flipped .flip-card-inner {
-    transform: rotateY(180deg);
-  }
-  
-  /* Front & Back card styling */
-  .quiz-container .flip-card-front,
-  .quiz-container .flip-card-back {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    backface-visibility: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-  }
-  
-  /* Front side */
-  .quiz-container .flip-card-front {
-    background-color: #fff;
-    border: 2px solid #007bff;
-  }
-  
-  /* Back side */
-  .quiz-container .flip-card-back {
-    background-color: #007bff;
-    color: white;
-    transform: rotateY(180deg);
-  }
-  
-  .quiz-container .question-text {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #333;
-  }
-  
-  .quiz-container .feedback-text {
-    font-size: 1.3rem;
-    font-weight: 500;
-  }
-  
-  /* Make sure only the input inside the quiz gets styled */
-  .quiz-container .answer-input {
-    width: 80%;
-    padding: 10px;
-    margin-top: 10px;
-    border: 2px solid #007bff;
-    border-radius: 6px;
-    font-size: 1rem;
-    text-align: center;
-  }
-  
-  /* Style only the quiz button */
-  .quiz-container .submit-btn {
-    margin-top: 20px;
-    font-size: 1.1rem;
-    padding: 10px 20px;
-    border-radius: 8px;
-  }
-  
-  /* Prevent Bootstrap from overriding */
-  .quiz-container button.btn {
-    font-size: 1.1rem;
-    padding: 10px 20px;
-    border-radius: 8px;
-  }
+}
   

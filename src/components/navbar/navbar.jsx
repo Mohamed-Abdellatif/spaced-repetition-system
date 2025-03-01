@@ -1,7 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import Container from "react-bootstrap/Container";
-
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
@@ -14,14 +13,14 @@ import {
 } from "../../Utils/firebase/firebase.utils";
 import "./navbar.css";
 import { onAuthStateChanged } from "firebase/auth";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCalendar, faQuestionCircle, faList, faSignOutAlt, faSignInAlt, faUser } from "@fortawesome/free-solid-svg-icons";
 
 const dataURL = "http://localhost:3001";
 const NavBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useContext(UserContext);
-  const [isClicked, setIsClicked] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [listNames, setListNames] = useState([]);
   const [displayName, setDisplayName] = useState("");
@@ -32,7 +31,7 @@ const NavBar = () => {
     setCurrentUser(null);
     navigate("/login");
   };
-
+  
   const getData = async () => {
     if (!currentUser) return;
     try {
@@ -51,9 +50,9 @@ const NavBar = () => {
   };
   useEffect(() => {
     getData();
-
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClicked]);
+  }, [currentUser]);
   const genres = [].concat(questions.map((question) => question.genre));
   let filteredArray = [];
   for (let i = 0; i < genres.length; i++) {
@@ -88,121 +87,107 @@ const NavBar = () => {
 
   return (
     <>
-    
-      <Navbar fixed="top" bg="primary" expand="lg" variant="dark" >
-        <Container fluid >
-          
-            
-          <Navbar.Brand className="brand " onClick={() => navigate("/")}>
+      <Navbar fixed="top" expand="lg" bg="white" className="shadow-sm">
+        <Container>
+          <Navbar.Brand className="brand fw-bold" onClick={() => navigate("/")}>
             SRS
           </Navbar.Brand>
-          
           
           <Navbar.Toggle aria-controls="navbarScroll" />
           
           <Navbar.Collapse id="navbarScroll">
-            <Nav
-              className="me-auto my-2 my-lg-0"
-              style={{ maxHeight: "100px" }}
-              navbarScroll
-            >
-              <button
-                className={
-                  currentPath === "schedule"
-                    ? "btn text-light active py-2"
-                    : "btn text-light py-2"
-                }
+            <Nav className="me-auto">
+              <Nav.Link
+                className={`nav-link ${currentPath === "schedule" ? "active" : ""}`}
                 onClick={() => navigate("/schedule")}
               >
+                <FontAwesomeIcon icon={faCalendar} className="me-2" />
                 Schedule
-              </button>
+              </Nav.Link>
+
               <NavDropdown
-                onClick={() => setIsClicked(!isClicked)}
-                disabled={!questions.length > 0}
                 title={
-                  filteredArray
-                    .concat("General")
-                    .includes(currentPath.slice(5)) ? (
-                    <span className="text-white">{currentPath.slice(5,)}</span>
-                  ) : (
-                    <span className="text-white">Choose Quiz Genre</span>
-                    
-                  )
+                  <>
+                    <FontAwesomeIcon icon={faQuestionCircle} className="me-2" />
+                    {filteredArray.concat("General").includes(currentPath.slice(5))
+                      ? currentPath.slice(5)
+                      : "Choose Quiz Genre"}
+                  </>
                 }
-                id="navbarScrollingDropdown"
-                className={
-                  currentPath.includes("quiz") &&
-                  "btn text-light  active p-0 m-0"
-                }
+                id="quiz-dropdown"
+                disabled={!questions.length > 0}
+                className={`nav-dropdown ${currentPath.includes("quiz") ? "active" : ""}`}
               >
                 {questions.length > 0 &&
                   filteredArray.map((genre) => (
                     <NavDropdown.Item
                       key={genre}
                       onClick={() => navigate(`/quiz/${genre}`)}
+                      active={currentPath === `quiz/${genre}`}
                     >
                       {genre}
                     </NavDropdown.Item>
                   ))}
                 <NavDropdown.Divider />
-                <NavDropdown.Item onClick={() => navigate(`/quiz/General`)}>
-                  All
+                <NavDropdown.Item
+                  onClick={() => navigate(`/quiz/General`)}
+                  active={currentPath === "quiz/General"}
+                >
+                  All Questions
                 </NavDropdown.Item>
               </NavDropdown>
+
               <NavDropdown
-                onClick={() => setIsClicked(!isClicked)}
                 title={
-                  listNames
-                    .includes(currentPath.slice(5)) ? (
-                    <span className="text-white">{currentPath.slice(5,)}</span>
-                  ) : (
-                    <span className="text-white">Lists</span>
-                  )
+                  <>
+                    <FontAwesomeIcon icon={faList} className="me-2" />
+                    {listNames.includes(currentPath.slice(5))
+                      ? currentPath.slice(5)
+                      : "Lists"}
+                  </>
                 }
-                className={
-                  currentPath.includes("list") &&
-                  "btn text-light active p-0 m-0"
-                }
-                disabled={!listNames.length>0}
-                id="navScrollingDropdown"
+                id="lists-dropdown"
+                disabled={!listNames.length > 0}
+                className={`nav-dropdown ${currentPath.includes("list") ? "active" : ""}`}
               >
                 {listNames.length > 0 &&
                   listNames.map((listName) => (
                     <NavDropdown.Item
                       key={listName}
                       onClick={() => navigate(`/list/${listName}`)}
+                      active={currentPath === `list/${listName}`}
                     >
                       {listName}
                     </NavDropdown.Item>
                   ))}
               </NavDropdown>
             </Nav>
-            <div className="d-flex">
-              <div className="btn displayName">
-                {currentUser && displayName}
-              </div>
-              {currentUser ? (
-                <button
-                  className="btn text-light"
-                  onClick={() => signOutHandler()}
-                >
-                  Sign Out
-                </button>
-              ) : (
-                <button
-                  className="btn text-light"
-                  onClick={() => navigate("/login")}
-                >
-                  Sign In
-                </button>
+
+            <Nav className="align-items-center">
+              {currentUser && (
+                <div className="d-flex align-items-center me-3">
+                  <FontAwesomeIcon icon={faUser} className="me-2 text-primary" />
+                  <span className="fw-medium">{displayName}</span>
+                </div>
               )}
-            </div>
+              
+              <Nav.Link
+                onClick={currentUser ? signOutHandler : () => navigate("/login")}
+                className="d-flex align-items-center"
+              >
+                <FontAwesomeIcon
+                  icon={currentUser ? faSignOutAlt : faSignInAlt}
+                  className="me-2"
+                />
+                {currentUser ? "Sign Out" : "Sign In"}
+              </Nav.Link>
+            </Nav>
           </Navbar.Collapse>
-          
         </Container>
       </Navbar>
-      
-      <Outlet/>
+      <div style={{ marginTop: "76px" }}>
+        <Outlet />
+      </div>
     </>
   );
 };

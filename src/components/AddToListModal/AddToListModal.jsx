@@ -1,120 +1,110 @@
 import "./AddToListModal.css";
 import { useState } from "react";
+import { Modal, Button, Form, ListGroup } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faTimes, faList } from "@fortawesome/free-solid-svg-icons";
 
-const AddToListModal = ({ addToList, lists, updateInput, newListName,createNewList }) => {
+const AddToListModal = ({ addToList, lists, updateInput, newListName, createNewList, show, onHide }) => {
   const [listName, setListName] = useState(null);
   const [isClicked, setIsClicked] = useState(false);
-  const handleClick=()=>{
-    createNewList(newListName)
-    setIsClicked(false)
-  }
-  const addQustionToList = () =>{
-    addToList(listName)
-    setListName(null)
-  }
-  
-  return (
-    <>
-      <div
-        className="modal fade"
-        id="AddToListModal"
-        tabIndex="-1"
-        aria-labelledby="addtolist"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-xl">
-          <div className="modal-content modal-list-content">
-            <header>
-              <div className="modal-header">
-                <h1 className="modal-title fs-5" id="addtolist">
-                  Add Question To List
-                </h1>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
-              </div>
-            </header>
 
-            <div className="modal-body modal-list-body">
-              <>
-                {!isClicked ? (
-                  <>
-                  <h3>Click on the list you want:</h3>
-                    {lists.length > 0 &&
-                      lists.map((list) => (
-                        <div key={list.id}>
-                         
-                          
-                          <div
-                            
-                            className="  mb-3 btn btn-primary"
-                            onClick={() => setListName(list.listName)}
-                          >
-                            {list.listName}
-                          </div>
-                          <br />
-                        </div>
-                      ))}
-                    <button
-                      className="  mb-3 btn btn-success"
-                      onClick={() => setIsClicked(true)}
-                    >
-                      Add New List
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <input
-                      value={newListName}
-                      onChange={updateInput}
-                      type="text"
-                      className="form-control mb-3"
-                      id="exampleFormControlInput10"
-                      placeholder="LIST NAME"
-                    />
-                    <button
-                      className="  ms-3 btn btn-secondary"
-                      onClick={() => setIsClicked(false)}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="  ms-3 btn btn-primary"
-                      onClick={() => handleClick()}
-                    >
-                      Add New List
-                    </button>
-                  </>
-                )}
-              </>
+  const handleClick = () => {
+    createNewList(newListName);
+    setIsClicked(false);
+  };
+
+  const addQuestionToList = () => {
+    addToList(listName);
+    setListName(null);
+    onHide();
+  };
+
+  return (
+    <Modal
+      show={show}
+      onHide={onHide}
+      id="AddToListModal"
+      aria-labelledby="addtolist"
+      size="lg"
+      centered
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>
+          <FontAwesomeIcon icon={faList} className="me-2" />
+          Add Question To List
+        </Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body className="p-4">
+        {!isClicked ? (
+          <>
+            <h5 className="mb-3">Select a list to add the question to:</h5>
+            <ListGroup className="mb-4">
+              {lists.length > 0 &&
+                lists.map((list) => (
+                  <ListGroup.Item
+                    key={list.id}
+                    action
+                    active={listName === list.listName}
+                    onClick={() => setListName(list.listName)}
+                    className="d-flex align-items-center mt-2"
+                  >
+                    {list.listName}
+                  </ListGroup.Item>
+                ))}
+            </ListGroup>
+            <Button
+              variant="success"
+              onClick={() => setIsClicked(true)}
+              className="d-flex align-items-center"
+            >
+              <FontAwesomeIcon icon={faPlus} className="me-2" />
+              Create New List
+            </Button>
+          </>
+        ) : (
+          <div className="d-flex flex-column">
+            <Form.Group className="mb-3">
+              <Form.Label>New List Name</Form.Label>
+              <Form.Control
+                value={newListName}
+                onChange={updateInput}
+                type="text"
+                placeholder="Enter list name"
+              />
+            </Form.Group>
+            <div>
+              <Button
+                variant="primary"
+                onClick={handleClick}
+                className="me-2"
+              >
+                Create List
+              </Button>
+              <Button
+                variant="outline-secondary"
+                onClick={() => setIsClicked(false)}
+              >
+                <FontAwesomeIcon icon={faTimes} />
+              </Button>
             </div>
-            <footer>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Cancel
-                </button>
-                <button
-                  className="btn btn-primary"
-                  data-bs-dismiss="modal"
-                  onClick={()=>addQustionToList()}
-                  disabled={listName===null}
-                >
-                  Add Question To{" "}
-                  <span className="text-warning">{listName}</span>
-                </button>
-              </div>
-            </footer>
           </div>
-        </div>
-      </div>
-    </>
+        )}
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button variant="outline-secondary" onClick={onHide}>
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          onClick={addQuestionToList}
+          disabled={listName === null}
+        >
+          Add to {listName && <span className="fw-bold">{listName}</span>}
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

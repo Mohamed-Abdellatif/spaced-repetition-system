@@ -1,7 +1,17 @@
 import "./AddModal.css";
+import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import MCQInput from "../MCQInput/MCQInput";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { 
+  faPlus, 
+  faImage, 
+  faBrain, 
+  faQuestion, 
+  faList, 
+  faChartLine 
+} from "@fortawesome/free-solid-svg-icons";
 
 const AddModal = ({
   questionObj,
@@ -9,13 +19,16 @@ const AddModal = ({
   handleSubmit,
   setQuestionObj,
   handleImageChange,
-  
+  show,
+  onHide,
+  image
 }) => {
-  const { question, answer, difficulty, genre, questionType, choices } =
-    questionObj;
+  const { question, answer, difficulty, genre, questionType, choices } = questionObj;
+
   const handleQuestionTypeChange = (questionType) => {
     setQuestionObj({ ...questionObj, questionType: questionType });
   };
+
   const updateChoices = (e) => {
     setQuestionObj({
       ...questionObj,
@@ -23,203 +36,161 @@ const AddModal = ({
     });
   };
 
+  const isFormValid = question && answer && difficulty && genre;
+
   return (
-    <>
-      <div
-        className="modal fade"
-        id="addModal"
-        tabIndex="-1"
-        aria-labelledby="exampleMod"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-xl">
-          <div className="modal-content modal-add-content">
-            <header>
-              <div className="modal-header">
-                <h1 className="modal-title fs-5" id="exampleMod">
-                  Add Question
-                </h1>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
-              </div>
-            </header>
+    <Modal
+      show={show}
+      onHide={onHide}
+      size="lg"
+      centered
+      className="question-modal"
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>
+          <FontAwesomeIcon icon={faPlus} className="me-2 text-primary" />
+          Add New Question
+        </Modal.Title>
+      </Modal.Header>
 
-            <div className="modal-body modal-add-body">
-              <>
-                <div className="">
-                  <div className="mb-3 ">
-                    <label
-                       
-                      className="form-label"
-                    >
-                      Genre
-                    </label>
-                    <input
-                      value={questionObj.genre}
-                      onChange={updateInput}
-                      name="genre"
-                      type="text"
-                      className="form-control"
-                       
-                      placeholder="Ex: Biology"
-                    />
-                  </div>
+      <Modal.Body className="p-4">
+        <Form>
+          <Row>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <FontAwesomeIcon icon={faBrain} className="me-2" />
+                  Genre
+                </Form.Label>
+                <Form.Control
+                  value={genre}
+                  onChange={updateInput}
+                  name="genre"
+                  type="text"
+                  placeholder="Ex: Biology"
+                />
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <FontAwesomeIcon icon={faChartLine} className="me-2" />
+                  Difficulty Level
+                </Form.Label>
+                <Form.Control
+                  value={difficulty}
+                  onChange={updateInput}
+                  name="difficulty"
+                  type="number"
+                  placeholder="0"
+                  min="1"
+                  max="10"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
 
-                  <div className="mb-3 ">
-                    <label
-                       
-                      className="form-label"
-                    >
-                      Question
-                    </label>
+          <Form.Group className="mb-3">
+            <Form.Label>
+              <FontAwesomeIcon icon={faQuestion} className="me-2" />
+              Question
+            </Form.Label>
+            <Form.Control
+              value={question}
+              onChange={updateInput}
+              name="question"
+              type="text"
+              placeholder="How to spell my name?"
+            />
+          </Form.Group>
 
-                    <input
-                      value={questionObj.question}
-                      onChange={updateInput}
-                      name="question"
-                      type="text"
-                      className="form-control"
-                       
-                      placeholder="How to spell my name?"
-                    />
-                  </div>
-                  <div className="mb-3 ">
-                    <label
-                       
-                      className="form-label"
-                    >
-                      Question Type
-                    </label>
-                    <DropdownButton
-                      
-                      title={questionObj.questionType}
-                      className="ms-3"
-                    >
-                      {questionObj.questionType === "MCQ" ? (
-                        ""
-                      ) : (
-                        <Dropdown.Item
-                          onClick={() => handleQuestionTypeChange("MCQ")}
-                        >
-                          MCQ
-                        </Dropdown.Item>
-                      )}
-                      {questionObj.questionType === "Short Response" ? (
-                        ""
-                      ) : (
-                        <Dropdown.Item
-                          onClick={() =>
-                            handleQuestionTypeChange("Short Response")
-                          }
-                        >
-                          Short Response
-                        </Dropdown.Item>
-                      )}
-                      {questionObj.questionType === "Complete" ? (
-                        ""
-                      ) : (
-                        <Dropdown.Item
-                          onClick={() => handleQuestionTypeChange("Complete")}
-                        >
-                          Complete
-                        </Dropdown.Item>
-                      )}
-                      {questionObj.questionType === "True or false" ? (
-                        ""
-                      ) : (
-                        <Dropdown.Item
-                          onClick={() =>
-                            handleQuestionTypeChange("True or false")
-                          }
-                        >
-                          True or false
-                        </Dropdown.Item>
-                      )}
-                    </DropdownButton>
-                  </div>
-                  <div className="mb-3 ">
-                    <label
-                       
-                      className="form-label"
-                    >
-                      Difficulty Level
-                    </label>
-                    <input
-                      value={questionObj.difficulty}
-                      onChange={updateInput}
-                      name="difficulty"
-                      type="number"
-                      className="form-control"
-                       
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label
-                      
-                      className="form-label"
-                    >
-                      Answer
-                    </label>
-                    <textarea
-                      value={questionObj.answer}
-                      onChange={updateInput}
-                      name="answer"
-                      className="form-control "
-                      
-                      rows="3"
-                    ></textarea>
-                    {questionType === "MCQ" && (
-                      <MCQInput
-                        updateChoices={updateChoices}
-                        choices={choices}
-                      />
-                    )}
-                  </div>
-                  <div className="btn-container"></div>
-                </div>
-                
-                  <input type="file" 
-                  onChange={handleImageChange} 
-                  />
-                  
-                
-              </>
+          <Form.Group className="mb-3">
+            <Form.Label>
+              <FontAwesomeIcon icon={faList} className="me-2" />
+              Question Type
+            </Form.Label>
+            <div>
+              <DropdownButton
+                variant="primary"
+                title={questionType}
+              >
+                {questionType !== "MCQ" && (
+                  <Dropdown.Item onClick={() => handleQuestionTypeChange("MCQ")}>
+                    Multiple Choice
+                  </Dropdown.Item>
+                )}
+                {questionType !== "Short Response" && (
+                  <Dropdown.Item onClick={() => handleQuestionTypeChange("Short Response")}>
+                    Short Response
+                  </Dropdown.Item>
+                )}
+                {questionType !== "Complete" && (
+                  <Dropdown.Item onClick={() => handleQuestionTypeChange("Complete")}>
+                    Complete
+                  </Dropdown.Item>
+                )}
+                {questionType !== "True or false" && (
+                  <Dropdown.Item onClick={() => handleQuestionTypeChange("True or false")}>
+                    True or False
+                  </Dropdown.Item>
+                )}
+              </DropdownButton>
             </div>
-            <footer>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Cancel
-                </button>
-                <button
-                  className="btn btn-primary"
-                  data-bs-dismiss={
-                    // eslint-disable-next-line
-                    !question == "" && // eslint-disable-next-line
-                    !answer == "" && // eslint-disable-next-line
-                    !difficulty == "" && // eslint-disable-next-line
-                    !genre == ""
-                      ? "modal"
-                      : ""
-                  }
-                  onClick={handleSubmit}
-                >
-                  Add Question
-                </button>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Answer</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={answer}
+              onChange={updateInput}
+              name="answer"
+              placeholder="Enter the answer"
+            />
+            {questionType === "MCQ" && (
+              <div className="mt-3">
+                <MCQInput
+                  updateChoices={updateChoices}
+                  choices={choices}
+                />
               </div>
-            </footer>
-          </div>
-        </div>
-      </div>
-    </>
+            )}
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>
+              <FontAwesomeIcon icon={faImage} className="me-2" />
+              Upload Image
+            </Form.Label>
+            <Form.Control
+              type="file"
+              onChange={handleImageChange}
+              accept="image/*"
+            />
+            {image && (
+              <small className="text-muted d-block mt-2">
+                Selected file: {image.name}
+              </small>
+            )}
+          </Form.Group>
+        </Form>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button variant="outline-secondary" onClick={onHide}>
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          onClick={handleSubmit}
+          disabled={!isFormValid}
+        >
+          <FontAwesomeIcon icon={faPlus} className="me-2" />
+          Add Question
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

@@ -5,8 +5,10 @@ import { UserContext } from "../../contexts/user.context";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { Modal, Button } from "react-bootstrap";
-import "./spacedSchedule.css"; // Import custom CSS for styling
+import { Modal, Button, Container, Row, Col, Card } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCalendar, faBook, faTimes, faCheck } from "@fortawesome/free-solid-svg-icons";
+import "./spacedSchedule.css";
 
 const dataURL = "http://localhost:3001";
 
@@ -32,8 +34,9 @@ const SpacedSchedule = () => {
         .map((q) => ({
           title: q.question,
           start: moment(q.nextTest).format("YYYY-MM-DD"),
-          backgroundColor: "#ffcc00",
-          textColor: "#333",
+          backgroundColor: "var(--bs-primary)",
+          textColor: "white",
+          borderColor: "var(--bs-primary)",
           extendedProps: { questionText: q.question, questionId: q.id },
         }));
 
@@ -61,7 +64,6 @@ const SpacedSchedule = () => {
 
   const handleEventClick = (info) => {
     const eventDate = moment(info.event.start).format("YYYY-MM-DD");
-
     setSelectedDate(moment(eventDate).format("MMMM Do YYYY"));
 
     const filteredQuestions = questions.filter(
@@ -73,40 +75,81 @@ const SpacedSchedule = () => {
   };
 
   return (
-    <div className="schedule-container">
-      <div className="schedule-card">
-        <h2 className="schedule-title">📅 Spaced Repetition Schedule</h2>
+    <Container className="py-4">
+      <Row className="mb-4">
+        <Col>
+          <h1 className="page-title">
+            <FontAwesomeIcon icon={faCalendar} className="me-3" />
+            Spaced Repetition Schedule
+          </h1>
+          <p className="page-description">
+            Track your learning progress and review schedule
+          </p>
+        </Col>
+      </Row>
 
-        <FullCalendar
-          plugins={[dayGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
-          events={events}
-          dateClick={handleDateClick}
-          eventClick={handleEventClick}
-          eventBorderColor="#fff"
-          height="auto"
-          headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth,dayGridWeek",
-          }}
-        />
-      </div>
+      <Row>
+        <Col>
+          <Card className="schedule-card">
+            <Card.Body>
+              <FullCalendar
+                plugins={[dayGridPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
+                events={events}
+                dateClick={handleDateClick}
+                eventClick={handleEventClick}
+                eventBorderColor="#fff"
+                height="auto"
+                headerToolbar={{
+                  left: "prev,next today",
+                  center: "title",
+                  right: "dayGridMonth,dayGridWeek",
+                }}
+              />
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
-      {/* Modal for Questions */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+      <Modal 
+        show={showModal} 
+        onHide={() => setShowModal(false)} 
+        centered
+        className="schedule-modal"
+      >
         <Modal.Header closeButton>
-          <Modal.Title>📖 Questions for {selectedDate}</Modal.Title>
+          <Modal.Title>
+            <FontAwesomeIcon icon={faBook} className="me-2" />
+            Questions for {selectedDate}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {selectedQuestions.length > 0 ? (
-            selectedQuestions.map((q, index) => (
-              <p key={q.id} className="modal-question">
-                <strong>{index + 1}.</strong> {q.question}<br/> Answer= {q.answer}
-              </p>
-            ))
+            <div className="questions-list">
+              {selectedQuestions.map((q, index) => (
+                <Card key={q.id} className="question-card mb-3">
+                  <Card.Body>
+                    <div className="d-flex align-items-start">
+                      <div className="question-number me-3">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <h5 className="question-text mb-2">{q.question}</h5>
+                        <p className="answer-text mb-0">
+                          <strong>Answer:</strong> {q.answer}
+                        </p>
+                      </div>
+                    </div>
+                  </Card.Body>
+                </Card>
+              ))}
+            </div>
           ) : (
-            <p className="no-questions">No questions scheduled for this date.</p>
+            <div className="text-center py-4">
+              <p className="text-muted mb-0">
+                No questions scheduled for this date.
+              </p>
+            </div>
           )}
         </Modal.Body>
         <Modal.Footer>
@@ -115,7 +158,7 @@ const SpacedSchedule = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </Container>
   );
 };
 

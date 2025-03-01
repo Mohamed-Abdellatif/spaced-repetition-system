@@ -1,23 +1,40 @@
 import { useState, useEffect } from "react";
-import { Row, Col, Button, DropdownButton, Dropdown, Spinner, Container } from "react-bootstrap";
+import {
+  Row,
+  Col,
+  Button,
+  DropdownButton,
+  Dropdown,
+  Spinner,
+  Container,
+  Form,
+  InputGroup,
+} from "react-bootstrap";
 import axios from "axios";
 import "./questionList.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faSearch, faFilter } from "@fortawesome/free-solid-svg-icons";
 
 import AddModal from "../AddModal/AddModal";
-
 import List from "../ViewQuestionsList/List";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import NotificationToast from "../Toast/toast";
-
 import EditModal from "../EditModal/editModal";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
 import AddToListModal from "../AddToListModal/AddToListModal";
 
+
 const dataURL = "http://localhost:3001";
 
 const QuestionList = () => {
   const { currentUser } = useContext(UserContext);
+ 
+  // Modal state management
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showAddToListModal, setShowAddToListModal] = useState(false);
 
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -53,9 +70,28 @@ const QuestionList = () => {
       choice2: "",
       choice3: "",
     },
-
   });
   const [currentGenre, setCurrentGenre] = useState("ALL GENRES");
+  
+  // Modal handlers
+  const handleAddClick = () => {
+    setShowAddModal(true);
+  };
+
+  const handleEditClick = (question) => {
+    setToEdit(question);
+    setShowEditModal(true);
+  };
+
+  const handleDeleteClick = (question) => {
+    setToDelete(question);
+    setShowDeleteModal(true);
+  };
+
+  const handleAddToListClick = (question) => {
+    setToBeAdded(question);
+    setShowAddToListModal(true);
+  };
 
   const handleSearchUpdate = (e) => {
     setQuery({ text: e.target.value });
@@ -111,6 +147,7 @@ const QuestionList = () => {
       console.log(error.message);
     }
   };
+
   useEffect(() => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -138,6 +175,7 @@ const QuestionList = () => {
       getData();
       setIsNotificationVisible(true);
       setResponse(response.data);
+      setShowDeleteModal(false);
     } catch {
       setResponse("Error please try again later");
       setIsNotificationVisible(true);
@@ -160,7 +198,6 @@ const QuestionList = () => {
   }, [currentUser]);
   //insert image
   const handleImageSubmit = async (questionID) => {
-
     if (image) {
       const formData = new FormData();
       formData.append("image", image);
@@ -178,13 +215,11 @@ const QuestionList = () => {
   };
   const handleEditSubmit = async () => {
     const { question, answer, difficulty, genre } = toEdit;
-    // eslint-disable-next-line
     if (
-      // eslint-disable-next-line
-      !question == " " && // eslint-disable-next-line
-      !answer == " " && // eslint-disable-next-line
-      !difficulty == " " && // eslint-disable-next-line
-      !genre == " " // eslint-disable-next-line
+      !question == " " &&
+      !answer == " " &&
+      !difficulty == " " &&
+      !genre == " "
     ) {
       try {
         const response = await axios.put(
@@ -192,10 +227,13 @@ const QuestionList = () => {
           toEdit
         );
         setResponse(response.data);
-        if (image !== null) { handleImageSubmit(toEdit.id) }
-        setImage(null)
+        if (image !== null) {
+          handleImageSubmit(toEdit.id);
+        }
+        setImage(null);
         getData();
         setIsNotificationVisible(true);
+        setShowEditModal(false);
       } catch (err) {
         console.log(err);
         setResponse("Error please try again later");
@@ -220,15 +258,14 @@ const QuestionList = () => {
   const handleAddSubmit = async () => {
     const { question, answer, difficulty, genre } = questionObj;
     if (
-      // eslint-disable-next-line
-      !question == " " && // eslint-disable-next-line
-      !answer == " " && // eslint-disable-next-line
-      !difficulty == " " && // eslint-disable-next-line
-      !genre == " " // eslint-disable-next-line
+      !question == " " &&
+      !answer == " " &&
+      !difficulty == " " &&
+      !genre == " "
     ) {
       const response = await axios.post(`${dataURL}/questions`, questionObj);
-      handleImageSubmit(response.data.id)
-      setImage(null)
+      handleImageSubmit(response.data.id);
+      setImage(null);
       getData();
 
       setQuestionObj({
@@ -242,11 +279,11 @@ const QuestionList = () => {
           choice2: "",
           choice3: "",
         },
-
       });
 
       setResponse(response.data.message);
       setIsNotificationVisible(true);
+      setShowAddModal(false);
     } else {
       setResponse("Please complete the blanks");
       setIsNotificationVisible(true);
@@ -308,139 +345,131 @@ const QuestionList = () => {
     setImage(event.target.files[0]);
   };
 
-
-
   return (
-    <>
-      <div className="fixedHeading">
-        <Container className="mt-5">
-          <Row className="mb-3 justify-content-between">
-            <Col sm={12} md={9} lg={9}>
-              <div className="input-group searchInput">
-                <input
-                  value={query.text}
-                  onChange={handleSearchUpdate}
-                  type="text"
-                  className="form-control"
-                  placeholder="Search"
-                  aria-label="Recipient's username"
-                  aria-describedby="button-addon2"
-                />
-                <Button
-                  variant="info"
-                  onClick={() => handleSearchClick()}
-                  type="button"
-                  
+    <Container fluid className="py-4">
+      <Row className="mb-4">
+        <Col xs={12} md={6} className="mb-3 mb-md-0">
+          <InputGroup>
+            <Form.Control
+              type="text"
+              placeholder="Search questions..."
+              value={query.text}
+              onChange={handleSearchUpdate}
+            />
+            <Button variant="outline-primary">
+              <FontAwesomeIcon icon={faSearch} />
+            </Button>
+          </InputGroup>
+        </Col>
+        <Col xs={12} md={3} className="mb-3 mb-md-0">
+          <DropdownButton
+            id="dropdown-basic-button"
+            title={currentGenre}
+            variant="outline-primary"
+            className="w-100"
+          >
+            <Dropdown.Item
+              onClick={() => setCurrentGenre("ALL GENRES")}
+              active={currentGenre === "ALL GENRES"}
+            >
+              ALL GENRES
+            </Dropdown.Item>
+            {allQuestions
+              .map((question) => question.genre)
+              .filter((value, index, self) => self.indexOf(value) === index)
+              .map((genre, index) => (
+                <Dropdown.Item
+                  key={index}
+                  onClick={() => setCurrentGenre(genre)}
+                  active={currentGenre === genre}
                 >
-                  <i className="fa fa-solid fa-magnifying-glass" />
-                </Button>
-              </div>
-            </Col>
-            <Col sm={4} md={3} lg={2} className="d-flex justify-content-end">
-              <Button
-                data-bs-toggle="modal"
-                data-bs-target="#addModal"
-                type="button"
-                className="btn btn-success addBtn"
-              >
-                Create New <i className="fa-solid fa-plus" />
-              </Button>
-            </Col>
-          </Row>
+                  {genre}
+                </Dropdown.Item>
+              ))}
+          </DropdownButton>
+        </Col>
+        <Col xs={12} md={3}>
+          <Button
+            variant="primary"
+            className="w-100 d-flex align-items-center justify-content-center"
+            onClick={handleAddClick}
+          >
+            <FontAwesomeIcon icon={faPlus} className="me-2" />
+            Add Question
+          </Button>
+        </Col>
+      </Row>
 
-          <Row className="">
-            <Col sm={8} md={9} lg={2}>
-              {questions.length} from {questionsLength}
-            </Col>
-            <Col sm={4} md={3} lg={2}  >
-              <DropdownButton
-                disabled={!questions.length}
-                title={currentGenre}
-                className="ms-3"
-              >
-                {questions &&
-                  filteredArray.map((genre) => (
-                    <Dropdown.Item key={genre} onClick={() => setCurrentGenre(genre)}>
-                      {genre}
-                    </Dropdown.Item>
-                  ))}
-                <Dropdown.Divider />
-                <Dropdown.Item onClick={() => setCurrentGenre("All GENRES")}>All GENRES</Dropdown.Item>
-              </DropdownButton>
-            </Col>
-          </Row>
-        </Container>
-      </div>
-
-      {!loading && currentUser ? (
-        <>
-          <div className="cards-container">
-            <Row className="justify-content-center">
-              <Col sm={12} md={10} >
-                <List
-                  addToList={setToBeAdded}
-                  setToEdit={setToEdit}
-                  toEdit={toEdit}
-                  questions={questions}
-                  setToDelete={setToDelete}
-                />
-              </Col>
-            </Row>
-          </div>
-        </>
-      ) : currentUser ? (
-        <div className="spinner">
-          <Spinner animation="border" />
+      {loading ? (
+        <div className="text-center py-5">
+          <Spinner animation="border" variant="primary" />
         </div>
       ) : (
-        <h3 className="spinner">Please Sign In</h3>
-      )}
-
-      {questions.length < 10 || questionsLength === questions.length ? (
-        ""
-      ) : (
-        <Button
-          variant="primary"
-          className="loadMoreButton"
-          onClick={() => loadMoreData()}
-        >
-          Load More...
-        </Button>
+        <>
+          <List
+            questions={questions}
+            setToDelete={handleDeleteClick}
+            setToEdit={handleEditClick}
+            addToList={handleAddToListClick}
+          />
+          {questionsLength > questions.length && (
+            <div className="text-center mt-4">
+              <Button variant="outline-primary" onClick={loadMoreData}>
+                Load More
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
       <AddModal
-        handleImageChange={handleImageChange}
-        setQuestionObj={setQuestionObj}
+        show={showAddModal}
+        onHide={() => setShowAddModal(false)}
         questionObj={questionObj}
-        handleSubmit={handleAddSubmit}
         updateInput={updateAddInput}
+        handleSubmit={handleAddSubmit}
+        setQuestionObj={setQuestionObj}
+        handleImageChange={handleImageChange}
+        image={image}
       />
 
-      <DeleteModal deleteQuestion={deleteQuestion} toDelete={toDelete} />
+      <EditModal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        questionObj={toEdit}
+        updateInput={updateInput}
+        handleSubmit={handleEditSubmit}
+        setQuestionObj={setToEdit}
+        handleImageChange={handleImageChange}
+        image={image}
+      />
+
+      <DeleteModal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        deleteQuestion={deleteQuestion}
+        toDelete={toDelete}
+      />
+
+      <AddToListModal
+        show={showAddToListModal}
+        onHide={() => setShowAddToListModal(false)}
+        addToList={(listName) => {
+          addToList(listName);
+          setShowAddToListModal(false);
+        }}
+        lists={lists}
+        updateInput={updateNewListInput}
+        newListName={newListName}
+        createNewList={(name) => createNewList(name)}
+      />
 
       <NotificationToast
         setShow={setIsNotificationVisible}
         show={isNotificationVisible}
         response={response}
       />
-
-      <EditModal
-        handleImageChange={handleImageChange}
-        setQuestionObj={setToEdit}
-        questionObj={toEdit}
-        handleSubmit={handleEditSubmit}
-        updateInput={updateInput}
-        image={image}
-      />
-
-      <AddToListModal
-        addToList={addToList}
-        lists={lists}
-        updateInput={updateNewListInput}
-        newListName={newListName}
-        createNewList={createNewList}
-      />
-    </>
+    </Container>
   );
 };
 
