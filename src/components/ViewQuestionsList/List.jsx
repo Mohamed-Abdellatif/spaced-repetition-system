@@ -1,8 +1,18 @@
 import QuestionCard from "../QuestionCard/QuestionCard";
 import { Row, Col, Alert } from "react-bootstrap";
 import "./List.css";
+import { UserContext } from "../../contexts/user.context";
+import { useContext } from "react";
 
-const List = ({ question, questions, setToDelete, setToEdit, toEdit, addToList }) => {
+const List = ({
+  question,
+  questions,
+  setToDelete,
+  setToEdit,
+  toEdit,
+  addToList,
+}) => {
+  const { currentUser } = useContext(UserContext);
   // If a single question is passed, wrap it in an array
   const questionsToRender = question ? [question] : questions || [];
 
@@ -23,7 +33,11 @@ const List = ({ question, questions, setToDelete, setToEdit, toEdit, addToList }
       ) : (
         <Col xs={12}>
           <Alert variant="warning" className="text-center">
-            <h3 className="mb-0">No questions available</h3>
+            {currentUser ? (
+              <h3 className="mb-0"> No questions available</h3>
+            ) : (
+              <h3 className="mb-0"> Please Sign In</h3>
+            )}
           </Alert>
         </Col>
       )}

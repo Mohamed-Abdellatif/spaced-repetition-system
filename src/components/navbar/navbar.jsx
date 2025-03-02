@@ -29,6 +29,8 @@ const NavBar = () => {
   const signOutHandler = async () => {
     await signOutUser();
     setCurrentUser(null);
+    setQuestions([]);
+    setListNames([]);
     navigate("/login");
   };
   
@@ -96,10 +98,11 @@ const NavBar = () => {
           <Navbar.Toggle aria-controls="navbarScroll" />
           
           <Navbar.Collapse id="navbarScroll">
-            <Nav className="me-auto">
+            <Nav className="me-auto" >
               <Nav.Link
                 className={`nav-link ${currentPath === "schedule" ? "active" : ""}`}
                 onClick={() => navigate("/schedule")}
+                disabled={currentUser===null}
               >
                 <FontAwesomeIcon icon={faCalendar} className="me-2" />
                 Schedule

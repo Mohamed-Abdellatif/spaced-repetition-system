@@ -24,12 +24,11 @@ import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
 import AddToListModal from "../AddToListModal/AddToListModal";
 
-
 const dataURL = "http://localhost:3001";
 
 const QuestionList = () => {
   const { currentUser } = useContext(UserContext);
- 
+
   // Modal state management
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -72,7 +71,7 @@ const QuestionList = () => {
     },
   });
   const [currentGenre, setCurrentGenre] = useState("ALL GENRES");
-  
+
   // Modal handlers
   const handleAddClick = () => {
     setShowAddModal(true);
@@ -112,7 +111,10 @@ const QuestionList = () => {
   };
 
   const getData = async () => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const response = await axios.post(`${dataURL}/getQuestions`, {

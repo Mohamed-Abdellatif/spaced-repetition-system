@@ -7,9 +7,7 @@
   align-items: center;
   padding: 30px;
 }
-.schedule-container a {
-  text-decoration: none !important;
-}
+
 /* 📜 Card Container */
 .schedule-card {
   background: white;
@@ -38,8 +36,13 @@
 
 /* 📅 FullCalendar Customization */
 .fc {
+  
   background: white;
   font-family: inherit;
+}
+
+.fc a{
+  text-decoration: none;
 }
 
 .fc .fc-toolbar-title {
@@ -58,14 +61,14 @@
 }
 
 .fc .fc-button:hover {
-  background-color: var(--bs-primary-dark);
+  
   border-color: var(--bs-primary-dark);
   transform: translateY(-1px);
 }
 
 .fc .fc-button-primary:not(:disabled).fc-button-active,
 .fc .fc-button-primary:not(:disabled):active {
-  background-color: var(--bs-primary-dark);
+  
   border-color: var(--bs-primary-dark);
 }
 

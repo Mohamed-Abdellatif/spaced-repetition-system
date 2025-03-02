@@ -57,7 +57,7 @@ const ViewQuestion = () => {
             height={"300px"}
           />
         )}
-        <h5 className={`card-title ${!img ? "mt-3" : "mt-3"}`}>Question: {question}</h5>
+        <h5 className={"card-title mt-3"}>Question: {question}</h5>
         <span
           className={`badge ${
             difficulty === "hard"
