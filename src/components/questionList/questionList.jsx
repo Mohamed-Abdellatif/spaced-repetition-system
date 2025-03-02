@@ -265,7 +265,8 @@ const QuestionList = () => {
       !difficulty == " " &&
       !genre == " "
     ) {
-      const response = await axios.post(`${dataURL}/questions`, questionObj);
+      const response = await axios.post(`${dataURL}/questions`, {...questionObj,created:new Date(),
+        nextTest: new Date(),});
       handleImageSubmit(response.data.id);
       setImage(null);
       getData();
@@ -275,8 +276,6 @@ const QuestionList = () => {
         difficulty: "",
         answer: "",
         genre: "",
-        created:new Date(),
-        nextTest: new Date(),
         questionType: "MCQ",
         choices: {
           choice1: "",
