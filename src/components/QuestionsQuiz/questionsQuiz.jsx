@@ -4,11 +4,11 @@ import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
 import moment from "moment";
-import { Container, Row, Col, Button, Form,  } from "react-bootstrap";
+import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faSync } from "@fortawesome/free-solid-svg-icons";
 
-const dataURL =  process.env.REACT_APP_SRS_BE_URL;
+const dataURL = process.env.REACT_APP_SRS_BE_URL;
 
 const QuestionsQuiz = () => {
   const { genre } = useParams();
@@ -74,7 +74,12 @@ const QuestionsQuiz = () => {
 
     let newInterval;
     let newStability = stability;
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Africa/Cairo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
     if (isCorrect) {
       // Increase interval exponentially based on stability
       newInterval = Math.round(prevInterval * newStability);
@@ -86,9 +91,8 @@ const QuestionsQuiz = () => {
     }
 
     const nextTestDate = moment().add(newInterval, "days").format();
-
     // Update question data
-    if (question.nextTest === today || question.nextTest === null) {
+    if (question.nextTest <= today || question.nextTest === null) {
       await axios.put(`${dataURL}/questions/${question.id}`, {
         nextTest: nextTestDate,
         lastTested: moment().format(),
@@ -128,7 +132,7 @@ const QuestionsQuiz = () => {
     <Container className="quiz-container">
       <Row className="w-100">
         <Col>
-          <h1 className="quiz-title">
+          <h1 className="quiz-title p-1">
             {genre !== "all" ? genre : "General"} Quiz
           </h1>
         </Col>
@@ -152,8 +156,8 @@ const QuestionsQuiz = () => {
                       <h3 className="question-text">
                         {questions[currentIndex]?.question}
                       </h3>
-                      <Form 
-                        onSubmit={handleSubmit} 
+                      <Form
+                        onSubmit={handleSubmit}
                         className="w-100 d-flex flex-column align-items-center"
                       >
                         <Form.Control
@@ -197,10 +201,16 @@ const QuestionsQuiz = () => {
                       ) : (
                         <div className="text-center">
                           <FontAwesomeIcon
-                            icon={response.includes("Right Answer") ? faCheck : faTimes}
+                            icon={
+                              response.includes("Right Answer")
+                                ? faCheck
+                                : faTimes
+                            }
                             size="3x"
                             className={`feedback-icon ${
-                              response.includes("Right Answer") ? "success" : "error"
+                              response.includes("Right Answer")
+                                ? "success"
+                                : "error"
                             }`}
                           />
                           <h3 className="feedback-text">{response}</h3>
@@ -216,7 +226,9 @@ const QuestionsQuiz = () => {
       ) : (
         <div className="text-center mt-5">
           <h3>No questions available for this category.</h3>
-          <p className="text-muted">Try selecting a different category or add some questions first.</p>
+          <p className="text-muted">
+            Try selecting a different category or add some questions first.
+          </p>
         </div>
       )}
     </Container>

@@ -54,7 +54,7 @@
 }
 
 .progress-bar progress::-webkit-progress-value {
-  background: linear-gradient(90deg, var(--bs-primary), var(--bs-primary-dark));
+  background: green;
   border-radius: 8px;
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }

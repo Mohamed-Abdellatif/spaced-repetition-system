@@ -265,8 +265,17 @@ const QuestionList = () => {
       !difficulty == " " &&
       !genre == " "
     ) {
-      const response = await axios.post(`${dataURL}/questions`, {...questionObj,created:new Date(),
-        nextTest: new Date(),});
+      const created = new Date().toLocaleString("en-US", {
+        timeZone: "Africa/Cairo",
+      });
+      const nextTest = new Date().toLocaleString("en-US", {
+        timeZone: "Africa/Cairo",
+      });
+      const response = await axios.post(`${dataURL}/questions`, {
+        ...questionObj,
+        created,
+        nextTest,
+      });
       handleImageSubmit(response.data.id);
       setImage(null);
       getData();
@@ -372,12 +381,11 @@ const QuestionList = () => {
             title={currentGenre}
             variant="outline-primary"
             className="w-100"
-            disabled={allQuestions.length<1}
+            disabled={allQuestions.length < 1}
           >
             <Dropdown.Item
               onClick={() => setCurrentGenre("ALL GENRES")}
               active={currentGenre === "ALL GENRES"}
-              
             >
               ALL GENRES
             </Dropdown.Item>
@@ -400,7 +408,7 @@ const QuestionList = () => {
             variant="primary"
             className="w-100 d-flex align-items-center justify-content-center"
             onClick={handleAddClick}
-            disabled={currentUser===null}
+            disabled={currentUser === null}
           >
             <FontAwesomeIcon icon={faPlus} className="me-2" />
             Add Question
