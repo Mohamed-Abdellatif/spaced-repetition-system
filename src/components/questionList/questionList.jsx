@@ -275,6 +275,8 @@ const QuestionList = () => {
         difficulty: "",
         answer: "",
         genre: "",
+        created:new Date(),
+        nextTest: new Date(),
         questionType: "MCQ",
         choices: {
           choice1: "",
