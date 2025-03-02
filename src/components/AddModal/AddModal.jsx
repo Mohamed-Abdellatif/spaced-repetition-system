@@ -178,7 +178,7 @@ const AddModal = ({
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="outline-secondary" onClick={onHide}>
+        <Button variant="secondary" onClick={onHide}>
           Cancel
         </Button>
         <Button

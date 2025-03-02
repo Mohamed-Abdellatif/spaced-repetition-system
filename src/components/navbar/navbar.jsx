@@ -16,7 +16,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar, faQuestionCircle, faList, faSignOutAlt, faSignInAlt, faUser } from "@fortawesome/free-solid-svg-icons";
 
-const dataURL = "http://localhost:3001";
+const dataURL =  process.env.REACT_APP_SRS_BE_URL;
 const NavBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -33,7 +33,6 @@ const NavBar = () => {
     setListNames([]);
     navigate("/login");
   };
-  
   const getData = async () => {
     if (!currentUser) return;
     try {
@@ -86,7 +85,6 @@ const NavBar = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   return (
     <>
       <Navbar fixed="top" expand="lg" bg="white" className="shadow-sm">
@@ -120,6 +118,7 @@ const NavBar = () => {
                 id="quiz-dropdown"
                 disabled={!questions.length > 0}
                 className={`nav-dropdown ${currentPath.includes("quiz") ? "active" : ""}`}
+                onClick={()=>getData()}
               >
                 {questions.length > 0 &&
                   filteredArray.map((genre) => (
@@ -144,14 +143,15 @@ const NavBar = () => {
                 title={
                   <>
                     <FontAwesomeIcon icon={faList} className="me-2" />
-                    {listNames.includes(currentPath.slice(5))
-                      ? currentPath.slice(5)
+                    {currentPath.includes("list")
+                      ? currentPath.slice(5).replaceAll("%20",' ')
                       : "Lists"}
                   </>
                 }
                 id="lists-dropdown"
                 disabled={!listNames.length > 0}
                 className={`nav-dropdown ${currentPath.includes("list") ? "active" : ""}`}
+                onClick={()=>getData()}
               >
                 {listNames.length > 0 &&
                   listNames.map((listName) => (

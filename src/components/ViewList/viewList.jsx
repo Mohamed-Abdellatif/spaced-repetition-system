@@ -12,13 +12,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt, faTimes } from "@fortawesome/free-solid-svg-icons";
 import "./viewList.css";
 
-const dataURL = "http://localhost:3001";
+const dataURL =  process.env.REACT_APP_SRS_BE_URL;
 
 const ViewList = () => {
   const navigate = useNavigate();
   const { listName } = useParams();
   const [toBeAdded, setToBeAdded] = useState({});
-  const [lists, setLists] = useState({});
+  const [lists, setLists] = useState([]);
   const [isClicked, setIsClicked] = useState(false);
   const [editListName, setEditListName] = useState(listName);
   const { currentUser } = useContext(UserContext);
@@ -44,7 +44,7 @@ const ViewList = () => {
     if (!currentUser) return;
     try {
       const response = await axios.post(`${dataURL}/getListQuestions`, {
-         listName: listName,
+         listName: listName.replaceAll("%20",' '),
         userId: currentUser?.uid,
       });
       
@@ -72,13 +72,13 @@ const ViewList = () => {
   const deleteQuestion = async () => {
     try {
       const response = await axios.post(`${dataURL}/getListQuestions`, {
-        listName: listName,
+        listName: listName.replaceAll("%20",' '),
         userId: currentUser?.uid,
       });
       const filtered = response.data[0].questions.filter(
         (id) => id !== toDelete.id
       );
-      await axios.put(`${dataURL}/lists/${listName}`, {
+      await axios.put(`${dataURL}/lists/${listName.replaceAll("%20",' ')}`, {
         questions: filtered,
         userId: currentUser?.uid,
       });
@@ -179,9 +179,9 @@ const ViewList = () => {
   const updateListName = (e) => {
     setEditListName(e.target.value);
   };
-
+  
   const changeListName=async()=>{
-  await axios.put(`${dataURL}/lists/${listName}`, {
+  await axios.put(`${dataURL}/lists/${lists.filter(list => list.listName===listName.replaceAll("%20",' '))[0].id}`, {
     newListName:editListName,
     userId: currentUser?.uid,
   });

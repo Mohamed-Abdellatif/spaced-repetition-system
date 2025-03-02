@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 import "./questionList.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faSearch, faFilter } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 
 import AddModal from "../AddModal/AddModal";
 import List from "../ViewQuestionsList/List";
@@ -24,7 +24,7 @@ import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
 import AddToListModal from "../AddToListModal/AddToListModal";
 
-const dataURL = "http://localhost:3001";
+const dataURL = process.env.REACT_APP_SRS_BE_URL;
 
 const QuestionList = () => {
   const { currentUser } = useContext(UserContext);
@@ -330,6 +330,8 @@ const QuestionList = () => {
   const updateNewListInput = (e) => {
     setNewListName(e.target.value);
   };
+
+  //create new list
   const createNewList = async (newListName) => {
     try {
       setNewListName("");
@@ -369,10 +371,12 @@ const QuestionList = () => {
             title={currentGenre}
             variant="outline-primary"
             className="w-100"
+            disabled={allQuestions.length<1}
           >
             <Dropdown.Item
               onClick={() => setCurrentGenre("ALL GENRES")}
               active={currentGenre === "ALL GENRES"}
+              
             >
               ALL GENRES
             </Dropdown.Item>
@@ -395,6 +399,7 @@ const QuestionList = () => {
             variant="primary"
             className="w-100 d-flex align-items-center justify-content-center"
             onClick={handleAddClick}
+            disabled={currentUser===null}
           >
             <FontAwesomeIcon icon={faPlus} className="me-2" />
             Add Question

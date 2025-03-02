@@ -4,11 +4,11 @@ import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
 import moment from "moment";
-import { Container, Row, Col, Button, Form, Card } from "react-bootstrap";
+import { Container, Row, Col, Button, Form,  } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faSync } from "@fortawesome/free-solid-svg-icons";
 
-const dataURL = "http://localhost:3001";
+const dataURL =  process.env.REACT_APP_SRS_BE_URL;
 
 const QuestionsQuiz = () => {
   const { genre } = useParams();

@@ -34,7 +34,7 @@ const DeleteModal = ({ deleteQuestion, toDelete, show, onHide }) => {
 
       <Modal.Footer>
         <Button
-          variant="outline-secondary"
+          variant="secondary"
           onClick={onHide}
         >
           Cancel

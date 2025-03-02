@@ -7,10 +7,10 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { Modal, Button, Container, Row, Col, Card } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendar, faBook, faTimes, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, faBook, } from "@fortawesome/free-solid-svg-icons";
 import "./spacedSchedule.css";
 
-const dataURL = "http://localhost:3001";
+const dataURL =  process.env.REACT_APP_SRS_BE_URL;
 
 const SpacedSchedule = () => {
   const { currentUser } = useContext(UserContext);

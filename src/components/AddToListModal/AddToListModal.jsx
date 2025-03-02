@@ -82,7 +82,7 @@ const AddToListModal = ({ addToList, lists, updateInput, newListName, createNewL
                 Create List
               </Button>
               <Button
-                variant="outline-secondary"
+                variant="secondary"
                 onClick={() => setIsClicked(false)}
               >
                 <FontAwesomeIcon icon={faTimes} />
@@ -93,7 +93,10 @@ const AddToListModal = ({ addToList, lists, updateInput, newListName, createNewL
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="outline-secondary" onClick={onHide}>
+        <Button variant="secondary" onClick={()=>{
+          setIsClicked(false);
+          onHide();
+        }}>
           Cancel
         </Button>
         <Button

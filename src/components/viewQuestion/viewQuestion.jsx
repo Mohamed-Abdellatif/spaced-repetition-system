@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./viewQuestion.css";
 
-const dataURL = "http://localhost:3001";
+const dataURL =  process.env.REACT_APP_SRS_BE_URL;
 
 const ViewQuestion = () => {
   const { questionId } = useParams();
