@@ -131,7 +131,7 @@ const EditModal = ({
           <Form.Group className="mb-3">
             <Form.Label>
               <FontAwesomeIcon icon={faImage} className="me-2" />
-              Upload Image
+              Edit Image
             </Form.Label>
             <Form.Control
               type="file"

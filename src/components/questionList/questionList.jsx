@@ -174,6 +174,7 @@ const QuestionList = () => {
       const response = await axios.delete(
         `${dataURL}/questions/${toDelete.id}`
       );
+      await axios.delete(`${dataURL}/deleteImage/${toDelete.id}`);
       getData();
       setIsNotificationVisible(true);
       setResponse(response.data);
@@ -224,12 +225,15 @@ const QuestionList = () => {
       !genre == " "
     ) {
       try {
+        
         const response = await axios.put(
           `${dataURL}/questions/${toEdit.id}`,
           toEdit
         );
         setResponse(response.data);
         if (image !== null) {
+          console.log(toEdit.img,`${dataURL}/deleteImage/${toEdit.id}`)
+          if(toEdit.img){await axios.delete(`${dataURL}/deleteImage/${toEdit.id}`);}
           handleImageSubmit(toEdit.id);
         }
         setImage(null);
@@ -324,25 +328,23 @@ const QuestionList = () => {
         if (!response.data[0].questions.includes(id)) {
           const requestions = response.data[0].questions;
 
-          const listResponse= await axios.put(`${dataURL}/lists/${listId}`, {
+          const listResponse = await axios.put(`${dataURL}/lists/${listId}`, {
             questions: requestions.concat(id),
             userId: currentUser?.uid,
           });
           setResponse(listResponse.data);
           setIsNotificationVisible(true);
-          
-        }else{
+        } else {
           setResponse("Question already exists in the list");
           setIsNotificationVisible(true);
         }
       } else {
-        const listResponse=await axios.put(`${dataURL}/lists/${listId}`, {
+        const listResponse = await axios.put(`${dataURL}/lists/${listId}`, {
           questions: [id],
           userId: currentUser?.uid,
         });
         setResponse(listResponse.data);
         setIsNotificationVisible(true);
-        
       }
     } catch (err) {
       setResponse(err);
