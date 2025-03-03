@@ -23,7 +23,7 @@ const NotificationToast = ({show, setShow, response}) => {
                 <strong className="me-auto">SRS</strong>
                 <small>1 second ago</small>
               </Toast.Header>
-              <Toast.Body>
+              <Toast.Body className="bg-light">
                 <strong>{response}</strong>
               </Toast.Body>
             </Toast>

@@ -317,24 +317,36 @@ const QuestionList = () => {
         listName: listName,
         userId: currentUser?.uid,
       });
-
+      const listId = lists.filter(
+        (list) => list.listName === listName.replaceAll("%20", " ")
+      )[0].id;
       if (response.data[0].questions !== null) {
         if (!response.data[0].questions.includes(id)) {
           const requestions = response.data[0].questions;
 
-          await axios.put(`${dataURL}/lists/${listName}`, {
+          const listResponse= await axios.put(`${dataURL}/lists/${listId}`, {
             questions: requestions.concat(id),
             userId: currentUser?.uid,
           });
+          setResponse(listResponse.data);
+          setIsNotificationVisible(true);
+          
+        }else{
+          setResponse("Question already exists in the list");
+          setIsNotificationVisible(true);
         }
       } else {
-        await axios.put(`${dataURL}/lists/${listName}`, {
+        const listResponse=await axios.put(`${dataURL}/lists/${listId}`, {
           questions: [id],
           userId: currentUser?.uid,
         });
+        setResponse(listResponse.data);
+        setIsNotificationVisible(true);
+        
       }
     } catch (err) {
-      console.log(err);
+      setResponse(err);
+      setIsNotificationVisible(true);
     }
   };
   const updateNewListInput = (e) => {
