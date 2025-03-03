@@ -91,7 +91,7 @@ const EditModal = ({
             <div>
               <DropdownButton
                 id="dropdown"
-                variant="outline-primary"
+                variant="primary"
                 title={questionType}
               >
                 {questionType !== "Short Response" && (
