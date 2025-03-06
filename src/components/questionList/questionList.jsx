@@ -437,12 +437,12 @@ const QuestionList = () => {
       ) : (
         <>
           <List
-            questions={questions}
+            questions={questions.sort((a, b) => a.id - b.id)}
             setToDelete={handleDeleteClick}
             setToEdit={handleEditClick}
             addToList={handleAddToListClick}
           />
-          {questionsLength > questions.length && (
+          {(questionsLength > questions.length) && (!query.text.length>0)  && (
             <div className="text-center mt-4">
               <Button variant="outline-primary" onClick={loadMoreData}>
                 Load More

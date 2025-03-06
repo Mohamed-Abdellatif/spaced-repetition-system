@@ -8,6 +8,7 @@ import SpacedSchedule from "./components/spacedSchedule/spacedSchedule";
 import ViewList from "./components/ViewList/viewList";
 import Authentication from "./Authentication/authentication/authentication.component";
 import ViewQuestion from "./components/viewQuestion/viewQuestion";
+import ListsPage from "./components/ListsPage/ListsPage";
 
 const App = () => {
   return (
@@ -51,6 +52,14 @@ const App = () => {
             element={
               <Container fluid="lg" className="py-4">
                 <ViewList />
+              </Container>
+            }
+          />
+          <Route
+            path="lists"
+            element={
+              <Container fluid="lg" className="py-4">
+                <ListsPage />
               </Container>
             }
           />

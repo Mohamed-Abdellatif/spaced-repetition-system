@@ -12,15 +12,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt, faTimes } from "@fortawesome/free-solid-svg-icons";
 import "./viewList.css";
 
-const dataURL =  process.env.REACT_APP_SRS_BE_URL;
+const dataURL = process.env.REACT_APP_SRS_BE_URL;
 
 const ViewList = () => {
-  const navigate = useNavigate();
   const { listName } = useParams();
   const [toBeAdded, setToBeAdded] = useState({});
   const [lists, setLists] = useState([]);
-  const [isClicked, setIsClicked] = useState(false);
-  const [editListName, setEditListName] = useState(listName);
   const { currentUser } = useContext(UserContext);
   const [questions, setQuestions] = useState([]);
   const [toEdit, setToEdit] = useState({
@@ -34,7 +31,7 @@ const ViewList = () => {
   const [newListName, setNewListName] = useState("");
   const [response, setResponse] = useState("");
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
-  
+
   // Add modal state management
   const [showAddToListModal, setShowAddToListModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -44,10 +41,10 @@ const ViewList = () => {
     if (!currentUser) return;
     try {
       const response = await axios.post(`${dataURL}/getListQuestions`, {
-         listName: listName.replaceAll("%20",' '),
+        listName: listName.replaceAll("%20", " "),
         userId: currentUser?.uid,
       });
-      
+
       const listResponse = await axios.post(`${dataURL}/getLists`, {
         userId: currentUser?.uid,
       });
@@ -62,23 +59,21 @@ const ViewList = () => {
   };
   useEffect(() => {
     getData();
-    
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listName]);
-  
 
   //delete
   const deleteQuestion = async () => {
     try {
       const response = await axios.post(`${dataURL}/getListQuestions`, {
-        listName: listName.replaceAll("%20",' '),
+        listName: listName.replaceAll("%20", " "),
         userId: currentUser?.uid,
       });
       const filtered = response.data[0].questions.filter(
         (id) => id !== toDelete.id
       );
-      await axios.put(`${dataURL}/lists/${listName.replaceAll("%20",' ')}`, {
+      await axios.put(`${dataURL}/lists/${listName.replaceAll("%20", " ")}`, {
         questions: filtered,
         userId: currentUser?.uid,
       });
@@ -90,7 +85,6 @@ const ViewList = () => {
       setResponse("Error please try again later");
       setIsNotificationVisible(true);
     }
-    
   };
 
   //edit
@@ -116,7 +110,7 @@ const ViewList = () => {
           `${dataURL}/questions/${toEdit.id}`,
           toEdit
         );
-        
+
         await setResponse(response.data);
         await getData();
         setIsNotificationVisible(true);
@@ -129,7 +123,6 @@ const ViewList = () => {
       setResponse("Please complete the blanks");
       setIsNotificationVisible(true);
     }
-    
   };
 
   //add to list
@@ -176,19 +169,6 @@ const ViewList = () => {
     }
   };
 
-  const updateListName = (e) => {
-    setEditListName(e.target.value);
-  };
-  
-  const changeListName=async()=>{
-  await axios.put(`${dataURL}/lists/${lists.filter(list => list.listName===listName.replaceAll("%20",' '))[0].id}`, {
-    newListName:editListName,
-    userId: currentUser?.uid,
-  });
-  navigate(`/list/${editListName}`)
-  setIsClicked(!isClicked)
-  }
-
   // Update handlers for modals
   const handleAddToList = (question) => {
     setToBeAdded(question);
@@ -204,51 +184,28 @@ const ViewList = () => {
     setToEdit(question);
     setShowEditModal(true);
   };
-
+  const list= lists?.filter(list => list.listName === listName)[0];
   return (
     <Container fluid className="py-4">
       <Row className="justify-content-center">
         <Col xs={12} md={10} lg={8}>
           <Card className="shadow-sm">
             <Card.Body>
-              {!isClicked ? (
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                  <h1 className="mb-0 text-primary">{listName}</h1>
-                  <Button
-                    variant="outline-primary"
-                    size="sm"
-                    onClick={() => setIsClicked(!isClicked)}
-                    className="d-flex align-items-center"
-                  >
-                    <FontAwesomeIcon icon={faPencilAlt} className="me-2" />
-                    Rename
-                  </Button>
-                </div>
-              ) : (
-                <div className="d-flex align-items-center mb-4">
-                  <Form.Control
-                    type="text"
-                    onChange={updateListName}
-                    value={editListName}
-                    className="me-2"
-                    placeholder="Enter new list name"
-                  />
-                  <Button
-                    variant="primary"
-                    onClick={() => changeListName()}
-                    className="me-2"
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    variant="outline-secondary"
-                    onClick={() => setIsClicked(!isClicked)}
-                  >
-                    <FontAwesomeIcon icon={faTimes} />
-                  </Button>
-                </div>
-              )}
-              
+              <Row className="my-2">
+                <Col>
+                  <h4 className="mb-0 text-primary text-uppercase">
+                    {listName}
+                  </h4>
+                </Col>
+              </Row>
+              <Row className="my-2">
+                <Col>
+                  <h6 className="mb-0 text-secondary text-capitalize">
+                    {(list?.description?.length>0)?(list.description):"No Description"}
+                  </h6>
+                </Col>
+              </Row>
+
               <div className="questions-container">
                 <List
                   addToList={handleAddToList}
@@ -263,7 +220,7 @@ const ViewList = () => {
         </Col>
       </Row>
 
-      <DeleteModal 
+      <DeleteModal
         show={showDeleteModal}
         onHide={() => setShowDeleteModal(false)}
         deleteQuestion={() => {

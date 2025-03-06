@@ -6,7 +6,7 @@ import { faEye, faEdit, faTrash, faPlus } from "@fortawesome/free-solid-svg-icon
 import { Card, Row, Col, Button } from "react-bootstrap";
 
 const QuestionCard = ({ questionObj, setToDelete, setToEdit, addToList }) => {
-  const { question, created, genre, id } = questionObj;
+  const { question, created, genre, id, questionType} = questionObj;
   const navigate = useNavigate();
 
   return (
@@ -14,7 +14,7 @@ const QuestionCard = ({ questionObj, setToDelete, setToEdit, addToList }) => {
       <Card.Body>
         <Row className="question-card__header">
           <Col xs={12} sm={8}>
-            <h3 className="question-card__title">Question</h3>
+            <h3 className="question-card__title">{question}</h3>
           </Col>
           <Col xs={12} sm={4} className="text-sm-end">
             <span className="question-card__genre">{genre}</span>
@@ -23,7 +23,7 @@ const QuestionCard = ({ questionObj, setToDelete, setToEdit, addToList }) => {
 
         <Row className="question-card__content">
           <Col xs={12}>
-            <p>{question}</p>
+            <p>Type: {questionType}</p>
             <small className="text-muted d-block">
               Created on {moment(created).format("MMMM Do YYYY")}
             </small>

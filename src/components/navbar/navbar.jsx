@@ -119,6 +119,7 @@ const NavBar = () => {
                 disabled={!questions.length > 0}
                 className={`nav-dropdown ${currentPath.includes("quiz") ? "active" : ""}`}
                 onClick={()=>getData()}
+                onMouseEnter={()=>getData()}
               >
                 {questions.length > 0 &&
                   filteredArray.map((genre) => (
@@ -138,32 +139,15 @@ const NavBar = () => {
                   All Questions
                 </NavDropdown.Item>
               </NavDropdown>
-
-              <NavDropdown
-                title={
-                  <>
-                    <FontAwesomeIcon icon={faList} className="me-2" />
-                    {currentPath.includes("list")
-                      ? currentPath.slice(5).replaceAll("%20",' ')
-                      : "Lists"}
-                  </>
-                }
-                id="lists-dropdown"
-                disabled={!listNames.length > 0}
-                className={`nav-dropdown ${currentPath.includes("list") ? "active" : ""}`}
-                onClick={()=>getData()}
+              
+              <Nav.Link
+                className={`nav-link ${currentPath === "lists" ? "active" : ""}`}
+                onClick={() => navigate("/lists")}
+                disabled={currentUser===null}
               >
-                {listNames.length > 0 &&
-                  listNames.map((listName) => (
-                    <NavDropdown.Item
-                      key={listName}
-                      onClick={() => navigate(`/list/${listName}`)}
-                      active={currentPath === `list/${listName}`}
-                    >
-                      {listName}
-                    </NavDropdown.Item>
-                  ))}
-              </NavDropdown>
+                <FontAwesomeIcon icon={faList} className="me-2" />
+                Lists
+              </Nav.Link>
             </Nav>
 
             <Nav className="align-items-center">

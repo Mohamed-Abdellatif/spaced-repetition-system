@@ -12,11 +12,10 @@ const EditModal = ({
   handleSubmit,
   setQuestionObj,
   handleImageChange,
-  image,
   show,
   onHide
 }) => {
-  const { question, answer, difficulty, genre, questionType, choices } = questionObj;
+  const { question, answer, difficulty, genre, questionType, choices,img } = questionObj;
 
   const handleQuestionTypeChange = (questionType) => {
     setQuestionObj({ ...questionObj, questionType: questionType });
@@ -131,7 +130,7 @@ const EditModal = ({
           <Form.Group className="mb-3">
             <Form.Label>
               <FontAwesomeIcon icon={faImage} className="me-2" />
-              Edit Image
+              {img?"Edit Image":"Upload Image"}
             </Form.Label>
             <Form.Control
               type="file"
