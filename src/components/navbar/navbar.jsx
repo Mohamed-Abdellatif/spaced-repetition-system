@@ -14,23 +14,34 @@ import {
 import "./navbar.css";
 import { onAuthStateChanged } from "firebase/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendar, faQuestionCircle, faList, faSignOutAlt, faSignInAlt, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCalendar,
+  faQuestionCircle,
+  faList,
+  faSignOutAlt,
+  faSignInAlt,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 
-const dataURL =  process.env.REACT_APP_SRS_BE_URL;
+const dataURL = process.env.REACT_APP_SRS_BE_URL;
 const NavBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useContext(UserContext);
   const [questions, setQuestions] = useState([]);
-  const [listNames, setListNames] = useState([]);
   const [displayName, setDisplayName] = useState("");
 
   const currentPath = location.pathname.slice(1);
+  const today = Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Cairo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
   const signOutHandler = async () => {
     await signOutUser();
     setCurrentUser(null);
     setQuestions([]);
-    setListNames([]);
     navigate("/login");
   };
   const getData = async () => {
@@ -39,10 +50,6 @@ const NavBar = () => {
       const response = await axios.post(`${dataURL}/getQuestions`, {
         userId: currentUser?.uid,
       });
-      const listResponse = await axios.post(`${dataURL}/getLists`, {
-        userId: currentUser?.uid,
-      });
-      setListNames([].concat(listResponse.data.map((list) => list.listName)));
 
       setQuestions(response.data);
     } catch (error) {
@@ -51,7 +58,7 @@ const NavBar = () => {
   };
   useEffect(() => {
     getData();
-    
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
   const genres = [].concat(questions.map((question) => question.genre));
@@ -92,15 +99,17 @@ const NavBar = () => {
           <Navbar.Brand className="brand fw-bold" onClick={() => navigate("/")}>
             SRS
           </Navbar.Brand>
-          
+
           <Navbar.Toggle aria-controls="navbarScroll" />
-          
+
           <Navbar.Collapse id="navbarScroll">
-            <Nav className="me-auto" >
+            <Nav className="me-auto">
               <Nav.Link
-                className={`nav-link ${currentPath === "schedule" ? "active" : ""}`}
+                className={`nav-link ${
+                  currentPath === "schedule" ? "active" : ""
+                }`}
                 onClick={() => navigate("/schedule")}
-                disabled={currentUser===null}
+                disabled={currentUser === null}
               >
                 <FontAwesomeIcon icon={faCalendar} className="me-2" />
                 Schedule
@@ -110,16 +119,20 @@ const NavBar = () => {
                 title={
                   <>
                     <FontAwesomeIcon icon={faQuestionCircle} className="me-2" />
-                    {filteredArray.concat("General").includes(currentPath.slice(5))
+                    {filteredArray
+                      .concat("General")
+                      .includes(currentPath.slice(5))
                       ? currentPath.slice(5)
                       : "Choose Quiz Genre"}
                   </>
                 }
                 id="quiz-dropdown"
                 disabled={!questions.length > 0}
-                className={`nav-dropdown ${currentPath.includes("quiz") ? "active" : ""}`}
-                onClick={()=>getData()}
-                onMouseEnter={()=>getData()}
+                className={`nav-dropdown ${
+                  currentPath.includes("quiz") ? "active" : ""
+                }`}
+                onClick={() => getData()}
+                onMouseEnter={() => getData()}
               >
                 {questions.length > 0 &&
                   filteredArray.map((genre) => (
@@ -133,17 +146,26 @@ const NavBar = () => {
                   ))}
                 <NavDropdown.Divider />
                 <NavDropdown.Item
+                  onClick={() => navigate(`/quiz/Due-Today`)}
+                  active={currentPath === "quiz/Due-Today"}
+                  disabled={questions?.filter(question=>question.nextTest===today).length<1}
+                >
+                  Due Today
+                </NavDropdown.Item>
+                <NavDropdown.Item
                   onClick={() => navigate(`/quiz/General`)}
                   active={currentPath === "quiz/General"}
                 >
                   All Questions
                 </NavDropdown.Item>
               </NavDropdown>
-              
+
               <Nav.Link
-                className={`nav-link ${currentPath === "lists" ? "active" : ""}`}
+                className={`nav-link ${
+                  currentPath === "lists" ? "active" : ""
+                }`}
                 onClick={() => navigate("/lists")}
-                disabled={currentUser===null}
+                disabled={currentUser === null}
               >
                 <FontAwesomeIcon icon={faList} className="me-2" />
                 Lists
@@ -153,13 +175,18 @@ const NavBar = () => {
             <Nav className="align-items-center">
               {currentUser && (
                 <div className="d-flex align-items-center me-3">
-                  <FontAwesomeIcon icon={faUser} className="me-2 text-primary" />
+                  <FontAwesomeIcon
+                    icon={faUser}
+                    className="me-2 text-primary"
+                  />
                   <span className="fw-medium">{displayName}</span>
                 </div>
               )}
-              
+
               <Nav.Link
-                onClick={currentUser ? signOutHandler : () => navigate("/login")}
+                onClick={
+                  currentUser ? signOutHandler : () => navigate("/login")
+                }
                 className="d-flex align-items-center"
               >
                 <FontAwesomeIcon

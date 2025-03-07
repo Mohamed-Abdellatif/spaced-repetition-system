@@ -18,7 +18,12 @@ const QuestionsQuiz = () => {
   const [currentAnswer, setCurrentAnswer] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
   const [response, setResponse] = useState("");
-
+  const today = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Cairo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
   useEffect(() => {
     if (!currentUser) return;
 
@@ -27,19 +32,21 @@ const QuestionsQuiz = () => {
         const res = await axios.post(`${dataURL}/getQuestions`, {
           userId: currentUser.uid,
         });
-
-        let filteredQuestions =
-          genre === "General"
-            ? res.data
-            : res.data.filter((q) => q.genre === genre);
-        setQuestions(shuffle(filteredQuestions));
+        
+        if(genre==="General"){
+          setQuestions(res.data);
+        }else if(genre==="Due-Today"){
+          setQuestions(res.data.filter(question =>question.nextTest===today));
+        }else{
+          setQuestions(res.data.filter(question => question.genre===genre));
+        }
       } catch (error) {
         console.error("Error fetching questions:", error);
       }
     };
 
     getData();
-  }, [genre, currentUser]);
+  }, [genre, currentUser,today]);
 
   useEffect(() => {
     if (questions.length > 0) {
@@ -74,12 +81,7 @@ const QuestionsQuiz = () => {
 
     let newInterval;
     let newStability = stability;
-    const today = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Africa/Cairo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
+    
     if (isCorrect) {
       // Increase interval exponentially based on stability
       newInterval = Math.round(prevInterval * newStability);
