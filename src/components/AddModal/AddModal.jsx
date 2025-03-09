@@ -12,8 +12,10 @@ import {
   faList, 
   faChartLine 
 } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 
 const AddModal = ({
+  generateQuestionFromText,
   questionObj,
   updateInput,
   handleSubmit,
@@ -28,6 +30,10 @@ const AddModal = ({
   const handleQuestionTypeChange = (questionType) => {
     setQuestionObj({ ...questionObj, questionType: questionType });
   };
+
+  const [text, setText] = useState('');
+
+  
 
   const updateChoices = (e) => {
     setQuestionObj({
@@ -157,6 +163,21 @@ const AddModal = ({
               </div>
             )}
           </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Generate Question From Text By AI</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={text}
+              onChange={(e)=>setText(e.target.value)}
+              name="text"
+              placeholder="Enter the text"
+            />
+            <Button className="mt-2" onClick={()=>{generateQuestionFromText(text)}}>
+              Generate Question
+              <FontAwesomeIcon icon={faQuestion} className="ms-2" />
+            </Button>
+          </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>
@@ -183,7 +204,10 @@ const AddModal = ({
         </Button>
         <Button
           variant="primary"
-          onClick={handleSubmit}
+          onClick={()=>{
+            handleSubmit();
+            setText('');
+          }}
           disabled={!isFormValid}
         >
           <FontAwesomeIcon icon={faPlus} className="me-2" />

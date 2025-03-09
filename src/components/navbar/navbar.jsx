@@ -38,6 +38,7 @@ const NavBar = () => {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
+  
   const signOutHandler = async () => {
     await signOutUser();
     setCurrentUser(null);

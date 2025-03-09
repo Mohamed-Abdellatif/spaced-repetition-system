@@ -3,6 +3,7 @@ import { Row, Col, Alert } from "react-bootstrap";
 import "./List.css";
 import { UserContext } from "../../contexts/user.context";
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
 const List = ({
   question,
@@ -13,7 +14,7 @@ const List = ({
   addToList,
 }) => {
   const { currentUser } = useContext(UserContext);
-  // If a single question is passed, wrap it in an array
+  const navigate=useNavigate();
   const questionsToRender = question ? [question] : questions || [];
 
   return (
@@ -36,7 +37,7 @@ const List = ({
             {currentUser ? (
               <h3 className="mb-0"> No questions available</h3>
             ) : (
-              <h3 className="mb-0"> Please Sign In</h3>
+              <h3 className="mb-0"> Please <span role="button" onClick={()=>navigate("/login")} className="text-warning text-decoration-underline ">Sign In</span></h3>
             )}
           </Alert>
         </Col>

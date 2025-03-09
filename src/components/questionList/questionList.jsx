@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import {
   Row,
   Col,
@@ -25,6 +26,7 @@ import { UserContext } from "../../contexts/user.context";
 import AddToListModal from "../AddToListModal/AddToListModal";
 
 const dataURL = process.env.REACT_APP_SRS_BE_URL;
+const Google_API_KEY = process.env.REACT_APP_API_KEY;
 
 const QuestionList = () => {
   const { currentUser } = useContext(UserContext);
@@ -225,15 +227,16 @@ const QuestionList = () => {
       !genre == " "
     ) {
       try {
-        
         const response = await axios.put(
           `${dataURL}/questions/${toEdit.id}`,
           toEdit
         );
         setResponse(response.data);
         if (image !== null) {
-          console.log(toEdit.img,`${dataURL}/deleteImage/${toEdit.id}`)
-          if(toEdit.img){await axios.delete(`${dataURL}/deleteImage/${toEdit.id}`);}
+          console.log(toEdit.img, `${dataURL}/deleteImage/${toEdit.id}`);
+          if (toEdit.img) {
+            await axios.delete(`${dataURL}/deleteImage/${toEdit.id}`);
+          }
           handleImageSubmit(toEdit.id);
         }
         setImage(null);
@@ -372,6 +375,59 @@ const QuestionList = () => {
   const handleImageChange = (event) => {
     setImage(event.target.files[0]);
   };
+  const sendResponseAsNotification = (res) => {
+    setResponse(res);
+    setIsNotificationVisible(true);
+  };
+  const generateQuestionFromText = async (text) => {
+    try {
+      const genAI = new GoogleGenerativeAI(Google_API_KEY);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const prompt = `
+        Extract a question from the following text and return it as a **valid JSON object** ONLY.
+        No explanations, no Markdown, just plain JSON.  you must complete the question with info extracted from the text below
+        The format must match:
+        {
+            "question": "",
+            "difficulty": "0",
+            "answer": "",
+            "genre": "",
+            "questionType": "Short Response",
+            "choices": { "choice1": "", "choice2": "", "choice3": "" }
+        }
+        Here is the text: "${text}"
+        `;
+
+      const response = await model.generateContent(prompt);
+
+      if (!response || !response.response) {
+        sendResponseAsNotification("Please Try Again Later");
+        return;
+      }
+
+      let responseText = response.response.text().trim();
+
+      if (responseText.startsWith("```json")) {
+        responseText = responseText.slice(7, -3).trim();
+      }
+
+      let extractedObject;
+      try {
+        extractedObject = JSON.parse(responseText);
+      } catch (jsonError) {
+        sendResponseAsNotification("Please Try Again Later");
+        return;
+      }
+
+      if (extractedObject?.question) {
+        setQuestionObj({ ...extractedObject, userId: currentUser?.uid });
+      } else {
+        sendResponseAsNotification("Please Try Again Later");
+      }
+    } catch (error) {
+      sendResponseAsNotification("Please Try Again Later");
+    }
+  };
 
   return (
     <Container fluid className="py-4">
@@ -442,7 +498,7 @@ const QuestionList = () => {
             setToEdit={handleEditClick}
             addToList={handleAddToListClick}
           />
-          {(questionsLength > questions.length) && (!query.text.length>0)  && (
+          {questionsLength > questions.length && !query.text.length > 0 && (
             <div className="text-center mt-4">
               <Button variant="outline-primary" onClick={loadMoreData}>
                 Load More
@@ -453,6 +509,7 @@ const QuestionList = () => {
       )}
 
       <AddModal
+        generateQuestionFromText={generateQuestionFromText}
         show={showAddModal}
         onHide={() => setShowAddModal(false)}
         questionObj={questionObj}

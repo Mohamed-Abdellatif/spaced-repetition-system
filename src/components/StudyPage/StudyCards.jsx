@@ -156,7 +156,6 @@ const StudyCards = () => {
   if (cards.length === remembered.length) {
     return (
       <Container className="study-container">
-        {/* //TODO: ROW AND COLS*/}
         <Row className="text-center ">
           <Col xs={12}>
             <h3>
