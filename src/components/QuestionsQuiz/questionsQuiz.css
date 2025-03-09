@@ -25,7 +25,7 @@
 }
 
 /* Make sure progress bar styling doesn't get overridden */
-.progress-bar {
+.quiz-container .progress-bar {
   width: 100%;
   max-width: 600px;
   margin: 0 auto 1rem;
@@ -40,7 +40,7 @@
   height: auto;
 }
 
-.progress-bar progress {
+.quiz-container .progress-bar progress {
   flex-grow: 1;
   height: 10px;
   border-radius: 8px;
@@ -48,18 +48,18 @@
   background-color: var(--bs-gray-200);
 }
 
-.progress-bar progress::-webkit-progress-bar {
+.quiz-container .progress-bar progress::-webkit-progress-bar {
   background-color: var(--bs-gray-200);
   border-radius: 8px;
 }
 
-.progress-bar progress::-webkit-progress-value {
+.quiz-container .progress-bar progress::-webkit-progress-value {
   background: green;
   border-radius: 8px;
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.progress-bar span {
+.quiz-container .progress-bar span {
   font-size: 1rem;
   font-weight: 600;
   color: var(--bs-gray-700);
@@ -69,7 +69,7 @@
   padding: 0;
 }
 
-.progress-bar {
+.quiz-container .progress-bar {
   animation-delay: 0.1s;
 }
 

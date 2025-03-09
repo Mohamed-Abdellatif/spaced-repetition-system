@@ -1,7 +1,7 @@
 import {
+  faBookOpen,
   faEdit,
   faEye,
-  faPlus,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -62,6 +62,18 @@ const ListCard = ({ list,setToDelete,setToEdit }) => {
                     className="w-100"
                   >
                     <FontAwesomeIcon icon={faTrash}  />
+                  </Button>
+                </Col>
+              </Row>
+              <Row className="mt-2 g-2 me-1">
+                <Col xs={12} className="text-center">
+                  <Button
+                    variant="outline-success"
+                    onClick={() => navigate(`/study/${listName}`)}
+                    className="w-100"
+                  >
+                    <span className="fw-bold">Study List</span>
+                    <FontAwesomeIcon icon={faBookOpen} className="ms-2"/> 
                   </Button>
                 </Col>
               </Row>

@@ -1,15 +1,13 @@
 import axios from "axios";
 import { useContext, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
 import AddToListModal from "../AddToListModal/AddToListModal";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import EditModal from "../EditModal/editModal";
 import NotificationToast from "../Toast/toast";
 import List from "../ViewQuestionsList/List";
-import { Container, Row, Col, Button, Form, Card } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencilAlt, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import "./viewList.css";
 
 const dataURL = process.env.REACT_APP_SRS_BE_URL;

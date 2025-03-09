@@ -9,6 +9,7 @@ import ViewList from "./components/ViewList/viewList";
 import Authentication from "./Authentication/authentication/authentication.component";
 import ViewQuestion from "./components/viewQuestion/viewQuestion";
 import ListsPage from "./components/ListsPage/ListsPage";
+import StudyCards from "./components/StudyPage/StudyCards";
 
 const App = () => {
   return (
@@ -71,7 +72,16 @@ const App = () => {
               </Container>
             }
           />
+          <Route
+            path="study/:listName"
+            element={
+              <Container fluid="lg" className="py-4">
+                <StudyCards />
+              </Container>
+            }
+          />
         </Route>
+        
       </Routes>
     </div>
   );
