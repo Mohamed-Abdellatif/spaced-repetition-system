@@ -24,7 +24,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router-dom";
 
-const dataURL = "http://localhost:3001";
+const dataURL = process.env.REACT_APP_SRS_BE_URL;
 
 const StudyCards = () => {
   const { listName } = useParams();
@@ -61,7 +61,7 @@ const StudyCards = () => {
     if (currentUser) {
       fetchCards();
     }
-  }, [currentUser,listName]);
+  }, [currentUser, listName]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -156,20 +156,28 @@ const StudyCards = () => {
   if (cards.length === remembered.length) {
     return (
       <Container className="study-container">
-        <div className="text-center ">
-          <h3>
-            {" "}
-            <FontAwesomeIcon icon={faAward} /> You finished Studying!!!
-          </h3>
-          <Button className="mt-3" variant="primary" onClick={() => {
-            setCurrentIndex(0);
-            setRemembered([]);
-            setReviewAgain([]);
-          }}>
-            Restart Studying
-            <FontAwesomeIcon icon={faSync} className="ms-2" />
-          </Button>
-        </div>
+        {/* //TODO: ROW AND COLS*/}
+        <Row className="text-center ">
+          <Col xs={12}>
+            <h3>
+              <FontAwesomeIcon icon={faAward} /> You finished Studying!!!
+            </h3>
+          </Col>
+          <Col xs={12}>
+            <Button
+              className="mt-3"
+              variant="primary"
+              onClick={() => {
+                setCurrentIndex(0);
+                setRemembered([]);
+                setReviewAgain([]);
+              }}
+            >
+              Restart Studying
+              <FontAwesomeIcon icon={faSync} className="ms-2" />
+            </Button>
+          </Col>
+        </Row>
       </Container>
     );
   }
