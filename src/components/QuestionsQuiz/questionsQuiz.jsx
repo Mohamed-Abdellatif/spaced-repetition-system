@@ -8,7 +8,7 @@ import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faSync } from "@fortawesome/free-solid-svg-icons";
 
-const dataURL = process.env.REACT_APP_SRS_BE_URL;
+const dataURL = import.meta.env.VITE_SRS_BE_URL;
 
 const QuestionsQuiz = () => {
   const { genre } = useParams();

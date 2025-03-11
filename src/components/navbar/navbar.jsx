@@ -23,7 +23,7 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
-const dataURL = process.env.REACT_APP_SRS_BE_URL;
+const dataURL = import.meta.env.VITE_SRS_BE_URL;
 const NavBar = () => {
   const location = useLocation();
   const navigate = useNavigate();

@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar, faBook, } from "@fortawesome/free-solid-svg-icons";
 import "./spacedSchedule.css";
 
-const dataURL =  process.env.REACT_APP_SRS_BE_URL;
+const dataURL =  import.meta.env.VITE_SRS_BE_URL;
 
 const SpacedSchedule = () => {
   const { currentUser } = useContext(UserContext);

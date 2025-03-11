@@ -10,7 +10,7 @@ import List from "../ViewQuestionsList/List";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import "./viewList.css";
 
-const dataURL = process.env.REACT_APP_SRS_BE_URL;
+const dataURL = import.meta.env.VITE_SRS_BE_URL;
 
 const ViewList = () => {
   const { listName } = useParams();

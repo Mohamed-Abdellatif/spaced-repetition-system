@@ -24,7 +24,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router-dom";
 
-const dataURL = process.env.REACT_APP_SRS_BE_URL;
+const dataURL = import.meta.env.VITE_SRS_BE_URL;
 
 const StudyCards = () => {
   const { listName } = useParams();

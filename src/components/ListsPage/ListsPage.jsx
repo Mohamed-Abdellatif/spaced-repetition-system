@@ -11,7 +11,7 @@ import DeleteListModal from "../DeleteListModal/DeleteListModal";
 import EditListModal from "../EditListModal/editListModal";
 import AddListModal from "../AddListModal/AddListModal";
 
-const dataURL = process.env.REACT_APP_SRS_BE_URL;
+const dataURL = import.meta.env.VITE_SRS_BE_URL;
 
 const ListsPage = () => {
   const { currentUser } = useContext(UserContext);

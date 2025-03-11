@@ -1,70 +1,127 @@
-# Getting Started with Create React App
+# Spaced Repetition System (SRS)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern web application for efficient learning through spaced repetition, built with React and Firebase.
 
-## Available Scripts
+## Overview
 
-In the project directory, you can run:
+The Spaced Repetition System (SRS) is a sophisticated learning tool that helps users retain information more effectively by scheduling review sessions at optimal intervals. This application combines proven learning techniques with modern technology to create an engaging and effective study experience.
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Smart Question Management**
+  - Create and organize questions with multiple formats (MCQ, text-based)
+  - Categorize questions by genre and difficulty
+  - Add images to questions for visual learning
+  - Search functionality for quick access to specific questions
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Spaced Repetition**
+  - Intelligent scheduling of review sessions
+  - Progress tracking for each study session
+  - Visual feedback on learning progress
+  - Customizable study lists
 
-### `npm test`
+- **List Management**
+  - Create and manage multiple study lists
+  - Add questions to different lists
+  - Search and filter lists
+  - List descriptions and metadata
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **User Authentication**
+  - Secure login with email/password
+  - Google authentication integration
+  - Protected routes and user-specific content
+  - Profile management
 
-### `npm run build`
+- **Modern UI/UX**
+  - Responsive design for all devices
+  - Clean and intuitive interface
+  - Progress visualization
+  - Loading states and animations
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Technology Stack
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- **Frontend**
+  - React 18.2.0
+  - React Bootstrap 5.3.1
+  - React Router 7.2.0
+  - Styled Components 5.3.6
+  - Font Awesome for icons
+  - Framer Motion for animations
+  - FullCalendar for scheduling
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **Backend & Services**
+  - Firebase Authentication
+  - Firebase Firestore
+  - Google Generative AI integration
+  - Axios for API communication
 
-### `npm run eject`
+- **Development**
+  - Vite for build tooling
+  - ESLint for code quality
+  - SASS for styling
+  - Environment variable management
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Getting Started
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. Set up environment variables:
+   Create a `.env` file with the following variables:
+   ```
+   VITE_SRS_BE_URL=your_backend_url
+   VITE_API_KEY=your_google_api_key
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+4. Start the development server:
+   ```bash
+   npm start
+   ```
 
-## Learn More
+5. Open [http://localhost:5173](http://localhost:5173) to view the app in your browser
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Project Structure
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+src/
+├── Authentication/       # Authentication components and styles
+├── components/          # React components
+│   ├── navbar/         # Navigation components
+│   ├── questionList/   # Question management
+│   ├── StudyPage/      # Study interface
+│   └── ...
+├── contexts/           # React contexts
+├── Utils/             # Utility functions
+├── assets/            # Static assets
+└── App.jsx            # Main application component
+```
 
-### Code Splitting
+## Key Components
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- **QuestionList**: Manages the creation, editing, and organization of questions
+- **StudyCards**: Implements the spaced repetition study interface
+- **ListsPage**: Handles the organization of study lists
+- **Authentication**: Manages user authentication and profile
+- **Navbar**: Provides navigation and user interface controls
 
-### Analyzing the Bundle Size
+## Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-### Making a Progressive Web App
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-### Advanced Configuration
+## Acknowledgments
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Create React App for the initial project setup
+- Firebase for authentication and database services
+- React Bootstrap for UI components
+- The spaced repetition learning community for inspiration

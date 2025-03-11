@@ -25,8 +25,8 @@ import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
 import AddToListModal from "../AddToListModal/AddToListModal";
 
-const dataURL = process.env.REACT_APP_SRS_BE_URL;
-const Google_API_KEY = process.env.REACT_APP_API_KEY;
+const dataURL = import.meta.env.VITE_SRS_BE_URL;
+const Google_API_KEY = import.meta.env.VITE_API_KEY;
 
 const QuestionList = () => {
   const { currentUser } = useContext(UserContext);
