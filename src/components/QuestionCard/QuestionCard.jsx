@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEdit, faTrash, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { Card, Row, Col, Button } from "react-bootstrap";
 
-const QuestionCard = ({ questionObj, setToDelete, setToEdit, addToList }) => {
+const QuestionCard = ({ listType,questionObj, setToDelete, setToEdit, addToList }) => {
   const { question, created, genre, id, questionType} = questionObj;
   const navigate = useNavigate();
 
@@ -33,7 +33,7 @@ const QuestionCard = ({ questionObj, setToDelete, setToEdit, addToList }) => {
         <Row className="question-card__footer">
           <Col xs={12}>
             <div className="question-card__actions">
-              <Row className="g-2 w-100">
+              {listType==="private"?<Row className="g-2 w-100">
                 <Col xs={12} sm={6} md={3}>
                   <Button
                     onClick={() => addToList(questionObj)}
@@ -77,7 +77,29 @@ const QuestionCard = ({ questionObj, setToDelete, setToEdit, addToList }) => {
                     Delete
                   </Button>
                 </Col>
-              </Row>
+              </Row>:<Row className="g-2 w-100">
+                <Col xs={12} sm={6} >
+                  <Button
+                    onClick={() => addToList(questionObj)}
+                    variant="primary"
+                    className="w-100"
+                  >
+                    <FontAwesomeIcon icon={faPlus} className="me-2" />
+                    Add To List
+                  </Button>
+                </Col>
+                
+                <Col xs={12} sm={6} >
+                  <Button
+                    onClick={() => navigate(`/question/${id}`)}
+                    variant="outline-secondary"
+                    className="w-100"
+                  >
+                    <FontAwesomeIcon icon={faEye} className="me-2" />
+                    View
+                  </Button>
+                </Col>
+              </Row>}
             </div>
           </Col>
         </Row>

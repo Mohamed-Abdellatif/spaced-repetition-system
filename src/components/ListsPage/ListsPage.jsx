@@ -10,6 +10,7 @@ import ListsMapper from "../ListsMapper/ListsMapper";
 import DeleteListModal from "../DeleteListModal/DeleteListModal";
 import EditListModal from "../EditListModal/editListModal";
 import AddListModal from "../AddListModal/AddListModal";
+import { getDisplayNameFromDocument } from "../../Utils/firebase/firebase.utils";
 
 const dataURL = import.meta.env.VITE_SRS_BE_URL;
 
@@ -28,7 +29,7 @@ const ListsPage = () => {
   const [toDelete, setToDelete] = useState({});
 
   const [lists, setLists] = useState([]);
-  const [newList, setNewList] = useState({listName:"",description:""});
+  const [newList, setNewList] = useState({ listName: "", description: "" });
 
   const [query, setQuery] = useState({ text: "" });
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
@@ -73,18 +74,29 @@ const ListsPage = () => {
 
   const updateAddInput = (e) => {
     e.preventDefault();
-    setNewList({...newList, [e.target.name]: e.target.value});
+    setNewList({ ...newList, [e.target.name]: e.target.value });
   };
 
-  const handleAddSubmit = async () => {
+  const handleAddSubmit = async (isListPublic) => {
     try {
-      const response = await axios.post(`${dataURL}/lists`, {
-        listName: newList.listName,
-        userId: currentUser?.uid,
-        description: newList.description
-      });
+      let response = {};
+      const displayName = await getDisplayNameFromDocument();
+      if (isListPublic) {
+        response = await axios.post(`${dataURL}/publicLists`, {
+          listName: newList.listName,
+          creatorId: currentUser?.uid,
+          description: newList.description,
+          creator:displayName[currentUser?.email]
+        });
+      } else {
+        response = await axios.post(`${dataURL}/lists`, {
+          listName: newList.listName,
+          userId: currentUser?.uid,
+          description: newList.description,
+        });
+      }
       setShowAddModal(false);
-      setNewList({});
+      setNewList({ listName: "", description: "" });
       getData();
       setResponse(response.data);
       setIsNotificationVisible(true);
@@ -106,9 +118,12 @@ const ListsPage = () => {
       const listResponse = await axios.post(`${dataURL}/getLists`, {
         userId: currentUser?.uid,
       });
+      const publicListResponse = await axios.post(`${dataURL}/getPublicListsWithCreatorId`, {
+        creatorId: currentUser?.uid,
+      });
       const res = await axios.post(`${dataURL}/getIds`);
       setQuestionObj([].concat(res.data.map((id) => id.id)));
-      setLists(listResponse.data.sort((a, b) => a.id - b.id));
+      setLists([...listResponse.data.sort((a, b) => a.id - b.id),...publicListResponse.data.sort((a, b) => a.id - b.id)]);
       setLoading(false);
       updateLists();
     } catch (error) {
@@ -135,7 +150,7 @@ const ListsPage = () => {
 
   const deleteList = async () => {
     try {
-      const response = await axios.delete(`${dataURL}/lists/${toDelete.id}`);
+      const response = toDelete.creatorId===currentUser.uid?await axios.delete(`${dataURL}/publicLists/${toDelete.id}`):await axios.delete(`${dataURL}/lists/${toDelete.id}`);
       getData();
       setIsNotificationVisible(true);
       setResponse(response.data);
@@ -152,11 +167,16 @@ const ListsPage = () => {
 
   const handleEditSubmit = async () => {
     try {
-      const response = await axios.put(`${dataURL}/lists/${toEdit.id}`, {
+      const response = toEdit.creatorId!==currentUser.uid?await axios.put(`${dataURL}/lists/${toEdit.id}`, {
         newListName: toEdit.listName,
         userId: currentUser?.uid,
         questions: toEdit.questions,
-        description: toEdit.description
+        description: toEdit.description,
+      }):await axios.put(`${dataURL}/publicList/${toEdit.id}`, {
+        newListName: toEdit.listName,
+        creatorId: currentUser?.uid,
+        questions: toEdit.questions,
+        description: toEdit.description,
       });
       getData();
       setShowEditModal(false);
@@ -225,6 +245,7 @@ const ListsPage = () => {
           setToDelete={handleDeleteClick}
           setListName={handleEditClick}
           setToEdit={handleEditClick}
+          setToAdd={null}
         />
       )}
       <NotificationToast

@@ -21,6 +21,7 @@ import {
   faSignOutAlt,
   faSignInAlt,
   faUser,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 
 const dataURL = import.meta.env.VITE_SRS_BE_URL;
@@ -169,7 +170,18 @@ const NavBar = () => {
                 disabled={currentUser === null}
               >
                 <FontAwesomeIcon icon={faList} className="me-2" />
-                Lists
+                 My Lists
+              </Nav.Link>
+
+              <Nav.Link
+                className={`nav-link ${
+                  currentPath === "publicLists" ? "active" : ""
+                }`}
+                onClick={() => navigate("/publicLists")}
+                disabled={currentUser === null}
+              >
+                <FontAwesomeIcon icon={faSearch} className="me-2" />
+                 Browse
               </Nav.Link>
             </Nav>
 

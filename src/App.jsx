@@ -10,6 +10,7 @@ import Authentication from "./Authentication/authentication/authentication.compo
 import ViewQuestion from "./components/viewQuestion/viewQuestion";
 import ListsPage from "./components/ListsPage/ListsPage";
 import StudyCards from "./components/StudyPage/StudyCards";
+import PublicListsPage from "./components/PublicListsPage/PublicListsPage";
 
 const App = () => {
   return (
@@ -52,7 +53,7 @@ const App = () => {
             path="list/:listName"
             element={
               <Container fluid="lg" className="py-4">
-                <ViewList />
+                <ViewList listType={"private"}/>
               </Container>
             }
           />
@@ -61,6 +62,22 @@ const App = () => {
             element={
               <Container fluid="lg" className="py-4">
                 <ListsPage />
+              </Container>
+            }
+          />
+          <Route
+            path="publicLists"
+            element={
+              <Container fluid="lg" className="py-4">
+                <PublicListsPage />
+              </Container>
+            }
+          />
+          <Route
+            path="publicList/:listName"
+            element={
+              <Container fluid="lg" className="py-4">
+                <ViewList listType={"public"}/>
               </Container>
             }
           />

@@ -5,6 +5,7 @@ const ListsMapper = ({
   lists,
   setToDelete,
   setToEdit,
+  setToAdd
 }) => {
   return (
     <Row>
@@ -17,6 +18,7 @@ const ListsMapper = ({
                 list={list}
                 setToDelete={setToDelete}
                 setToEdit={setToEdit}
+                setToAdd={setToAdd}
               />
             </Col>
           );

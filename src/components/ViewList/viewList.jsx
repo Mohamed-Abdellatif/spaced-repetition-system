@@ -12,7 +12,7 @@ import "./viewList.css";
 
 const dataURL = import.meta.env.VITE_SRS_BE_URL;
 
-const ViewList = () => {
+const ViewList = ({listType}) => {
   const { listName } = useParams();
   const [toBeAdded, setToBeAdded] = useState({});
   const [lists, setLists] = useState([]);
@@ -38,15 +38,23 @@ const ViewList = () => {
   const getData = async () => {
     if (!currentUser) return;
     try {
-      const response = await axios.post(`${dataURL}/getListQuestions`, {
+      const response =listType==="private" ?await axios.post(`${dataURL}/getListQuestions`, {
         listName: listName.replaceAll("%20", " "),
         userId: currentUser?.uid,
+      }):await axios.post(`${dataURL}/getPublicListQuestions`, {
+        listName: listName.replaceAll("%20", " ")
       });
 
       const listResponse = await axios.post(`${dataURL}/getLists`, {
         userId: currentUser?.uid,
       });
-      setLists(listResponse.data);
+      const publicListResponse = await axios.post(
+        `${dataURL}/getPublicListsWithCreatorId`,
+        {
+          creatorId: currentUser?.uid,
+        }
+      );
+      setLists([...listResponse.data,... publicListResponse.data]);
       const res = await axios.post(`${dataURL}/getQuestionsById`, {
         questionsList: response.data[0].questions,
       });
@@ -60,6 +68,11 @@ const ViewList = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listName]);
+  useEffect(() => {
+    getData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser]);
 
   //delete
   const deleteQuestion = async () => {
@@ -183,6 +196,7 @@ const ViewList = () => {
     setShowEditModal(true);
   };
   const list= lists?.filter(list => list.listName === listName)[0];
+  
   return (
     <Container fluid className="py-4">
       <Row className="justify-content-center">
@@ -206,6 +220,7 @@ const ViewList = () => {
 
               <div className="questions-container">
                 <List
+                  listType={listType}
                   addToList={handleAddToList}
                   setToEdit={handleEdit}
                   toEdit={toEdit}

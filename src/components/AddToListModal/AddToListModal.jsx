@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTimes, faList } from "@fortawesome/free-solid-svg-icons";
 
 const AddToListModal = ({ addToList, lists, updateInput, newListName, createNewList, show, onHide }) => {
-  const [listName, setListName] = useState(null);
+  const [listObj, setListObj] = useState(null);
   const [isClicked, setIsClicked] = useState(false);
 
   const handleClick = () => {
@@ -14,8 +14,8 @@ const AddToListModal = ({ addToList, lists, updateInput, newListName, createNewL
   };
 
   const addQuestionToList = () => {
-    addToList(listName);
-    setListName(null);
+    addToList(listObj);
+    setListObj(null);
     onHide();
   };
 
@@ -45,8 +45,8 @@ const AddToListModal = ({ addToList, lists, updateInput, newListName, createNewL
                   <ListGroup.Item
                     key={list.id}
                     action
-                    active={listName === list.listName}
-                    onClick={() => setListName(list.listName)}
+                    active={listObj?.listName === list.listName}
+                    onClick={() => setListObj(list)}
                     className="d-flex align-items-center mt-2"
                   >
                     {list.listName}
@@ -102,9 +102,9 @@ const AddToListModal = ({ addToList, lists, updateInput, newListName, createNewL
         <Button
           variant="primary"
           onClick={addQuestionToList}
-          disabled={listName === null}
+          disabled={listObj === null}
         >
-          Add to {listName && <span className="fw-bold">{listName}</span>}
+          Add to {listObj && <span className="fw-bold">{listObj?.listName}</span>}
         </Button>
       </Modal.Footer>
     </Modal>

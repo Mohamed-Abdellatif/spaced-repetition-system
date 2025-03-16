@@ -1,13 +1,22 @@
 import "./AddListModal.css";
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col, ButtonGroup } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faList, faPen } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlus,
+  faList,
+  faPen,
+  faLock,
+  faLockOpen,
+} from "@fortawesome/free-solid-svg-icons";
+import ToggleButton from "react-bootstrap/ToggleButton";
+import { useEffect, useState } from "react";
 
 const AddListModal = ({ updateInput, handleSubmit, show, onHide, list }) => {
   const { listName, description } = list;
+  const [isListPublic, setIsListPublic] = useState(false);
 
   const isFormValid = listName?.length > 0;
-
+  
   return (
     <Modal
       show={show}
@@ -25,6 +34,34 @@ const AddListModal = ({ updateInput, handleSubmit, show, onHide, list }) => {
 
       <Modal.Body className="p-4">
         <Form>
+          <Row >
+            <Col >
+              <ButtonGroup className="mb-3 bg-secondary">
+                <ToggleButton
+                  id="public_list"
+                  type="radio"
+                  variant={isListPublic ? "primary" : "bg-secondary"}
+                  name="radio"
+                  value={true}
+                  checked={isListPublic}
+                  onChange={() => setIsListPublic(true)}
+                >
+                  <FontAwesomeIcon icon={faLockOpen} className="me-2" /> Public
+                </ToggleButton>
+                <ToggleButton
+                  id="private_list"
+                  type="radio"
+                  variant={!isListPublic ? "primary" : "bg-secondary"}
+                  name="radio"
+                  value={false}
+                  checked={!isListPublic}
+                  onChange={() => setIsListPublic(false)}
+                >
+                  <FontAwesomeIcon icon={faLock} className="me-2" /> Private
+                </ToggleButton>
+              </ButtonGroup>
+            </Col>
+          </Row>
           <Row>
             <Form.Group className="mb-3">
               <Form.Label>
@@ -64,7 +101,10 @@ const AddListModal = ({ updateInput, handleSubmit, show, onHide, list }) => {
         </Button>
         <Button
           variant="primary"
-          onClick={handleSubmit}
+          onClick={() => {
+            handleSubmit(isListPublic)
+            setIsListPublic(false);
+          }}
           disabled={!isFormValid}
         >
           <FontAwesomeIcon icon={faPlus} className="me-2" />

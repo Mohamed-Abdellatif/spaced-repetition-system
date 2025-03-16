@@ -134,7 +134,13 @@ const QuestionList = () => {
       const listResponse = await axios.post(`${dataURL}/getLists`, {
         userId: currentUser?.uid,
       });
-      setLists(listResponse.data);
+      const publicListResponse = await axios.post(
+        `${dataURL}/getPublicListsWithCreatorId`,
+        {
+          creatorId: currentUser?.uid,
+        }
+      );
+      setLists([...listResponse.data,... publicListResponse.data]);
       if (currentGenre === "ALL GENRES") {
         setQuestions(response.data);
       } else {
@@ -317,37 +323,69 @@ const QuestionList = () => {
     }
   }
   //add to list
-  const addToList = async (listName) => {
+  const addToList = async (list) => {
     const { id } = toBeAdded;
+    const {listName}= list;
     try {
-      const response = await axios.post(`${dataURL}/getListQuestions`, {
-        listName: listName,
-        userId: currentUser?.uid,
-      });
-      const listId = lists.filter(
-        (list) => list.listName === listName.replaceAll("%20", " ")
-      )[0].id;
-      if (response.data[0].questions !== null) {
-        if (!response.data[0].questions.includes(id)) {
-          const requestions = response.data[0].questions;
-
+      if(list?.creatorId === currentUser?.uid){
+        const response = await axios.post(`${dataURL}/getPublicListQuestions`, {
+          listName: listName,
+        });
+        const listId = lists.filter(
+          (list) => list.listName === listName.replaceAll("%20", " ")
+        )[0].id;
+        if (response.data[0].questions !== null) {
+          if (!response.data[0].questions.includes(id)) {
+            const requestions = response.data[0].questions;
+  
+            const listResponse = await axios.put(`${dataURL}/publicList/${listId}`, {
+              questions: requestions.concat(id),
+              creatorId: currentUser?.uid,
+            });
+            setResponse(listResponse.data);
+            setIsNotificationVisible(true);
+          } else {
+            setResponse("Question already exists in the list");
+            setIsNotificationVisible(true);
+          }
+        } else {
+          const listResponse = await axios.put(`${dataURL}/publicList/${listId}`, {
+            questions: [id],
+            creatorId: currentUser?.uid,
+          });
+          setResponse(listResponse.data);
+          setIsNotificationVisible(true);
+        }
+      }else{
+        const response = await axios.post(`${dataURL}/getListQuestions`, {
+          listName: listName,
+          userId: currentUser?.uid,
+        });
+        const listId = lists.filter(
+          (list) => list.listName === listName.replaceAll("%20", " ")
+        )[0].id;
+        if (response.data[0].questions !== null) {
+          if (!response.data[0].questions.includes(id)) {
+            const requestions = response.data[0].questions;
+  
+            const listResponse = await axios.put(`${dataURL}/lists/${listId}`, {
+              questions: requestions.concat(id),
+              userId: currentUser?.uid,
+            });
+            setResponse(listResponse.data);
+            setIsNotificationVisible(true);
+          } else {
+            setResponse("Question already exists in the list");
+            setIsNotificationVisible(true);
+          }
+        } else {
           const listResponse = await axios.put(`${dataURL}/lists/${listId}`, {
-            questions: requestions.concat(id),
+            questions: [id],
             userId: currentUser?.uid,
           });
           setResponse(listResponse.data);
           setIsNotificationVisible(true);
-        } else {
-          setResponse("Question already exists in the list");
-          setIsNotificationVisible(true);
         }
-      } else {
-        const listResponse = await axios.put(`${dataURL}/lists/${listId}`, {
-          questions: [id],
-          userId: currentUser?.uid,
-        });
-        setResponse(listResponse.data);
-        setIsNotificationVisible(true);
       }
     } catch (err) {
       setResponse(err);
@@ -493,6 +531,7 @@ const QuestionList = () => {
       ) : (
         <>
           <List
+            listType={"private"}
             questions={questions.sort((a, b) => a.id - b.id)}
             setToDelete={handleDeleteClick}
             setToEdit={handleEditClick}
@@ -541,8 +580,8 @@ const QuestionList = () => {
       <AddToListModal
         show={showAddToListModal}
         onHide={() => setShowAddToListModal(false)}
-        addToList={(listName) => {
-          addToList(listName);
+        addToList={(list) => {
+          addToList(list);
           setShowAddToListModal(false);
         }}
         lists={lists}
