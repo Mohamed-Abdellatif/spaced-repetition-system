@@ -11,7 +11,6 @@ import {
   Form,
   InputGroup,
 } from "react-bootstrap";
-import axios from "axios";
 import "./questionList.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
@@ -24,6 +23,8 @@ import EditModal from "../EditModal/editModal";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
 import AddToListModal from "../AddToListModal/AddToListModal";
+import { imagesApi, listsApi, questionsApi } from "../../Utils/api";
+import { handleNotification } from "../../Utils/helperfunctions";
 
 const dataURL = import.meta.env.VITE_SRS_BE_URL;
 const Google_API_KEY = import.meta.env.VITE_API_KEY;
@@ -101,11 +102,11 @@ const QuestionList = () => {
   const handleSearchClick = async () => {
     if (currentUser) {
       try {
-        const response = await axios.post(
-          `${dataURL}/searchQuestions/${query.text}`,
-          { userId: currentUser?.uid }
+        const response = await questionsApi.searchQuestions(
+          query.text,
+          currentUser?.uid
         );
-        setQuestions(response.data);
+        setQuestions(response);
       } catch (err) {
         console.log(err);
       }
@@ -119,33 +120,27 @@ const QuestionList = () => {
     }
     try {
       setLoading(true);
-      const response = await axios.post(`${dataURL}/getQuestions`, {
-        questionsNumber: questionsToShow,
-        userId: currentUser?.uid,
-      });
-      const allResponse = await axios.post(`${dataURL}/getQuestions`, {
-        userId: currentUser?.uid,
-      });
-      const lengthResponse = await axios.post(`${dataURL}/questionsLength`, {
-        userId: currentUser?.uid,
-      });
-      setQuestionsLength(lengthResponse.data);
-      setAllQuestions(allResponse.data);
-      const listResponse = await axios.post(`${dataURL}/getLists`, {
-        userId: currentUser?.uid,
-      });
-      const publicListResponse = await axios.post(
-        `${dataURL}/getPublicListsWithCreatorId`,
-        {
-          creatorId: currentUser?.uid,
-        }
+
+      const response = await questionsApi.getQuestions(
+        currentUser?.uid,
+        questionsToShow
       );
-      setLists([...listResponse.data,... publicListResponse.data]);
+      const allResponse = await questionsApi.getQuestions(currentUser?.uid);
+      const lengthResponse = await questionsApi.getQuestionsLength(
+        currentUser?.uid
+      );
+      setQuestionsLength(lengthResponse);
+      setAllQuestions(allResponse);
+      const listResponse = await listsApi.getLists(currentUser?.uid);
+      const publicListResponse = await listsApi.getPublicListsWithCreatorId(
+        currentUser?.uid
+      );
+      setLists([...listResponse, ...publicListResponse]);
       if (currentGenre === "ALL GENRES") {
-        setQuestions(response.data);
+        setQuestions(response);
       } else {
         setQuestions(
-          allResponse.data.filter((question) => currentGenre === question.genre)
+          allResponse.filter((question) => currentGenre === question.genre)
         );
       }
 
@@ -154,7 +149,11 @@ const QuestionList = () => {
       if ("Network Error" === error.message) {
         setLoading(false);
       }
-      console.log(error.message);
+      handleNotification(
+        setIsNotificationVisible,
+        setResponse,
+        "Please Try Again Later"
+      );
     }
   };
 
@@ -179,17 +178,17 @@ const QuestionList = () => {
 
   const deleteQuestion = async () => {
     try {
-      const response = await axios.delete(
-        `${dataURL}/questions/${toDelete.id}`
-      );
-      await axios.delete(`${dataURL}/deleteImage/${toDelete.id}`);
+      const response = await questionsApi.deleteQuestion(toDelete.id);
+      await imagesApi.deleteImage(toDelete.id);
       getData();
-      setIsNotificationVisible(true);
-      setResponse(response.data);
+      handleNotification(setIsNotificationVisible, setResponse, response);
       setShowDeleteModal(false);
     } catch {
-      setResponse("Error please try again later");
-      setIsNotificationVisible(true);
+      handleNotification(
+        setIsNotificationVisible,
+        setResponse,
+        "Error please try again later"
+      );
     }
   };
 
@@ -213,7 +212,7 @@ const QuestionList = () => {
       const formData = new FormData();
       formData.append("image", image);
       // eslint-disable-next-line
-      const res = await axios.put(`${dataURL}/upload/${questionID}`, formData);
+      await imagesApi.uploadImage(questionID, formData);
     }
   };
 
@@ -233,30 +232,31 @@ const QuestionList = () => {
       !genre == " "
     ) {
       try {
-        const response = await axios.put(
-          `${dataURL}/questions/${toEdit.id}`,
-          toEdit
-        );
-        setResponse(response.data);
+        const response = await questionsApi.updateQuestion(toEdit.id, toEdit);
+
         if (image !== null) {
-          console.log(toEdit.img, `${dataURL}/deleteImage/${toEdit.id}`);
           if (toEdit.img) {
-            await axios.delete(`${dataURL}/deleteImage/${toEdit.id}`);
+            await imagesApi.deleteImage(toEdit.id);
           }
           handleImageSubmit(toEdit.id);
         }
         setImage(null);
         getData();
-        setIsNotificationVisible(true);
+        handleNotification(setIsNotificationVisible, setResponse, response);
         setShowEditModal(false);
       } catch (err) {
-        console.log(err);
-        setResponse("Error please try again later");
-        setIsNotificationVisible(true);
+        handleNotification(
+          setIsNotificationVisible,
+          setResponse,
+          "Error please try again later"
+        );
       }
     } else {
-      setResponse("Please complete the blanks");
-      setIsNotificationVisible(true);
+      handleNotification(
+        setIsNotificationVisible,
+        setResponse,
+        "Please complete the blanks"
+      );
     }
   };
 
@@ -281,15 +281,13 @@ const QuestionList = () => {
       const created = new Date().toLocaleString("en-US", {
         timeZone: "Africa/Cairo",
       });
-      const nextTest = new Date().toLocaleString("en-US", {
-        timeZone: "Africa/Cairo",
-      });
-      const response = await axios.post(`${dataURL}/questions`, {
+      const nextTest = created;
+      await questionsApi.createQuestion({
         ...questionObj,
         created,
         nextTest,
       });
-      handleImageSubmit(response.data.id);
+      handleImageSubmit(response.id);
       setImage(null);
       getData();
 
@@ -305,13 +303,18 @@ const QuestionList = () => {
           choice3: "",
         },
       });
-
-      setResponse(response.data.message);
-      setIsNotificationVisible(true);
+      handleNotification(
+        setIsNotificationVisible,
+        setResponse,
+        response.message
+      );
       setShowAddModal(false);
     } else {
-      setResponse("Please complete the blanks");
-      setIsNotificationVisible(true);
+      handleNotification(
+        setIsNotificationVisible,
+        setResponse,
+        "Please complete the blanks"
+      );
     }
   };
 
@@ -325,71 +328,84 @@ const QuestionList = () => {
   //add to list
   const addToList = async (list) => {
     const { id } = toBeAdded;
-    const {listName}= list;
+    const { listName } = list;
     try {
-      if(list?.creatorId === currentUser?.uid){
-        const response = await axios.post(`${dataURL}/getPublicListQuestions`, {
-          listName: listName,
-        });
+      if (list?.creatorId === currentUser?.uid) {
+        const response = await listsApi.getPublicListQuestions(listName);
         const listId = lists.filter(
           (list) => list.listName === listName.replaceAll("%20", " ")
         )[0].id;
-        if (response.data[0].questions !== null) {
-          if (!response.data[0].questions.includes(id)) {
-            const requestions = response.data[0].questions;
-  
-            const listResponse = await axios.put(`${dataURL}/publicList/${listId}`, {
+        if (response[0].questions !== null) {
+          if (!response[0].questions.includes(id)) {
+            const requestions = response[0].questions;
+            await listsApi.updatePublicList(listId, {
               questions: requestions.concat(id),
               creatorId: currentUser?.uid,
             });
-            setResponse(listResponse.data);
-            setIsNotificationVisible(true);
+            handleNotification(
+              setIsNotificationVisible,
+              setResponse,
+              `Question Added to '${listName}' Successfully`
+            );
           } else {
-            setResponse("Question already exists in the list");
-            setIsNotificationVisible(true);
+            handleNotification(
+              setIsNotificationVisible,
+              setResponse,
+              "Question already exists in the list"
+            );
           }
         } else {
-          const listResponse = await axios.put(`${dataURL}/publicList/${listId}`, {
+          await listsApi.updatePublicList(listId, {
             questions: [id],
             creatorId: currentUser?.uid,
           });
-          setResponse(listResponse.data);
-          setIsNotificationVisible(true);
+          handleNotification(
+            setIsNotificationVisible,
+            setResponse,
+            `Question Added to '${listName}' Successfully`
+          );
         }
-      }else{
-        const response = await axios.post(`${dataURL}/getListQuestions`, {
-          listName: listName,
-          userId: currentUser?.uid,
-        });
+      } else {
+        const response = await listsApi.getListQuestions(
+          listName,
+          currentUser?.uid
+        );
         const listId = lists.filter(
           (list) => list.listName === listName.replaceAll("%20", " ")
         )[0].id;
-        if (response.data[0].questions !== null) {
-          if (!response.data[0].questions.includes(id)) {
-            const requestions = response.data[0].questions;
-  
-            const listResponse = await axios.put(`${dataURL}/lists/${listId}`, {
+        if (response[0].questions !== null) {
+          if (!response[0].questions.includes(id)) {
+            const requestions = response[0].questions;
+            await listsApi.updateList(listId, {
               questions: requestions.concat(id),
               userId: currentUser?.uid,
             });
-            setResponse(listResponse.data);
-            setIsNotificationVisible(true);
+            handleNotification(
+              setIsNotificationVisible,
+              setResponse,
+              `Question Added to '${listName}' Successfully`
+            );
           } else {
-            setResponse("Question already exists in the list");
-            setIsNotificationVisible(true);
+            handleNotification(
+              setIsNotificationVisible,
+              setResponse,
+              "Question already exists in the list"
+            );
           }
         } else {
-          const listResponse = await axios.put(`${dataURL}/lists/${listId}`, {
+          await listsApi.updateList(listId, {
             questions: [id],
             userId: currentUser?.uid,
           });
-          setResponse(listResponse.data);
-          setIsNotificationVisible(true);
+          handleNotification(
+            setIsNotificationVisible,
+            setResponse,
+            `Question Added to '${listName}' Successfully`
+          );
         }
       }
     } catch (err) {
-      setResponse(err);
-      setIsNotificationVisible(true);
+      handleNotification(setIsNotificationVisible, setResponse, err);
     }
   };
   const updateNewListInput = (e) => {
@@ -400,7 +416,7 @@ const QuestionList = () => {
   const createNewList = async (newListName) => {
     try {
       setNewListName("");
-      await axios.post(`${dataURL}/lists`, {
+      await listsApi.createList({
         listName: newListName,
         userId: currentUser?.uid,
       });
@@ -412,10 +428,6 @@ const QuestionList = () => {
 
   const handleImageChange = (event) => {
     setImage(event.target.files[0]);
-  };
-  const sendResponseAsNotification = (res) => {
-    setResponse(res);
-    setIsNotificationVisible(true);
   };
   const generateQuestionFromText = async (text) => {
     try {
@@ -439,7 +451,11 @@ const QuestionList = () => {
       const response = await model.generateContent(prompt);
 
       if (!response || !response.response) {
-        sendResponseAsNotification("Please Try Again Later");
+        handleNotification(
+          setIsNotificationVisible,
+          setResponse,
+          "Please Try Again Later"
+        );
         return;
       }
 
@@ -453,17 +469,29 @@ const QuestionList = () => {
       try {
         extractedObject = JSON.parse(responseText);
       } catch (jsonError) {
-        sendResponseAsNotification("Please Try Again Later");
+        handleNotification(
+          setIsNotificationVisible,
+          setResponse,
+          "Please Try Again Later"
+        );
         return;
       }
 
       if (extractedObject?.question) {
         setQuestionObj({ ...extractedObject, userId: currentUser?.uid });
       } else {
-        sendResponseAsNotification("Please Try Again Later");
+        handleNotification(
+          setIsNotificationVisible,
+          setResponse,
+          "Please Try Again Later"
+        );
       }
     } catch (error) {
-      sendResponseAsNotification("Please Try Again Later");
+      handleNotification(
+        setIsNotificationVisible,
+        setResponse,
+        "Please Try Again Later"
+      );
     }
   };
 
