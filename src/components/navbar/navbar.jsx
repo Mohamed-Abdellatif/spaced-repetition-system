@@ -23,6 +23,7 @@ import {
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { questionsApi } from "../../Utils/api";
+import { todayFormatDate } from "../../Utils/helperfunctions";
 
 const NavBar = () => {
   const location = useLocation();
@@ -33,12 +34,7 @@ const NavBar = () => {
   const [displayName, setDisplayName] = useState("");
 
   const currentPath = location.pathname.slice(1);
-  const today = Intl.DateTimeFormat("en-CA", {
-    timeZone: "Africa/Cairo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
+  const today = todayFormatDate();
 
   const signOutHandler = async () => {
     await signOutUser();

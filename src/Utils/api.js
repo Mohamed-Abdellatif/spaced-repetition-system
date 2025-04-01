@@ -175,11 +175,6 @@ export const imagesApi = {
   }
 };
 
-// Helper function to format dates
-export const todayFormatDate = (timeZone = "Africa/Cairo") => {
-  return new Date().toLocaleString("en-US", { timeZone });
-};
-
 // Helper function to handle errors
 export const handleApiError = (error, defaultMessage = "An error occurred") => {
   console.error('API Error:', error);

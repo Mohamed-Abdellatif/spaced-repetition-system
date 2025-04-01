@@ -155,3 +155,12 @@ export const generateQuestionFromText = async (text,setIsNotificationVisible,set
     );
   }
 };
+
+export const todayFormatDate = (timeZone = "Africa/Cairo") => {
+  return Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+};

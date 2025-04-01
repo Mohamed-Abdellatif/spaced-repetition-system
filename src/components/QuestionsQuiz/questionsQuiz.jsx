@@ -7,6 +7,7 @@ import moment from "moment";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faSync } from "@fortawesome/free-solid-svg-icons";
+import { todayFormatDate } from "../../Utils/helperfunctions";
 
 const dataURL = import.meta.env.VITE_SRS_BE_URL;
 
@@ -18,12 +19,7 @@ const QuestionsQuiz = () => {
   const [currentAnswer, setCurrentAnswer] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
   const [response, setResponse] = useState("");
-  const today = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Africa/Cairo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
+  const today = todayFormatDate();
   useEffect(() => {
     if (!currentUser) return;
 
