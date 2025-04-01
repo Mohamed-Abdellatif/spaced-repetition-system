@@ -52,7 +52,12 @@ export const questionsApi = {
   getQuestionsLength: async (userId) => {
     const response = await axios.post(`${dataURL}/questionsLength`, { userId });
     return response.data;
-  }
+  },
+
+  getIDs: async () => {
+    const response = await axios.post(`${dataURL}/getIds`);
+    return response.data;
+  },
 };
 
 // Lists API
@@ -171,7 +176,7 @@ export const imagesApi = {
 };
 
 // Helper function to format dates
-export const formatDate = (timeZone = "Africa/Cairo") => {
+export const todayFormatDate = (timeZone = "Africa/Cairo") => {
   return new Date().toLocaleString("en-US", { timeZone });
 };
 
