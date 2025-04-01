@@ -2,11 +2,11 @@ import axios from "axios";
 import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
-import AddToListModal from "../AddToListModal/AddToListModal";
-import DeleteModal from "../DeleteModal/DeleteModal";
-import EditModal from "../EditModal/editModal";
-import NotificationToast from "../Toast/toast";
-import List from "../ViewQuestionsList/List";
+import AddToListModal from "../../components/AddToListModal/AddToListModal";
+import DeleteModal from "../../components/DeleteModal/DeleteModal";
+import EditModal from "../../components/EditModal/editModal";
+import NotificationToast from "../../components/Toast/toast";
+import List from "../../components/ViewQuestionsList/List";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import "./viewList.css";
 

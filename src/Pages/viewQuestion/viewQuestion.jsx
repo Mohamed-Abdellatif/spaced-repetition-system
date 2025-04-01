@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import NotificationToast from "../Toast/toast";
+import NotificationToast from "../../components/Toast/toast";
 import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./viewQuestion.css";

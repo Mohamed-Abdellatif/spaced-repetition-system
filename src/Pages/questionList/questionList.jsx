@@ -10,18 +10,18 @@ import {
 import "./questionList.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import AddModal from "../AddModal/AddModal";
-import List from "../ViewQuestionsList/List";
-import DeleteModal from "../DeleteModal/DeleteModal";
-import NotificationToast from "../Toast/toast";
-import EditModal from "../EditModal/editModal";
+import AddModal from "../../components/AddModal/AddModal";
+import List from "../../components/ViewQuestionsList/List";
+import DeleteModal from "../../components/DeleteModal/DeleteModal";
+import NotificationToast from "../../components/Toast/toast";
+import EditModal from "../../components/EditModal/editModal";
 import { UserContext } from "../../contexts/user.context";
-import AddToListModal from "../AddToListModal/AddToListModal";
+import AddToListModal from "../../components/AddToListModal/AddToListModal";
 import { imagesApi, listsApi, questionsApi } from "../../Utils/api";
 import { addQuestionToList, generateQuestionFromText, handleNotification } from "../../Utils/helperfunctions";
 import { useQuestions } from "../../hooks/useQuestions";
-import SearchBar from "../SearchBar/SearchBar";
-import GenreFilter from "../GenreFilter/GenreFilter";
+import SearchBar from "../../components/SearchBar/SearchBar";
+import GenreFilter from "../../components/GenreFilter/GenreFilter";
 
 const QuestionList = () => {
   const { currentUser } = useContext(UserContext);

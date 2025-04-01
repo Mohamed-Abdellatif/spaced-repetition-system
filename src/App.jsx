@@ -2,15 +2,15 @@ import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import NavBar from "./components/navbar/navbar";
 import { Container } from "react-bootstrap";
-import QuestionList from "./components/questionList/questionList";
-import QuestionsQuiz from "./components/QuestionsQuiz/questionsQuiz";
-import SpacedSchedule from "./components/spacedSchedule/spacedSchedule";
-import ViewList from "./components/ViewList/viewList";
+import QuestionList from "./Pages/questionList/questionList";
+import QuestionsQuiz from "./Pages/QuestionsQuiz/questionsQuiz";
+import SpacedSchedule from "./Pages/spacedSchedule/spacedSchedule";
+import ViewList from "./Pages/ViewList/viewList";
 import Authentication from "./Authentication/authentication/authentication.component";
-import ViewQuestion from "./components/viewQuestion/viewQuestion";
-import ListsPage from "./components/ListsPage/ListsPage";
-import StudyCards from "./components/StudyPage/StudyCards";
-import PublicListsPage from "./components/PublicListsPage/PublicListsPage";
+import ListsPage from "./Pages/ListsPage/ListsPage";
+import StudyCards from "./Pages/StudyPage/StudyCards";
+import PublicListsPage from "./Pages/PublicListsPage/PublicListsPage";
+import ViewQuestion from "./Pages/viewQuestion/viewQuestion";
 
 const App = () => {
   return (

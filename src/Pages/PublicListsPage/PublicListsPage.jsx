@@ -3,10 +3,10 @@ import { Row, Col, Button, Form, InputGroup, Spinner } from "react-bootstrap";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import NotificationToast from "../Toast/toast";
+import NotificationToast from "../../components/Toast/toast";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
-import ListsMapper from "../ListsMapper/ListsMapper";
+import ListsMapper from "../../components/ListsMapper/ListsMapper";
 
 const dataURL = import.meta.env.VITE_SRS_BE_URL;
 

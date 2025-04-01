@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { Row, Col, Button, Form, InputGroup, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
-import NotificationToast from "../Toast/toast";
+import NotificationToast from "../../components/Toast/toast";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
-import ListsMapper from "../ListsMapper/ListsMapper";
-import DeleteListModal from "../DeleteListModal/DeleteListModal";
-import EditListModal from "../EditListModal/editListModal";
-import AddListModal from "../AddListModal/AddListModal";
+import ListsMapper from "../../components/ListsMapper/ListsMapper";
+import DeleteListModal from "../../components/DeleteListModal/DeleteListModal";
+import EditListModal from "../../components/EditListModal/editListModal";
+import AddListModal from "../../components/AddListModal/AddListModal";
 import { getDisplayNameFromDocument } from "../../Utils/firebase/firebase.utils";
 import { listsApi, questionsApi } from "../../Utils/api";
 
