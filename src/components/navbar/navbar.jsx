@@ -1,5 +1,4 @@
 import { useContext, useState, useEffect } from "react";
-import axios from "axios";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -23,11 +22,12 @@ import {
   faUser,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
+import { questionsApi } from "../../Utils/api";
 
-const dataURL = import.meta.env.VITE_SRS_BE_URL;
 const NavBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
   const { currentUser, setCurrentUser } = useContext(UserContext);
   const [questions, setQuestions] = useState([]);
   const [displayName, setDisplayName] = useState("");
@@ -39,7 +39,7 @@ const NavBar = () => {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
-  
+
   const signOutHandler = async () => {
     await signOutUser();
     setCurrentUser(null);
@@ -49,25 +49,18 @@ const NavBar = () => {
   const getData = async () => {
     if (!currentUser) return;
     try {
-      const response = await axios.post(`${dataURL}/getQuestions`, {
-        userId: currentUser?.uid,
-      });
+      const response = await questionsApi.getQuestions(currentUser.uid);
 
-      setQuestions(response.data);
+      setQuestions(response);
     } catch (error) {
       console.log(error);
     }
   };
-  useEffect(() => {
-    getData();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser]);
   const genres = [].concat(questions.map((question) => question.genre));
-  let filteredArray = [];
+  let uniqueGenreArray = [];
   for (let i = 0; i < genres.length; i++) {
-    if (!filteredArray.includes(genres[i])) {
-      filteredArray.push(genres[i]);
+    if (!uniqueGenreArray.includes(genres[i])) {
+      uniqueGenreArray.push(genres[i]);
     }
   }
   const getDisplayName = async () => {
@@ -75,6 +68,7 @@ const NavBar = () => {
     setDisplayName(displayName[currentUser?.email]);
   };
   useEffect(() => {
+    getData();
     getDisplayName();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,15 +77,11 @@ const NavBar = () => {
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        // User present
         setCurrentUser(currentUser);
-        // redirect to home if user is on /login page
       } else {
-        // User not logged in
-        // redirect to login if on a protected page
+        navigate("/login");
       }
     });
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -121,7 +111,7 @@ const NavBar = () => {
                 title={
                   <>
                     <FontAwesomeIcon icon={faQuestionCircle} className="me-2" />
-                    {filteredArray
+                    {uniqueGenreArray
                       .concat("General")
                       .includes(currentPath.slice(5))
                       ? currentPath.slice(5)
@@ -137,7 +127,7 @@ const NavBar = () => {
                 onMouseEnter={() => getData()}
               >
                 {questions.length > 0 &&
-                  filteredArray.map((genre) => (
+                  uniqueGenreArray.map((genre) => (
                     <NavDropdown.Item
                       key={genre}
                       onClick={() => navigate(`/quiz/${genre}`)}
@@ -150,7 +140,10 @@ const NavBar = () => {
                 <NavDropdown.Item
                   onClick={() => navigate(`/quiz/Due-Today`)}
                   active={currentPath === "quiz/Due-Today"}
-                  disabled={questions?.filter(question=>question.nextTest===today).length<1}
+                  disabled={
+                    questions?.filter((question) => question.nextTest === today)
+                      .length < 1
+                  }
                 >
                   Due Today
                 </NavDropdown.Item>
@@ -170,7 +163,7 @@ const NavBar = () => {
                 disabled={currentUser === null}
               >
                 <FontAwesomeIcon icon={faList} className="me-2" />
-                 My Lists
+                My Lists
               </Nav.Link>
 
               <Nav.Link
@@ -181,7 +174,7 @@ const NavBar = () => {
                 disabled={currentUser === null}
               >
                 <FontAwesomeIcon icon={faSearch} className="me-2" />
-                 Browse
+                Browse
               </Nav.Link>
             </Nav>
 

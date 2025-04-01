@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Row, Col, Button, Form, InputGroup, Spinner } from "react-bootstrap";
-import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import NotificationToast from "../Toast/toast";
@@ -11,8 +10,7 @@ import DeleteListModal from "../DeleteListModal/DeleteListModal";
 import EditListModal from "../EditListModal/editListModal";
 import AddListModal from "../AddListModal/AddListModal";
 import { getDisplayNameFromDocument } from "../../Utils/firebase/firebase.utils";
-
-const dataURL = import.meta.env.VITE_SRS_BE_URL;
+import { listsApi, questionsApi } from "../../Utils/api";
 
 const ListsPage = () => {
   const { currentUser } = useContext(UserContext);
@@ -21,19 +19,15 @@ const ListsPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
   const [loading, setLoading] = useState(true);
   const [toEdit, setToEdit] = useState({});
   const [response, setResponse] = useState("");
-
   const [toDelete, setToDelete] = useState({});
-
   const [lists, setLists] = useState([]);
   const [newList, setNewList] = useState({ listName: "", description: "" });
-
   const [query, setQuery] = useState({ text: "" });
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
-  const [questionObj, setQuestionObj] = useState([]);
+  const [questionIDs, setQuestionIDs] = useState([]);
 
   // Modal handlers
   const handleAddClick = () => {
@@ -61,11 +55,11 @@ const ListsPage = () => {
     }
     if (currentUser) {
       try {
-        const response = await axios.post(
-          `${dataURL}/searchLists/${query.text}`,
-          { userId: currentUser?.uid }
+        const response = await listsApi.searchLists(
+          query.text,
+          currentUser.uid
         );
-        setLists(response.data.sort((a, b) => a.id - b.id));
+        setLists(response.sort((a, b) => a.id - b.id));
       } catch (err) {
         console.log(err);
       }
@@ -82,14 +76,14 @@ const ListsPage = () => {
       let response = {};
       const displayName = await getDisplayNameFromDocument();
       if (isListPublic) {
-        response = await axios.post(`${dataURL}/publicLists`, {
+        response = await listsApi.createPublicList({
           listName: newList.listName,
           creatorId: currentUser?.uid,
           description: newList.description,
-          creator:displayName[currentUser?.email]
+          creator: displayName[currentUser?.email],
         });
       } else {
-        response = await axios.post(`${dataURL}/lists`, {
+        response = await listsApi.createList({
           listName: newList.listName,
           userId: currentUser?.uid,
           description: newList.description,
@@ -98,7 +92,7 @@ const ListsPage = () => {
       setShowAddModal(false);
       setNewList({ listName: "", description: "" });
       getData();
-      setResponse(response.data);
+      setResponse(response);
       setIsNotificationVisible(true);
     } catch (err) {
       setResponse("Error please try again later");
@@ -114,16 +108,16 @@ const ListsPage = () => {
     }
     try {
       setLoading(true);
-
-      const listResponse = await axios.post(`${dataURL}/getLists`, {
-        userId: currentUser?.uid,
-      });
-      const publicListResponse = await axios.post(`${dataURL}/getPublicListsWithCreatorId`, {
-        creatorId: currentUser?.uid,
-      });
-      const res = await axios.post(`${dataURL}/getIds`);
-      setQuestionObj([].concat(res.data.map((id) => id.id)));
-      setLists([...listResponse.data.sort((a, b) => a.id - b.id),...publicListResponse.data.sort((a, b) => a.id - b.id)]);
+      const listResponse = await listsApi.getLists(currentUser?.uid);
+      const publicListResponse = await listsApi.getPublicLists(
+        currentUser?.uid
+      );
+      const IdsResponse = await questionsApi.getIDs();
+      setQuestionIDs([].concat(IdsResponse.map((id) => id.id)));
+      setLists([
+        ...listResponse.sort((a, b) => a.id - b.id),
+        ...publicListResponse.sort((a, b) => a.id - b.id),
+      ]);
       setLoading(false);
       updateLists();
     } catch (error) {
@@ -137,10 +131,10 @@ const ListsPage = () => {
   const updateLists = async () => {
     lists
       ?.map((list) =>
-        list.questions?.filter((question) => questionObj?.includes(question))
+        list.questions?.filter((question) => questionIDs?.includes(question))
       )
       .map((questions, i) =>
-        axios.put(`${dataURL}/lists/${lists[i].id}`, {
+        listsApi.updateList(lists[i].id, {
           newListName: lists[i].listName,
           userId: currentUser?.uid,
           questions: questions,
@@ -150,7 +144,10 @@ const ListsPage = () => {
 
   const deleteList = async () => {
     try {
-      const response = toDelete.creatorId===currentUser.uid?await axios.delete(`${dataURL}/publicLists/${toDelete.id}`):await axios.delete(`${dataURL}/lists/${toDelete.id}`);
+      const response =
+        toDelete.creatorId === currentUser.uid
+          ? await listsApi.deletePublicList(toDelete.id)
+          : await listsApi.deleteList(toDelete.id);
       getData();
       setIsNotificationVisible(true);
       setResponse(response.data);
@@ -167,17 +164,20 @@ const ListsPage = () => {
 
   const handleEditSubmit = async () => {
     try {
-      const response = toEdit.creatorId!==currentUser.uid?await axios.put(`${dataURL}/lists/${toEdit.id}`, {
-        newListName: toEdit.listName,
-        userId: currentUser?.uid,
-        questions: toEdit.questions,
-        description: toEdit.description,
-      }):await axios.put(`${dataURL}/publicList/${toEdit.id}`, {
-        newListName: toEdit.listName,
-        creatorId: currentUser?.uid,
-        questions: toEdit.questions,
-        description: toEdit.description,
-      });
+      const response =
+        toEdit.creatorId !== currentUser.uid
+          ? await listsApi.updateList(toEdit.id, {
+              newListName: toEdit.listName,
+              userId: currentUser?.uid,
+              questions: toEdit.questions,
+              description: toEdit.description,
+            })
+          : await listsApi.updatePublicList(toEdit.id, {
+              newListName: toEdit.listName,
+              creatorId: currentUser?.uid,
+              questions: toEdit.questions,
+              description: toEdit.description,
+            });
       getData();
       setShowEditModal(false);
       setResponse(response.data);
