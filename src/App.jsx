@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
-import NavBar from "./components/navbar/navbar";
+import NavBar from "./layout/navbar/navbar";
 import { Container } from "react-bootstrap";
 import QuestionList from "./Pages/questionList/questionList";
 import QuestionsQuiz from "./Pages/QuestionsQuiz/questionsQuiz";

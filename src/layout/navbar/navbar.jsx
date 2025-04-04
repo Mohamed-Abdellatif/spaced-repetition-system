@@ -22,7 +22,7 @@ import {
   faUser,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
-import { questionsApi } from "../../Utils/api";
+import { questionsApi } from "../../services/api";
 import { todayFormatDate } from "../../Utils/helperfunctions";
 
 const NavBar = () => {

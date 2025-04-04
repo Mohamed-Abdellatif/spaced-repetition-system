@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 import NotificationToast from "../../components/Toast/toast";
 import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./viewQuestion.css";
-
-const dataURL = import.meta.env.VITE_SRS_BE_URL;
+import { imagesApi, questionsApi } from "../../services/api";
 
 const ViewQuestion = () => {
   const { questionId } = useParams();
@@ -18,12 +16,10 @@ const ViewQuestion = () => {
 
   const getData = async () => {
     try {
-      const response = await axios.get(`${dataURL}/question/${questionId}`);
-      setQuestionObj(response.data);
+      const response = await questionsApi.getQuestionById(questionId);
+      setQuestionObj(response);
 
-      const imgResponse = await axios.get(
-        `${dataURL}/questionsImg/${questionId}`
-      );
+      const imgResponse = imagesApi.getImage(questionId);
       if (imgResponse.status === 200) {
         setImageURL(imgResponse.data.url);
       }

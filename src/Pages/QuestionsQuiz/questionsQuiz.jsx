@@ -1,5 +1,4 @@
 import "./questionsQuiz.css";
-import axios from "axios";
 import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
@@ -8,8 +7,7 @@ import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faSync } from "@fortawesome/free-solid-svg-icons";
 import { todayFormatDate } from "../../Utils/helperfunctions";
-
-const dataURL = import.meta.env.VITE_SRS_BE_URL;
+import { questionsApi } from "../../services/api";
 
 const QuestionsQuiz = () => {
   const { genre } = useParams();
@@ -25,16 +23,20 @@ const QuestionsQuiz = () => {
 
     const getData = async () => {
       try {
-        const res = await axios.post(`${dataURL}/getQuestions`, {
-          userId: currentUser.uid,
-        });
-        
-        if(genre==="General"){
-          setQuestions(res.data);
-        }else if(genre==="Due-Today"){
-          setQuestions(res.data.filter(question =>question.nextTest===today));
-        }else{
-          setQuestions(res.data.filter(question => question.genre===genre));
+        const questionsResponse = await questionsApi.getQuestions(
+          currentUser.uid
+        );
+
+        if (genre === "General") {
+          setQuestions(questionsResponse);
+        } else if (genre === "Due-Today") {
+          setQuestions(
+            questionsResponse.filter((question) => question.nextTest === today)
+          );
+        } else {
+          setQuestions(
+            questionsResponse.filter((question) => question.genre === genre)
+          );
         }
       } catch (error) {
         console.error("Error fetching questions:", error);
@@ -42,7 +44,7 @@ const QuestionsQuiz = () => {
     };
 
     getData();
-  }, [genre, currentUser,today]);
+  }, [genre, currentUser, today]);
 
   useEffect(() => {
     if (questions.length > 0) {
@@ -77,7 +79,7 @@ const QuestionsQuiz = () => {
 
     let newInterval;
     let newStability = stability;
-    
+
     if (isCorrect) {
       // Increase interval exponentially based on stability
       newInterval = Math.round(prevInterval * newStability);
@@ -91,7 +93,7 @@ const QuestionsQuiz = () => {
     const nextTestDate = moment().add(newInterval, "days").format();
     // Update question data
     if (question.nextTest <= today || question.nextTest === null) {
-      await axios.put(`${dataURL}/questions/${question.id}`, {
+      await questionsApi.updateQuestion(question.id, {
         nextTest: nextTestDate,
         lastTested: moment().format(),
         interval: newInterval, // Store interval for better adaptation

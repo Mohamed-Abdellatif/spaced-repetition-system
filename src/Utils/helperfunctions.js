@@ -1,4 +1,4 @@
-import { listsApi } from "./api";
+import { listsApi } from "../services/api";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 const Google_API_KEY = import.meta.env.VITE_API_KEY;
 

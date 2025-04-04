@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { Row, Col, Button, Form, InputGroup, Spinner } from "react-bootstrap";
-import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import NotificationToast from "../../components/Toast/toast";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
 import ListsMapper from "../../components/ListsMapper/ListsMapper";
-
-const dataURL = import.meta.env.VITE_SRS_BE_URL;
+import { imagesApi, listsApi, questionsApi } from "../../services/api";
+import { todayFormatDate } from "../../Utils/helperfunctions";
 
 const PublicListsPage = () => {
   const { currentUser } = useContext(UserContext);
@@ -42,11 +41,11 @@ const PublicListsPage = () => {
     }
     if (currentUser) {
       try {
-        const response = await axios.post(
-          `${dataURL}/searchPublicLists/${query.text}`,
-          { userId: currentUser?.uid }
+        const response = await listsApi.searchPublicLists(
+          query.text,
+          currentUser.uid
         );
-        setLists(response.data.sort((a, b) => a.id - b.id));
+        setLists(response.sort((a, b) => a.id - b.id));
       } catch (err) {
         console.log(err);
       }
@@ -61,8 +60,8 @@ const PublicListsPage = () => {
     try {
       setLoading(true);
 
-      const listResponse = await axios.post(`${dataURL}/getPublicLists`);
-      setLists(listResponse.data.sort((a, b) => a.id - b.id));
+      const listResponse = await listsApi.getPublicLists();
+      setLists(listResponse.sort((a, b) => a.id - b.id));
       setLoading(false);
     } catch (error) {
       if ("Network Error" === error.message) {
@@ -74,7 +73,7 @@ const PublicListsPage = () => {
   };
   const setToAdd = async (list) => {
     try {
-      const response = await axios.post(`${dataURL}/lists`, {
+      const response = await listsApi.createList({
         listName: list.listName,
         userId: currentUser?.uid,
         description: list.description,
@@ -84,44 +83,31 @@ const PublicListsPage = () => {
       if (list?.questions?.length > 0) {
         for (const questionId of list.questions) {
           try {
-            const questionResponse = await axios.get(
-              `${dataURL}/question/${questionId}`
+            const questionResponse = await questionsApi.getQuestionById(
+              questionId
             );
-            const questionData = questionResponse.data;
+            const questionData = questionResponse;
 
-            const created = new Date().toLocaleString("en-US", {
-              timeZone: "Africa/Cairo",
-            });
-            const nextTest = new Date().toLocaleString("en-US", {
-              timeZone: "Africa/Cairo",
-            });
+            const created = todayFormatDate();
+            const nextTest = todayFormatDate();
 
-            const newQuestionResponse = await axios.post(
-              `${dataURL}/questions`,
-              {
-                ...questionData,
-                userId: currentUser?.uid,
-                created,
-                nextTest,
-              }
-            );
+            const newQuestionResponse = await questionsApi.createQuestion({
+              ...questionData,
+              userId: currentUser?.uid,
+              created,
+              nextTest,
+            });
 
             if (questionData.img) {
               try {
-                const imageResponse = await axios.get(
-                  `${dataURL}/questionsImgDirect/${questionId}`,
-                  {
-                    responseType: "blob",
-                  }
+                const imageResponse = await imagesApi.getImageDirect(
+                  questionId
                 );
 
-                if (imageResponse.data) {
+                if (imageResponse) {
                   const formData = new FormData();
-                  formData.append("image", imageResponse.data);
-                  await axios.put(
-                    `${dataURL}/upload/${newQuestionResponse.data.id}`,
-                    formData
-                  );
+                  formData.append("image", imageResponse);
+                  await imagesApi.uploadImage(newQuestionResponse.id, formData);
                 }
               } catch (imageError) {
                 setResponse("Please Try Again");
@@ -138,7 +124,7 @@ const PublicListsPage = () => {
       setShowAddModal(false);
       setNewList({ listName: "", description: "" });
       getData();
-      setResponse(response.data);
+      setResponse("Added Successfully");
       setIsNotificationVisible(true);
     } catch (err) {
       console.error("Error adding list:", err);

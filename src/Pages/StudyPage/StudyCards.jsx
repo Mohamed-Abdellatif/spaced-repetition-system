@@ -9,7 +9,6 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { UserContext } from "../../contexts/user.context";
-import axios from "axios";
 import "./StudyCards.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -23,9 +22,7 @@ import {
   faSync,
 } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router-dom";
-import { listsApi } from "../../Utils/api";
-
-const dataURL = import.meta.env.VITE_SRS_BE_URL;
+import { listsApi, questionsApi } from "../../services/api";
 
 const StudyCards = () => {
   const { listName } = useParams();
@@ -44,24 +41,24 @@ const StudyCards = () => {
     const fetchCards = async () => {
       try {
         let questionRes = [];
-        const response = await axios.post(`${dataURL}/getListQuestions`, {
-          listName: listName.replaceAll("%20", " "),
-          userId: currentUser?.uid,
-        });
+        const response = await listsApi.getListQuestions(
+          listName.replaceAll("%20", " "),
+          currentUser?.uid
+        );
         const publicListResponse = await listsApi.getPublicListQuestions(
           listName.replaceAll("%20", " ")
         );
-        if (response?.data[0]?.questions.length > 0) {
-          questionRes = await axios.post(`${dataURL}/getQuestionsById`, {
-            questionsList: response?.data[0]?.questions,
-          });
+        if (response[0]?.questions.length > 0) {
+          questionRes = await questionsApi.getQuestionsByIds(
+            response[0]?.questions
+          );
         } else {
-          questionRes = await axios.post(`${dataURL}/getQuestionsById`, {
-            questionsList: publicListResponse[0]?.questions,
-          });
+          questionRes = await questionsApi.getQuestionsByIds(
+            publicListResponse[0]?.questions
+          );
         }
-        setCards(questionRes.data);
-        setCardCount(questionRes.data.length);
+        setCards(questionRes);
+        setCardCount(questionRes.length);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching cards:", error);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { questionsApi, listsApi } from '../Utils/api';
+import { questionsApi, listsApi } from '../services/api';
 import { handleNotification } from '../Utils/helperfunctions';
 
 export const useQuestions = (currentUser) => {

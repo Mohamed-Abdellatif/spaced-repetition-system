@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
@@ -9,10 +8,9 @@ import NotificationToast from "../../components/Toast/toast";
 import List from "../../components/ViewQuestionsList/List";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import "./viewList.css";
+import { listsApi, questionsApi } from "../../services/api";
 
-const dataURL = import.meta.env.VITE_SRS_BE_URL;
-
-const ViewList = ({listType}) => {
+const ViewList = ({ listType }) => {
   const { listName } = useParams();
   const [toBeAdded, setToBeAdded] = useState({});
   const [lists, setLists] = useState([]);
@@ -38,27 +36,23 @@ const ViewList = ({listType}) => {
   const getData = async () => {
     if (!currentUser) return;
     try {
-      const response =listType==="private" ?await axios.post(`${dataURL}/getListQuestions`, {
-        listName: listName.replaceAll("%20", " "),
-        userId: currentUser?.uid,
-      }):await axios.post(`${dataURL}/getPublicListQuestions`, {
-        listName: listName.replaceAll("%20", " ")
-      });
+      const response =
+        listType === "private"
+          ? await listsApi.getListQuestions(
+              listName.replaceAll("%20", " "),
+              currentUser?.uid
+            )
+          : await listsApi.getPublicListQuestions(
+              listName.replaceAll("%20", " ")
+            );
 
-      const listResponse = await axios.post(`${dataURL}/getLists`, {
-        userId: currentUser?.uid,
-      });
-      const publicListResponse = await axios.post(
-        `${dataURL}/getPublicListsWithCreatorId`,
-        {
-          creatorId: currentUser?.uid,
-        }
+      const listResponse = await listsApi.getLists(currentUser?.uid);
+      const publicListResponse = await listsApi.getPublicListsWithCreatorId(
+        currentUser?.uid
       );
-      setLists([...listResponse.data,... publicListResponse.data]);
-      const res = await axios.post(`${dataURL}/getQuestionsById`, {
-        questionsList: response.data[0].questions,
-      });
-      setQuestions(res.data);
+      setLists([...listResponse, ...publicListResponse]);
+      const res = await questionsApi.getQuestionsByIds(response[0].questions);
+      setQuestions(res);
     } catch (error) {
       console.log(error.message);
     }
@@ -77,14 +71,12 @@ const ViewList = ({listType}) => {
   //delete
   const deleteQuestion = async () => {
     try {
-      const response = await axios.post(`${dataURL}/getListQuestions`, {
-        listName: listName.replaceAll("%20", " "),
-        userId: currentUser?.uid,
-      });
-      const filtered = response.data[0].questions.filter(
-        (id) => id !== toDelete.id
+      const response = await listsApi.getListQuestions(
+        listName.replaceAll("%20", " "),
+        currentUser?.uid
       );
-      await axios.put(`${dataURL}/lists/${listName.replaceAll("%20", " ")}`, {
+      const filtered = response[0].questions.filter((id) => id !== toDelete.id);
+      await listsApi.updateList(listName.replaceAll("%20", " "), {
         questions: filtered,
         userId: currentUser?.uid,
       });
@@ -117,12 +109,9 @@ const ViewList = ({listType}) => {
       !genre == " " // eslint-disable-next-line
     ) {
       try {
-        const response = await axios.put(
-          `${dataURL}/questions/${toEdit.id}`,
-          toEdit
-        );
+        const response = await questionsApi.updateQuestion(toEdit.id, toEdit);
 
-        await setResponse(response.data);
+        setResponse(response);
         await getData();
         setIsNotificationVisible(true);
       } catch (err) {
@@ -140,22 +129,22 @@ const ViewList = ({listType}) => {
   const addToList = async (listNameToAdd) => {
     const { id } = toBeAdded;
     try {
-      const response = await axios.post(`${dataURL}/getListQuestions`, {
-        listName: listNameToAdd,
-        userId: currentUser?.uid,
-      });
+      const response = await await listsApi.getListQuestions(
+        listName.replaceAll("%20", " "),
+        currentUser?.uid
+      );
 
-      if (response.data[0].questions !== null) {
-        if (!response.data[0].questions.includes(id)) {
-          const requestions = response.data[0].questions;
+      if (response[0].questions !== null) {
+        if (!response[0].questions.includes(id)) {
+          const requestions = response[0].questions;
 
-          await axios.put(`${dataURL}/lists/${listNameToAdd}`, {
+          await listsApi.updateList(listNameToAdd, {
             questions: requestions.concat(id),
             userId: currentUser?.uid,
           });
         }
       } else {
-        await axios.put(`${dataURL}/lists/${listNameToAdd}`, {
+        await listsApi.updateList(listNameToAdd, {
           questions: [id],
           userId: currentUser?.uid,
         });
@@ -170,7 +159,7 @@ const ViewList = ({listType}) => {
   const createNewList = async (newListName) => {
     try {
       setNewListName("");
-      await axios.post(`${dataURL}/lists`, {
+      await listsApi.createList({
         listName: newListName,
         userId: currentUser?.uid,
       });
@@ -195,8 +184,8 @@ const ViewList = ({listType}) => {
     setToEdit(question);
     setShowEditModal(true);
   };
-  const list= lists?.filter(list => list.listName === listName)[0];
-  
+  const list = lists?.filter((list) => list.listName === listName)[0];
+
   return (
     <Container fluid className="py-4">
       <Row className="justify-content-center">
@@ -213,7 +202,9 @@ const ViewList = ({listType}) => {
               <Row className="my-2">
                 <Col>
                   <h6 className="mb-0 text-secondary text-capitalize">
-                    {(list?.description?.length>0)?(list.description):"No Description"}
+                    {list?.description?.length > 0
+                      ? list.description
+                      : "No Description"}
                   </h6>
                 </Col>
               </Row>

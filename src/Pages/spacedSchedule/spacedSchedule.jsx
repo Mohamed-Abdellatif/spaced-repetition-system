@@ -1,4 +1,3 @@
-import axios from "axios";
 import moment from "moment";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../contexts/user.context";
@@ -7,10 +6,9 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { Modal, Button, Container, Row, Col, Card } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendar, faBook, } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, faBook } from "@fortawesome/free-solid-svg-icons";
 import "./spacedSchedule.css";
-
-const dataURL =  import.meta.env.VITE_SRS_BE_URL;
+import { questionsApi } from "../../services/api";
 
 const SpacedSchedule = () => {
   const { currentUser } = useContext(UserContext);
@@ -23,9 +21,7 @@ const SpacedSchedule = () => {
   const getData = async () => {
     if (!currentUser) return;
     try {
-      const response = await axios.post(`${dataURL}/getQuestions`, {
-        userId: currentUser.uid,
-      });
+      const response = await questionsApi.getQuestions(currentUser.uid);
 
       setQuestions(response.data);
 
@@ -111,9 +107,9 @@ const SpacedSchedule = () => {
         </Col>
       </Row>
 
-      <Modal 
-        show={showModal} 
-        onHide={() => setShowModal(false)} 
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
         centered
         className="schedule-modal"
       >
@@ -130,9 +126,7 @@ const SpacedSchedule = () => {
                 <Card key={q.id} className="question-card mb-3">
                   <Card.Body>
                     <div className="d-flex align-items-start">
-                      <div className="question-number me-3">
-                        {index + 1}
-                      </div>
+                      <div className="question-number me-3">{index + 1}</div>
                       <div>
                         <h5 className="question-text mb-2">{q.question}</h5>
                         <p className="answer-text mb-0">

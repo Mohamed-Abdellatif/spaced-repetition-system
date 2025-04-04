@@ -10,7 +10,7 @@ import DeleteListModal from "../../components/DeleteListModal/DeleteListModal";
 import EditListModal from "../../components/EditListModal/editListModal";
 import AddListModal from "../../components/AddListModal/AddListModal";
 import { getDisplayNameFromDocument } from "../../Utils/firebase/firebase.utils";
-import { listsApi, questionsApi } from "../../Utils/api";
+import { listsApi, questionsApi } from "../../services/api";
 
 const ListsPage = () => {
   const { currentUser } = useContext(UserContext);

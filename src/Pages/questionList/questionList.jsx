@@ -1,12 +1,6 @@
 import { useState, useContext } from "react";
 
-import {
-  Row,
-  Col,
-  Button,
-  Spinner,
-  Container,
-} from "react-bootstrap";
+import { Row, Col, Button, Spinner, Container } from "react-bootstrap";
 import "./questionList.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -17,8 +11,12 @@ import NotificationToast from "../../components/Toast/toast";
 import EditModal from "../../components/EditModal/editModal";
 import { UserContext } from "../../contexts/user.context";
 import AddToListModal from "../../components/AddToListModal/AddToListModal";
-import { imagesApi, listsApi, questionsApi } from "../../Utils/api";
-import { addQuestionToList, generateQuestionFromText, handleNotification } from "../../Utils/helperfunctions";
+import { imagesApi, listsApi, questionsApi } from "../../services/api";
+import {
+  addQuestionToList,
+  generateQuestionFromText,
+  handleNotification,
+} from "../../Utils/helperfunctions";
 import { useQuestions } from "../../hooks/useQuestions";
 import SearchBar from "../../components/SearchBar/SearchBar";
 import GenreFilter from "../../components/GenreFilter/GenreFilter";
@@ -39,7 +37,7 @@ const QuestionList = () => {
     setResponse,
     searchQuestions,
     loadMoreData,
-    getData
+    getData,
   } = useQuestions(currentUser);
 
   // Modal state management
@@ -213,7 +211,14 @@ const QuestionList = () => {
   };
 
   const addToList = async (list) => {
-    await addQuestionToList(list, toBeAdded,lists,setResponse,setIsNotificationVisible,currentUser);
+    await addQuestionToList(
+      list,
+      toBeAdded,
+      lists,
+      setResponse,
+      setIsNotificationVisible,
+      currentUser
+    );
   };
 
   const updateNewListInput = (e) => {
@@ -247,8 +252,14 @@ const QuestionList = () => {
   };
 
   const handleGenerateQuestionFromText = async (text) => {
-   await generateQuestionFromText(text,setIsNotificationVisible,setResponse,setQuestionObj,currentUser);
-  }
+    await generateQuestionFromText(
+      text,
+      setIsNotificationVisible,
+      setResponse,
+      setQuestionObj,
+      currentUser
+    );
+  };
 
   return (
     <Container fluid className="py-4">
@@ -275,6 +286,18 @@ const QuestionList = () => {
           </Button>
         </Col>
       </Row>
+      <Row>
+        <Col xs={12}>
+          <h6>
+            {questions.length} Question{questions.length > 1? "s" : ""}
+            {currentGenre && currentGenre!== "ALL GENRES"? ` in ` : ""}
+           <span className="text-primary"> {currentGenre && currentGenre!== "ALL GENRES"? `"${currentGenre}"` : ""}</span>
+          </h6>
+          <h6>
+           Total: {questionsLength} Question{questionsLength > 1? "s" : ""}
+          </h6>
+        </Col>
+      </Row>
 
       {loading ? (
         <div className="text-center py-5">
@@ -289,7 +312,7 @@ const QuestionList = () => {
             setToEdit={handleEditClick}
             addToList={handleAddToListClick}
           />
-          {questionsLength > questions.length && !query.text.length > 0 && (
+          {questionsLength > questions.length && currentGenre === "ALL GENRES" && (
             <div className="text-center mt-4">
               <Button variant="outline-primary" onClick={loadMoreData}>
                 Load More
