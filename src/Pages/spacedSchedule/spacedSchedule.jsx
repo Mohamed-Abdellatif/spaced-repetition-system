@@ -23,9 +23,9 @@ const SpacedSchedule = () => {
     try {
       const response = await questionsApi.getQuestions(currentUser.uid);
 
-      setQuestions(response.data);
+      setQuestions(response);
 
-      const eventList = response.data
+      const eventList = response
         .filter((q) => q.nextTest !== null)
         .map((q) => ({
           title: q.question,
