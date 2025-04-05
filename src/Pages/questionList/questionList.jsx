@@ -286,7 +286,7 @@ const QuestionList = () => {
           </Button>
         </Col>
       </Row>
-      <Row>
+      {currentUser?.uid && <Row>
         <Col xs={12}>
           <h6>
             {questions.length} Question{questions.length > 1? "s" : ""}
@@ -297,7 +297,7 @@ const QuestionList = () => {
            Total: {questionsLength} Question{questionsLength > 1? "s" : ""}
           </h6>
         </Col>
-      </Row>
+      </Row>}
 
       {loading ? (
         <div className="text-center py-5">

@@ -49,7 +49,7 @@ const ListsPage = () => {
   };
 
   const handleSearchClick = async () => {
-    if (query.text < 1) {
+    if (query.text.length < 1) {
       getData();
       return;
     }
@@ -150,7 +150,7 @@ const ListsPage = () => {
           : await listsApi.deleteList(toDelete.id);
       getData();
       setIsNotificationVisible(true);
-      setResponse(response.data);
+      setResponse(response);
       setShowDeleteModal(false);
     } catch {
       setResponse("Error please try again later");
@@ -180,7 +180,7 @@ const ListsPage = () => {
             });
       getData();
       setShowEditModal(false);
-      setResponse(response.data);
+      setResponse(response);
       setIsNotificationVisible(true);
     } catch {
       setResponse("Error please try again later");

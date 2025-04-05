@@ -19,9 +19,9 @@ const ViewQuestion = () => {
       const response = await questionsApi.getQuestionById(questionId);
       setQuestionObj(response);
 
-      const imgResponse = imagesApi.getImage(questionId);
+      const imgResponse = await imagesApi.getImage(questionId);
       if (imgResponse.status === 200) {
-        setImageURL(imgResponse.data.url);
+        setImageURL(imgResponse.url);
       }
     } catch (err) {
       setResponse("Error, please try again later");
