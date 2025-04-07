@@ -4,15 +4,16 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import MCQInput from "../MCQInput/MCQInput";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { 
-  faPlus, 
-  faImage, 
-  faBrain, 
-  faQuestion, 
-  faList, 
-  faChartLine 
+import {
+  faPlus,
+  faImage,
+  faBrain,
+  faQuestion,
+  faList,
+  faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
+import { QuestionObj, QuestionTypes } from "../../Utils/constants";
 
 const AddModal = ({
   generateQuestionFromText,
@@ -21,19 +22,20 @@ const AddModal = ({
   handleSubmit,
   setQuestionObj,
   handleImageChange,
+  handleQuestionAsImageChange,
+  questionAsImage,
   show,
   onHide,
-  image
+  image,
 }) => {
-  const { question, answer, difficulty, genre, questionType, choices } = questionObj;
+  const { question, answer, difficulty, genre, questionType, choices } =
+    questionObj;
 
   const handleQuestionTypeChange = (questionType) => {
     setQuestionObj({ ...questionObj, questionType: questionType });
   };
 
-  const [text, setText] = useState('');
-
-  
+  const [text, setText] = useState("");
 
   const updateChoices = (e) => {
     setQuestionObj({
@@ -47,7 +49,10 @@ const AddModal = ({
   return (
     <Modal
       show={show}
-      onHide={onHide}
+      onHide={() => {
+        onHide();
+        setQuestionObj({...QuestionObj})
+      }}
       size="lg"
       centered
       className="question-modal"
@@ -88,9 +93,9 @@ const AddModal = ({
                   onChange={updateInput}
                   name="difficulty"
                   type="number"
-                  placeholder="0"
+                  placeholder="1"
                   min="1"
-                  max="10"
+                  max="5"
                 />
               </Form.Group>
             </Col>
@@ -101,13 +106,36 @@ const AddModal = ({
               <FontAwesomeIcon icon={faQuestion} className="me-2" />
               Question
             </Form.Label>
-            <Form.Control
-              value={question}
-              onChange={updateInput}
-              name="question"
-              type="text"
-              placeholder="How to spell my name?"
-            />
+            {questionType === "image" ? (
+              <>
+                <Form.Control
+                  className="mb-2"
+                  value={question}
+                  onChange={updateInput}
+                  name="question"
+                  type="text"
+                  placeholder="Describe the image"
+                />
+                <Form.Control
+                  type="file"
+                  onChange={handleQuestionAsImageChange}
+                  accept="image/*"
+                />
+                {questionAsImage && (
+                  <small className="text-muted d-block mt-2">
+                    Selected file: {questionAsImage.name}
+                  </small>
+                )}
+              </>
+            ) : (
+              <Form.Control
+                value={question}
+                onChange={updateInput}
+                name="question"
+                type="text"
+                placeholder="How to spell my name?"
+              />
+            )}
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -118,62 +146,53 @@ const AddModal = ({
             <div>
               <DropdownButton
                 variant="primary"
-                title={questionType}
+                title={questionType.toUpperCase()}
               >
-                {questionType !== "MCQ" && (
-                  <Dropdown.Item onClick={() => handleQuestionTypeChange("MCQ")}>
-                    Multiple Choice
-                  </Dropdown.Item>
-                )}
-                {questionType !== "Short Response" && (
-                  <Dropdown.Item onClick={() => handleQuestionTypeChange("Short Response")}>
-                    Short Response
-                  </Dropdown.Item>
-                )}
-                {questionType !== "Complete" && (
-                  <Dropdown.Item onClick={() => handleQuestionTypeChange("Complete")}>
-                    Complete
-                  </Dropdown.Item>
-                )}
-                {questionType !== "True or false" && (
-                  <Dropdown.Item onClick={() => handleQuestionTypeChange("True or false")}>
-                    True or False
-                  </Dropdown.Item>
+                {QuestionTypes.filter((type) => type !== questionType).map(
+                  (type) => {
+                    return (
+                      <Dropdown.Item
+                        key={type}
+                        onClick={() => handleQuestionTypeChange(type)}
+                      >
+                        <span className="text-capitalize">{type}</span>
+                      </Dropdown.Item>
+                    );
+                  }
                 )}
               </DropdownButton>
             </div>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Answer</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={answer}
-              onChange={updateInput}
-              name="answer"
-              placeholder="Enter the answer"
-            />
-            {questionType === "MCQ" && (
-              <div className="mt-3">
-                <MCQInput
-                  updateChoices={updateChoices}
-                  choices={choices}
-                />
-              </div>
-            )}
-          </Form.Group>
+          {questionType !== "true or false" && (
+            <Form.Group className="mb-3">
+              <Form.Label>Answer</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={answer}
+                onChange={updateInput}
+                name="answer"
+                placeholder="Enter the answer"
+              />
+            </Form.Group>
+          )}
           <Form.Group className="mb-3">
             <Form.Label>Generate Question From Text By AI</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
               value={text}
-              onChange={(e)=>setText(e.target.value)}
+              onChange={(e) => setText(e.target.value)}
               name="text"
               placeholder="Enter the text"
             />
-            <Button className="mt-2" onClick={()=>{generateQuestionFromText(text)}}>
+            <Button
+              className="mt-2"
+              onClick={() => {
+                generateQuestionFromText(text);
+              }}
+            >
               Generate Question
               <FontAwesomeIcon icon={faQuestion} className="ms-2" />
             </Button>
@@ -199,14 +218,17 @@ const AddModal = ({
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
+        <Button variant="secondary" onClick={() => {
+            onHide();
+            setQuestionObj({...QuestionObj})
+          }}>
           Cancel
         </Button>
         <Button
           variant="primary"
-          onClick={()=>{
+          onClick={() => {
             handleSubmit();
-            setText('');
+            setText("");
           }}
           disabled={!isFormValid}
         >

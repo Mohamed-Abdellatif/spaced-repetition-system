@@ -23,6 +23,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router-dom";
 import { listsApi, questionsApi } from "../../services/api";
+import { getQuestionImage } from "../../Utils/helperfunctions";
 
 const StudyCards = () => {
   const { listName } = useParams();
@@ -35,6 +36,7 @@ const StudyCards = () => {
   const [reviewAgain, setReviewAgain] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { currentUser } = useContext(UserContext);
+  const [questionImgURL, setQuestionImgURL] = useState(null);
 
   // Fetch cards from API
   useEffect(() => {
@@ -59,6 +61,7 @@ const StudyCards = () => {
         }
         setCards(questionRes);
         setCardCount(questionRes.length);
+        getQuestionImage(questionRes[currentIndex], setQuestionImgURL);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching cards:", error);
@@ -218,6 +221,15 @@ const StudyCards = () => {
           <Card className="study-card align-content-between">
             <Card.Body className="text-center">
               <Row className="card-content">
+                {cards[currentIndex]?.questionType === "image" && (
+                  <img
+                    src={questionImgURL}
+                    className=""
+                    alt="question"
+                    width={"300px"}
+                    height={"300px"}
+                  />
+                )}
                 <Card.Title className="question-text">
                   {cards[currentIndex]?.question}
                 </Card.Title>

@@ -5,11 +5,13 @@ import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./viewQuestion.css";
 import { imagesApi, questionsApi } from "../../services/api";
+import { getQuestionImage } from "../../Utils/helperfunctions";
 
 const ViewQuestion = () => {
   const { questionId } = useParams();
   const [questionObj, setQuestionObj] = useState({});
   const [imageURL, setImageURL] = useState(null);
+  const [questionImgURL, setQuestionImgURL] = useState(null);
   const [response, setResponse] = useState();
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -18,9 +20,10 @@ const ViewQuestion = () => {
     try {
       const response = await questionsApi.getQuestionById(questionId);
       setQuestionObj(response);
-
+      getQuestionImage(response,setQuestionImgURL);
+      
       const imgResponse = await imagesApi.getImage(questionId);
-      if (imgResponse.status === 200) {
+      if (imgResponse) {
         setImageURL(imgResponse.url);
       }
     } catch (err) {
@@ -35,7 +38,7 @@ const ViewQuestion = () => {
     getData();
   }, [questionId]);
 
-  const { question, answer, difficulty, img } = questionObj;
+  const { question, answer, difficulty,questionType,img } = questionObj;
 
   return (
     <div className="container mt-5 d-flex justify-content-center">
@@ -47,16 +50,16 @@ const ViewQuestion = () => {
       >
         {!isFlipped ? (
           <div className="card-body front text-center">
-            {img && (
+            {questionType==="image" && (
               <img
-                src={`${imageURL}?t=${Date.now()}`}
+                src={`${questionImgURL}?t=${Date.now()}`}
                 className="card-img-top flashcard-image"
-                alt="question diagram"
+                alt="question"
                 width={"300px"}
                 height={"300px"}
               />
             )}
-            <h5 className={"card-title mt-3"}>Question: {question}</h5>
+            <h5 className={"card-title mt-3"}>Question: <br /> {question}</h5>
             <span
               className={`badge ${
                 difficulty === "hard"
@@ -71,7 +74,16 @@ const ViewQuestion = () => {
           </div>
         ) : (
           <div className="card-body back text-center d-flex align-items-center justify-content-center">
-            <p className="answer-text">Answer: {answer}</p>
+            {img && (
+              <img
+                src={`${imageURL}?t=${Date.now()}`}
+                className="card-img-top flashcard-image"
+                alt="question diagram"
+                width={"300px"}
+                height={"300px"}
+              />
+            )}
+            <p className="answer-text">Answer: <br />{answer}</p>
           </div>
         )}
       </motion.div>

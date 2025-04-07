@@ -6,7 +6,7 @@ import moment from "moment";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faSync } from "@fortawesome/free-solid-svg-icons";
-import { todayFormatDate } from "../../Utils/helperfunctions";
+import { getQuestionImage, todayFormatDate } from "../../Utils/helperfunctions";
 import { questionsApi } from "../../services/api";
 
 const QuestionsQuiz = () => {
@@ -15,6 +15,7 @@ const QuestionsQuiz = () => {
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState("");
+  const [questionImgURL, setQuestionImgURL] = useState(null);
   const [isFlipped, setIsFlipped] = useState(false);
   const [response, setResponse] = useState("");
   const today = todayFormatDate();
@@ -50,6 +51,8 @@ const QuestionsQuiz = () => {
     if (questions.length > 0) {
       setCurrentQuestion(questions[currentIndex]);
     }
+    
+    getQuestionImage(questions[currentIndex],setQuestionImgURL);
   }, [questions, currentIndex]);
 
   const setCurrentQuestion = (question) => {
@@ -153,6 +156,15 @@ const QuestionsQuiz = () => {
                 <div className={`flip-card ${isFlipped ? "flipped" : ""}`}>
                   <div className="flip-card-inner">
                     <div className="flip-card-front">
+                      {questions[currentIndex]?.questionType === "image" && (
+                        <img
+                          src={questionImgURL}
+                          className=""
+                          alt="question"
+                          width={"330px"}
+                          height={"300px"}
+                        />
+                      )}
                       <h3 className="question-text">
                         {questions[currentIndex]?.question}
                       </h3>

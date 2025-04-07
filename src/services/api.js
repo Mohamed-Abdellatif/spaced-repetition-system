@@ -172,6 +172,31 @@ export const imagesApi = {
   deleteImage: async (questionId) => {
     const response = await axios.delete(`${dataURL}/deleteImage/${questionId}`);
     return response.data;
+  },
+  // Upload image
+  uploadImageAsQuestion: async (questionId, formData) => {
+    const response = await axios.put(`${dataURL}/uploadAsQuestion/${questionId}`, formData);
+    return response.data;
+  },
+
+  // Get image
+  getImageAsQuestion: async (questionId) => {
+    const response = await axios.get(`${dataURL}/questionsAsImages/${questionId}`);
+    return response.data;
+  },
+
+  // Get image direct (as blob)
+  getQuestionAsImageDirect: async (questionId) => {
+    const response = await axios.get(`${dataURL}/questionsAsImagesImgDirect/${questionId}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
+  // Delete image
+  deleteQuestionAsImage: async (questionId) => {
+    const response = await axios.delete(`${dataURL}/deleteQuestionsAsImages/${questionId}`);
+    return response.data;
   }
 };
 

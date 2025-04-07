@@ -12,23 +12,11 @@ import { todayFormatDate } from "../../Utils/helperfunctions";
 const PublicListsPage = () => {
   const { currentUser } = useContext(UserContext);
 
-  // Modal state management
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-
   const [loading, setLoading] = useState(true);
-  const [toEdit, setToEdit] = useState({});
   const [response, setResponse] = useState("");
-
-  const [toDelete, setToDelete] = useState({});
-
   const [lists, setLists] = useState([]);
-  const [newList, setNewList] = useState({ listName: "", description: "" });
-
   const [query, setQuery] = useState({ text: "" });
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
-  const [questionObj, setQuestionObj] = useState([]);
 
   const handleSearchUpdate = (e) => {
     setQuery({ text: e.target.value });
@@ -114,6 +102,22 @@ const PublicListsPage = () => {
                 setIsNotificationVisible(true);
               }
             }
+            if (questionData.questionType === "image") {
+              try {
+                const imageResponse = await imagesApi.getQuestionAsImageDirect(
+                  questionId
+                );
+
+                if (imageResponse) {
+                  const formData = new FormData();
+                  formData.append("image", imageResponse);
+                  await imagesApi.uploadImageAsQuestion(newQuestionResponse.id, formData);
+                }
+              } catch (imageError) {
+                setResponse("Please Try Again");
+                setIsNotificationVisible(true);
+              }
+            }
           } catch (questionError) {
             setResponse("Please Try Again");
             setIsNotificationVisible(true);
@@ -121,8 +125,6 @@ const PublicListsPage = () => {
         }
       }
 
-      setShowAddModal(false);
-      setNewList({ listName: "", description: "" });
       getData();
       setResponse("Added Successfully");
       setIsNotificationVisible(true);

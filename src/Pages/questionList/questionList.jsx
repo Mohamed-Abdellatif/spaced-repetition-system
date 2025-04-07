@@ -16,10 +16,12 @@ import {
   addQuestionToList,
   generateQuestionFromText,
   handleNotification,
+  todayFormatDate,
 } from "../../Utils/helperfunctions";
 import { useQuestions } from "../../hooks/useQuestions";
 import SearchBar from "../../components/SearchBar/SearchBar";
 import GenreFilter from "../../components/GenreFilter/GenreFilter";
+import { QuestionObj, ToEditQuestionObj } from "../../Utils/constants";
 
 const QuestionList = () => {
   const { currentUser } = useContext(UserContext);
@@ -47,30 +49,12 @@ const QuestionList = () => {
   const [showAddToListModal, setShowAddToListModal] = useState(false);
 
   const [image, setImage] = useState(null);
-  const [toEdit, setToEdit] = useState({
-    question: "",
-    difficulty: "",
-    answer: "",
-    genre: "",
-    questionType: "",
-  });
+  const [questionAsImage, setQuestionAsImage] = useState(null);
+  const [toEdit, setToEdit] = useState({ ...ToEditQuestionObj });
   const [toDelete, setToDelete] = useState({});
   const [toBeAdded, setToBeAdded] = useState({});
   const [newListName, setNewListName] = useState("");
-  const [questionObj, setQuestionObj] = useState({
-    question: "",
-    difficulty: "",
-    answer: "",
-    userId: "",
-    genre: "",
-    questionType: "MCQ",
-    choices: {
-      choice1: "",
-      choice2: "",
-      choice3: "",
-    },
-  });
-
+  const [questionObj, setQuestionObj] = useState({ ...QuestionObj });
   // Modal handlers
   const handleAddClick = () => {
     setShowAddModal(true);
@@ -96,6 +80,9 @@ const QuestionList = () => {
     try {
       const response = await questionsApi.deleteQuestion(toDelete.id);
       await imagesApi.deleteImage(toDelete.id);
+      if (toDelete.questionType === "image") {
+        await imagesApi.deleteQuestionAsImage(toDelete.id);
+      }
       getData();
       handleNotification(setIsNotificationVisible, setResponse, response);
       setShowDeleteModal(false);
@@ -163,38 +150,31 @@ const QuestionList = () => {
   };
 
   const handleAddSubmit = async () => {
-    const { question, answer, difficulty, genre } = questionObj;
+    const { question, answer, difficulty, genre, questionType } = questionObj;
     if (
       !question == " " &&
       !answer == " " &&
       !difficulty == " " &&
-      !genre == " "
+      !genre == " " &&
+      questionType === "image" &&
+      questionAsImage !== null
     ) {
-      const created = new Date().toLocaleString("en-US", {
-        timeZone: "Africa/Cairo",
-      });
+      const created = todayFormatDate();
       const nextTest = created;
       const response = await questionsApi.createQuestion({
         ...questionObj,
         created,
         nextTest,
       });
+      if (questionType === "image") {
+        handleQuestionAsImageSubmit(response.id);
+      }
       handleImageSubmit(response.id);
       setImage(null);
+      setQuestionAsImage(null);
       getData();
 
-      setQuestionObj({
-        question: "",
-        difficulty: "",
-        answer: "",
-        genre: "",
-        questionType: "MCQ",
-        choices: {
-          choice1: "",
-          choice2: "",
-          choice3: "",
-        },
-      });
+      setQuestionObj({ ...QuestionObj });
       handleNotification(
         setIsNotificationVisible,
         setResponse,
@@ -202,11 +182,19 @@ const QuestionList = () => {
       );
       setShowAddModal(false);
     } else {
-      handleNotification(
-        setIsNotificationVisible,
-        setResponse,
-        "Please complete the blanks"
-      );
+      if (questionType === "image" && questionAsImage === null) {
+        handleNotification(
+          setIsNotificationVisible,
+          setResponse,
+          "Please upload an image"
+        );
+      } else {
+        handleNotification(
+          setIsNotificationVisible,
+          setResponse,
+          "Please complete the blanks"
+        );
+      }
     }
   };
 
@@ -242,12 +230,22 @@ const QuestionList = () => {
   const handleImageChange = (event) => {
     setImage(event.target.files[0]);
   };
+  const handleQuestionAsImageChange = (event) => {
+    setQuestionAsImage(event.target.files[0]);
+  };
 
   const handleImageSubmit = async (questionID) => {
     if (image) {
       const formData = new FormData();
       formData.append("image", image);
       await imagesApi.uploadImage(questionID, formData);
+    }
+  };
+  const handleQuestionAsImageSubmit = async (questionID) => {
+    if (questionAsImage) {
+      const formData = new FormData();
+      formData.append("image", questionAsImage);
+      await imagesApi.uploadImageAsQuestion(questionID, formData);
     }
   };
 
@@ -286,18 +284,25 @@ const QuestionList = () => {
           </Button>
         </Col>
       </Row>
-      {currentUser?.uid && <Row>
-        <Col xs={12}>
-          <h6>
-            {questions.length} Question{questions.length > 1? "s" : ""}
-            {currentGenre && currentGenre!== "ALL GENRES"? ` in ` : ""}
-           <span className="text-primary"> {currentGenre && currentGenre!== "ALL GENRES"? `"${currentGenre}"` : ""}</span>
-          </h6>
-          <h6>
-           Total: {questionsLength} Question{questionsLength > 1? "s" : ""}
-          </h6>
-        </Col>
-      </Row>}
+      {currentUser?.uid && (
+        <Row>
+          <Col xs={12}>
+            <h6>
+              {questions.length} Question{questions.length > 1 ? "s" : ""}
+              {currentGenre && currentGenre !== "ALL GENRES" ? ` in ` : ""}
+              <span className="text-primary">
+                {" "}
+                {currentGenre && currentGenre !== "ALL GENRES"
+                  ? `"${currentGenre}"`
+                  : ""}
+              </span>
+            </h6>
+            <h6>
+              Total: {questionsLength} Question{questionsLength > 1 ? "s" : ""}
+            </h6>
+          </Col>
+        </Row>
+      )}
 
       {loading ? (
         <div className="text-center py-5">
@@ -312,13 +317,14 @@ const QuestionList = () => {
             setToEdit={handleEditClick}
             addToList={handleAddToListClick}
           />
-          {questionsLength > questions.length && currentGenre === "ALL GENRES" && (
-            <div className="text-center mt-4">
-              <Button variant="outline-primary" onClick={loadMoreData}>
-                Load More
-              </Button>
-            </div>
-          )}
+          {questionsLength > questions.length &&
+            currentGenre === "ALL GENRES" && (
+              <div className="text-center mt-4">
+                <Button variant="outline-primary" onClick={loadMoreData}>
+                  Load More
+                </Button>
+              </div>
+            )}
         </>
       )}
 
@@ -331,6 +337,8 @@ const QuestionList = () => {
         handleSubmit={handleAddSubmit}
         setQuestionObj={setQuestionObj}
         handleImageChange={handleImageChange}
+        handleQuestionAsImageChange={handleQuestionAsImageChange}
+        questionAsImage={questionAsImage}
         image={image}
       />
 

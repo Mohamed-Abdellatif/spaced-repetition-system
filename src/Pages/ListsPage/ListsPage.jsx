@@ -145,7 +145,7 @@ const ListsPage = () => {
   const deleteList = async () => {
     try {
       const response =
-        toDelete.creatorId === currentUser.uid
+        toDelete.creatorId
           ? await listsApi.deletePublicList(toDelete.id)
           : await listsApi.deleteList(toDelete.id);
       getData();

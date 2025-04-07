@@ -1,4 +1,4 @@
-import { listsApi } from "../services/api";
+import { imagesApi, listsApi } from "../services/api";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 const Google_API_KEY = import.meta.env.VITE_API_KEY;
 
@@ -118,6 +118,13 @@ export const generateQuestionFromText = async (text,setIsNotificationVisible,set
         "Please Try Again Later"
       );
       return;
+    }else if(text.length<30){
+      handleNotification(
+        setIsNotificationVisible,
+        setResponse,
+        "Please Enter a Longer Text"
+      );
+      return;
     }
 
     let responseText = response.response.text().trim();
@@ -163,4 +170,16 @@ export const todayFormatDate = (timeZone = "Africa/Cairo") => {
       month: "2-digit",
       day: "2-digit",
     }).format(new Date());
+};
+
+
+export const getQuestionImage = async (question,setQuestionImgURL) => {
+  if (question?.questionType === "image") {
+    const imgQuestionResponse = await imagesApi.getImageAsQuestion(
+      question.id
+    );
+    if (imgQuestionResponse) {
+      setQuestionImgURL(imgQuestionResponse.url);
+    }
+  }
 };
