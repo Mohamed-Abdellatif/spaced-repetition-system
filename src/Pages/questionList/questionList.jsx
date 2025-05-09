@@ -156,8 +156,7 @@ const QuestionList = () => {
       !answer == " " &&
       !difficulty == " " &&
       !genre == " " &&
-      questionType === "image" &&
-      questionAsImage !== null
+      (questionType === "image" ? questionAsImage !== null : true)
     ) {
       const created = todayFormatDate();
       const nextTest = created;
