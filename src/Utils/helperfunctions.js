@@ -183,3 +183,81 @@ export const getQuestionImage = async (question,setQuestionImgURL) => {
     }
   }
 };
+
+
+export const generateWrongChoicesFromText = async (
+  text,
+  correctAnswer,
+  setIsNotificationVisible,
+  setResponse,
+  setWrongChoices
+) => {
+  try {
+    const genAI = new GoogleGenerativeAI(Google_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `
+      Based on the following text, generate 3 wrong answer choices (distractors) that are plausible but incorrect compared to the correct answer.
+      Return ONLY a valid JSON object in this format:
+      {
+        "choice1": "",
+        "choice2": "",
+        "choice3": ""
+      }
+      Text: "${text}"
+      Correct Answer: "${correctAnswer}"
+    `;
+
+    const response = await model.generateContent(prompt);
+
+    if (!response || !response.response) {
+      handleNotification(
+        setIsNotificationVisible,
+        setResponse,
+        "Please Try Again Later"
+      );
+      return;
+    } else if (text.length < 4 || correctAnswer.trim() === "") {
+      handleNotification(
+        setIsNotificationVisible,
+        setResponse,
+        "Please Enter Valid Text and Answer"
+      );
+      return;
+    }
+
+    let responseText = response.response.text().trim();
+
+    if (responseText.startsWith("```json")) {
+      responseText = responseText.slice(7, -3).trim();
+    }
+
+    let extractedChoices;
+    try {
+      extractedChoices = JSON.parse(responseText);
+    } catch (jsonError) {
+      handleNotification(
+        setIsNotificationVisible,
+        setResponse,
+        "Please Try Again Later"
+      );
+      return;
+    }
+
+    if (extractedChoices?.choice1 && extractedChoices?.choice2 && extractedChoices?.choice3) {
+      setWrongChoices(extractedChoices);
+    } else {
+      handleNotification(
+        setIsNotificationVisible,
+        setResponse,
+        "Failed to Generate Wrong Choices"
+      );
+    }
+  } catch (error) {
+    handleNotification(
+      setIsNotificationVisible,
+      setResponse,
+      "Please Try Again Later"
+    );
+  }
+};

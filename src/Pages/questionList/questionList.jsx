@@ -15,6 +15,7 @@ import { imagesApi, listsApi, questionsApi } from "../../services/api";
 import {
   addQuestionToList,
   generateQuestionFromText,
+  generateWrongChoicesFromText,
   handleNotification,
   todayFormatDate,
 } from "../../Utils/helperfunctions";
@@ -47,6 +48,7 @@ const QuestionList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showAddToListModal, setShowAddToListModal] = useState(false);
+  const [wrongChoices, setWrongChoices] = useState();
 
   const [image, setImage] = useState(null);
   const [questionAsImage, setQuestionAsImage] = useState(null);
@@ -169,16 +171,28 @@ const QuestionList = () => {
       !genre == " " &&
       (questionType === "image" ? questionAsImage !== null : true)
     ) {
+      if (questionType === "MCQ") {
+        await generateWrongChoicesFromText(
+          question,
+          answer,
+          setIsNotificationVisible,
+          setResponse,
+          setWrongChoices
+        );
+      
+      }
       const created = todayFormatDate();
       const nextTest = created;
       const response = await questionsApi.createQuestion({
         ...questionObj,
+        choices:wrongChoices,
         created,
         nextTest,
       });
       if (questionType === "image") {
         handleQuestionAsImageSubmit(response.id);
       }
+      
       handleImageSubmit(response.id);
       setImage(null);
       setQuestionAsImage(null);

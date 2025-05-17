@@ -3,12 +3,18 @@ import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
 import moment from "moment";
-import { Container, Row, Col, Button, Form, ButtonGroup, ToggleButton } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Form,
+} from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faSync } from "@fortawesome/free-solid-svg-icons";
 import { getQuestionImage, todayFormatDate } from "../../Utils/helperfunctions";
 import { questionsApi } from "../../services/api";
-import { QuestionObj, trueOrFalseRadios } from "../../Utils/constants";
+import QuestionQuizAnswerInput from "../../components/QuestionQuizAnswerInput/QuestionQuizAnswerInput";
 
 const QuestionsQuiz = () => {
   const { genre } = useParams();
@@ -173,43 +179,9 @@ const QuestionsQuiz = () => {
                         onSubmit={handleSubmit}
                         className="w-100 d-flex flex-column align-items-center"
                       >
-                        {questions[currentIndex]?.questionType !== "true or false" ? (
-                          <Form.Control
-                            type="text"
-                            className="answer-input"
-                            value={currentAnswer}
-                            onChange={(e) => setCurrentAnswer(e.target.value)}
-                            placeholder="Type your answer..."
-                            disabled={isFlipped}
-                            autoFocus
-                          />
-                        ) : (
-                          <Form.Group >
-                            
-                            <ButtonGroup>
-                              {trueOrFalseRadios.map((radio, idx) => (
-                                <ToggleButton
-                                  key={idx}
-                                  id={`radio-${idx}`}
-                                  type="radio"
-                                  variant={`${
-                                    currentAnswer === radio.bool.toString()
-                                      ? "primary"
-                                      : "secondary"
-                                  }`}
-                                  name="t/f-answer"
-                                  value={radio.bool}
-                                  checked={currentAnswer === radio.name}
-                                  onChange={(e) => setCurrentAnswer(e.target.value)}
-                                >
-                                  <span className="text-light">
-                                    {radio.name}
-                                  </span>
-                                </ToggleButton>
-                              ))}
-                            </ButtonGroup>
-                          </Form.Group>
-                        )}
+                        
+                        <QuestionQuizAnswerInput questions={questions} currentIndex={currentIndex} currentAnswer={currentAnswer} isFlipped={isFlipped} setCurrentAnswer={setCurrentAnswer}/>
+
                         <Button
                           type="submit"
                           className="submit-btn"

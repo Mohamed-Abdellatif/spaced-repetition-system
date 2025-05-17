@@ -2,7 +2,6 @@ import "./editModal.css";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
-import MCQInput from "../MCQInput/MCQInput";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faImage } from "@fortawesome/free-solid-svg-icons";
 import ModalAnswerInputModalAnswerInput from "../ModalAnswerInput/ModalAnswerInputModalAnswerInput";
@@ -20,13 +19,6 @@ const EditModal = ({
 
   const handleQuestionTypeChange = (questionType) => {
     setQuestionObj({ ...questionObj, questionType: questionType });
-  };
-
-  const updateChoices = (e) => {
-    setQuestionObj({
-      ...questionObj,
-      choices: { ...choices, [e.target.name]: e.target.value },
-    });
   };
 
   const isFormValid = question && answer && difficulty && genre;

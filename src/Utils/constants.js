@@ -1,4 +1,4 @@
-export const QuestionTypes=["complete","true or false","short response","image"];
+export const QuestionTypes=["complete","true or false","short response","image","MCQ"];
 export const QuestionObj={
     question: "",
     difficulty: 1,
