@@ -5,6 +5,7 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import MCQInput from "../MCQInput/MCQInput";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faImage } from "@fortawesome/free-solid-svg-icons";
+import ModalAnswerInputModalAnswerInput from "../ModalAnswerInput/ModalAnswerInputModalAnswerInput";
 
 const EditModal = ({
   questionObj,
@@ -112,20 +113,7 @@ const EditModal = ({
             </div>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Answer</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={answer}
-              onChange={updateInput}
-              name="answer"
-              placeholder="Enter the answer"
-            />
-            {questionType === "MCQ" && (
-              <MCQInput updateChoices={updateChoices} choices={choices} />
-            )}
-          </Form.Group>
+          <ModalAnswerInputModalAnswerInput questionObj={questionObj} updateInput={updateInput}/>
 
           <Form.Group className="mb-3">
             <Form.Label>

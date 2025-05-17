@@ -142,11 +142,22 @@ const QuestionList = () => {
 
   //add
   const updateAddInput = (e) => {
-    setQuestionObj({
-      ...questionObj,
-      [e.target.name]: e.target.value,
-      userId: currentUser?.uid,
-    });
+    if (
+      questionObj.questionType === "true or false" &&
+      e.target.name === "answer"
+    ) {
+      setQuestionObj({
+        ...questionObj,
+        [e.target.name]: e.target.value,
+        userId: currentUser?.uid,
+      });
+    } else {
+      setQuestionObj({
+        ...questionObj,
+        [e.target.name]: e.target.value,
+        userId: currentUser?.uid,
+      });
+    }
   };
 
   const handleAddSubmit = async () => {

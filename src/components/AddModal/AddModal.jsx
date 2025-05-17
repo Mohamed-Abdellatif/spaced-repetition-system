@@ -2,7 +2,6 @@ import "./AddModal.css";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
-import MCQInput from "../MCQInput/MCQInput";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlus,
@@ -12,8 +11,9 @@ import {
   faList,
   faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { QuestionObj, QuestionTypes } from "../../Utils/constants";
+import ModalAnswerInputModalAnswerInput from "../ModalAnswerInput/ModalAnswerInputModalAnswerInput";
 
 const AddModal = ({
   generateQuestionFromText,
@@ -28,21 +28,19 @@ const AddModal = ({
   onHide,
   image,
 }) => {
-  const { question, answer, difficulty, genre, questionType, choices } =
-    questionObj;
+  const { question, answer, difficulty, genre, questionType } = questionObj;
+
+  useEffect(() => {
+    if (questionType == "true or false") {
+      setQuestionObj({ ...questionObj, answer: "true" });
+    }
+  }, [questionType]);
 
   const handleQuestionTypeChange = (questionType) => {
     setQuestionObj({ ...questionObj, questionType: questionType });
   };
 
   const [text, setText] = useState("");
-
-  const updateChoices = (e) => {
-    setQuestionObj({
-      ...questionObj,
-      choices: { ...choices, [e.target.name]: e.target.value },
-    });
-  };
 
   const isFormValid = question && answer && difficulty && genre;
 
@@ -51,7 +49,7 @@ const AddModal = ({
       show={show}
       onHide={() => {
         onHide();
-        setQuestionObj({...QuestionObj})
+        setQuestionObj({ ...QuestionObj });
       }}
       size="lg"
       centered
@@ -164,19 +162,10 @@ const AddModal = ({
             </div>
           </Form.Group>
 
-          {questionType !== "true or false" && (
-            <Form.Group className="mb-3">
-              <Form.Label>Answer</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={answer}
-                onChange={updateInput}
-                name="answer"
-                placeholder="Enter the answer"
-              />
-            </Form.Group>
-          )}
+          <ModalAnswerInputModalAnswerInput
+            questionObj={questionObj}
+            updateInput={updateInput}
+          />
           <Form.Group className="mb-3">
             <Form.Label>Generate Question From Text By AI</Form.Label>
             <Form.Control
@@ -218,10 +207,13 @@ const AddModal = ({
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="secondary" onClick={() => {
+        <Button
+          variant="secondary"
+          onClick={() => {
             onHide();
-            setQuestionObj({...QuestionObj})
-          }}>
+            setQuestionObj({ ...QuestionObj });
+          }}
+        >
           Cancel
         </Button>
         <Button

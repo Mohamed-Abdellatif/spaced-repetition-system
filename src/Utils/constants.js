@@ -19,3 +19,8 @@ export const ToEditQuestionObj={
     genre: "",
     questionType: "",
   };
+
+export  const trueOrFalseRadios = [
+    { name: "True", value: "1",bool:true },
+    { name: "False", value: "2",bool:false },
+  ];
