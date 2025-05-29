@@ -105,6 +105,7 @@ const QuestionList = () => {
   };
 
   const handleEditSubmit = async () => {
+    let wrongChoicesObj;
     const { question, answer, difficulty, genre } = toEdit;
     if (
       !question == " " &&
@@ -117,7 +118,7 @@ const QuestionList = () => {
           toEdit.questionType === "MCQ" &&
           Object.values(toEdit.choices).includes("")
         ) {
-          await generateWrongChoicesFromText(
+          wrongChoicesObj= await generateWrongChoicesFromText(
             question,
             answer,
             setIsNotificationVisible,
@@ -127,7 +128,7 @@ const QuestionList = () => {
 
         const response = await questionsApi.updateQuestion(toEdit.id, {
           ...toEdit,
-          choices: wrongChoices,
+          choices: wrongChoicesObj,
         });
 
         if (image !== null) {
