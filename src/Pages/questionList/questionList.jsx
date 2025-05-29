@@ -105,7 +105,7 @@ const QuestionList = () => {
   };
 
   const handleEditSubmit = async () => {
-    let wrongChoicesObj;
+    let wrongChoicesObj={};
     const { question, answer, difficulty, genre } = toEdit;
     if (
       !question == " " &&
@@ -114,9 +114,9 @@ const QuestionList = () => {
       !genre == " "
     ) {
       try {
+         
         if (
-          toEdit.questionType === "MCQ" &&
-          Object.values(toEdit.choices).includes("")
+          toEdit.questionType === "MCQ"
         ) {
           wrongChoicesObj= await generateWrongChoicesFromText(
             question,
@@ -145,7 +145,7 @@ const QuestionList = () => {
         handleNotification(
           setIsNotificationVisible,
           setResponse,
-          "Error please try again later"
+          err.message
         );
       }
     } else {
