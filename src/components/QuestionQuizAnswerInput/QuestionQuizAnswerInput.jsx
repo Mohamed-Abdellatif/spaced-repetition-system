@@ -1,5 +1,7 @@
 import { ButtonGroup, Form, ToggleButton } from "react-bootstrap";
 import { trueOrFalseRadios } from "../../Utils/constants";
+import { shuffle } from "../../Utils/helperfunctions";
+import { useMemo } from "react";
 
 const QuestionQuizAnswerInput = ({
   questions,
@@ -8,31 +10,39 @@ const QuestionQuizAnswerInput = ({
   isFlipped,
   setCurrentAnswer,
 }) => {
+  const shuffledChoices = useMemo(() => {
+    const currentQuestion = questions[currentIndex];
+    if (!currentQuestion) return [];
+
+    const allChoices = Object.values(currentQuestion.choices || {}).concat(
+      currentQuestion.answer
+    );
+
+    return shuffle(allChoices);
+  }, [questions, currentIndex]);
 
   if (questions[currentIndex]?.questionType === "MCQ") {
     return (
       <Form.Group>
         <ButtonGroup vertical>
-          {Object.values(questions[currentIndex]?.choices || {})
-            .concat(questions[currentIndex]?.answer)
-            .map((choice, idx) => (
-              <ToggleButton
-                key={choice}
-                id={`mcq-${idx}`}
-                type="radio"
-                variant={currentAnswer === choice ? "primary" : "secondary"}
-                name="mcq-answer"
-                value={choice}
-                checked={currentAnswer === choice}
-                onChange={(e) => setCurrentAnswer(e.target.value)}
-                disabled={isFlipped}
-                className="mb-3  text-start"
-              >
-                <span className="text-light">
-                  {idx + 1}. {choice}
-                </span>
-              </ToggleButton>
-            ))}
+          {shuffledChoices.map((choice, idx) => (
+            <ToggleButton
+              key={choice}
+              id={choice}
+              type="radio"
+              variant={currentAnswer === choice ? "primary" : "secondary"}
+              name="mcq-answer"
+              value={choice}
+              checked={currentAnswer === choice}
+              onChange={(e) => setCurrentAnswer(e.target.value)}
+              disabled={isFlipped}
+              className="mb-3  text-start"
+            >
+              <span className="text-light">
+                {idx + 1}. {choice}
+              </span>
+            </ToggleButton>
+          ))}
         </ButtonGroup>
       </Form.Group>
     );
@@ -64,7 +74,6 @@ const QuestionQuizAnswerInput = ({
       </Form.Group>
     );
   }
-
 
   return (
     <>

@@ -18,6 +18,11 @@ export const ToEditQuestionObj={
     answer: "",
     genre: "",
     questionType: "",
+    choices: {
+      choice1: "",
+      choice2: "",
+      choice3: "",
+    },
   };
 
 export  const trueOrFalseRadios = [

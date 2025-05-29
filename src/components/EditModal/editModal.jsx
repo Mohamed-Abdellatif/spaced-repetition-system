@@ -5,6 +5,7 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faImage } from "@fortawesome/free-solid-svg-icons";
 import ModalAnswerInputModalAnswerInput from "../ModalAnswerInput/ModalAnswerInputModalAnswerInput";
+import { QuestionTypes } from "../../Utils/constants";
 
 const EditModal = ({
   questionObj,
@@ -13,9 +14,10 @@ const EditModal = ({
   setQuestionObj,
   handleImageChange,
   show,
-  onHide
+  onHide,
 }) => {
-  const { question, answer, difficulty, genre, questionType, choices,img } = questionObj;
+  const { question, answer, difficulty, genre, questionType, choices, img } =
+    questionObj;
 
   const handleQuestionTypeChange = (questionType) => {
     setQuestionObj({ ...questionObj, questionType: questionType });
@@ -24,13 +26,7 @@ const EditModal = ({
   const isFormValid = question && answer && difficulty && genre;
 
   return (
-    <Modal 
-      show={show}
-      onHide={onHide}
-      id="editModal" 
-      size="lg" 
-      centered
-    >
+    <Modal show={show} onHide={onHide} id="editModal" size="lg" centered>
       <Modal.Header closeButton>
         <Modal.Title>
           <FontAwesomeIcon icon={faEdit} className="me-2" />
@@ -86,31 +82,33 @@ const EditModal = ({
                 variant="primary"
                 title={questionType}
               >
-                {questionType !== "Short Response" && (
-                  <Dropdown.Item onClick={() => handleQuestionTypeChange("Short Response")}>
-                    Short Response
-                  </Dropdown.Item>
-                )}
-                {questionType !== "Complete" && (
-                  <Dropdown.Item onClick={() => handleQuestionTypeChange("Complete")}>
-                    Complete
-                  </Dropdown.Item>
-                )}
-                {questionType !== "True or false" && (
-                  <Dropdown.Item onClick={() => handleQuestionTypeChange("True or false")}>
-                    True or false
-                  </Dropdown.Item>
-                )}
+                
+                {QuestionTypes.filter(
+                  (type) => type.toLowerCase() !== questionType.toLowerCase()
+                ).map((type) => {
+                  return (
+                    <Dropdown.Item
+                      key={type}
+                      onClick={() => handleQuestionTypeChange(type)}
+                      className="text-capitalize"
+                    >
+                      {type}
+                    </Dropdown.Item>
+                  );
+                })}
               </DropdownButton>
             </div>
           </Form.Group>
 
-          <ModalAnswerInputModalAnswerInput questionObj={questionObj} updateInput={updateInput}/>
+          <ModalAnswerInputModalAnswerInput
+            questionObj={questionObj}
+            updateInput={updateInput}
+          />
 
           <Form.Group className="mb-3">
             <Form.Label>
               <FontAwesomeIcon icon={faImage} className="me-2" />
-              {img?"Edit Image":"Upload Image"}
+              {img ? "Edit Image" : "Upload Image"}
             </Form.Label>
             <Form.Control
               type="file"

@@ -2,12 +2,23 @@ import { imagesApi, listsApi } from "../services/api";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 const Google_API_KEY = import.meta.env.VITE_API_KEY;
 
-export const handleNotification = (setIsNotificationVisible, setResponse,response) => {
-    setIsNotificationVisible(true);
-    setResponse(response);
-  }; 
+export const handleNotification = (
+  setIsNotificationVisible,
+  setResponse,
+  response
+) => {
+  setIsNotificationVisible(true);
+  setResponse(response);
+};
 
-export const addQuestionToList = async (list,toBeAdded,lists,setResponse,setIsNotificationVisible,currentUser) => {
+export const addQuestionToList = async (
+  list,
+  toBeAdded,
+  lists,
+  setResponse,
+  setIsNotificationVisible,
+  currentUser
+) => {
   const { id } = toBeAdded;
   const { listName } = list;
   try {
@@ -90,7 +101,13 @@ export const addQuestionToList = async (list,toBeAdded,lists,setResponse,setIsNo
   }
 };
 
-export const generateQuestionFromText = async (text,setIsNotificationVisible,setResponse,setQuestionObj,currentUser) => {
+export const generateQuestionFromText = async (
+  text,
+  setIsNotificationVisible,
+  setResponse,
+  setQuestionObj,
+  currentUser
+) => {
   try {
     const genAI = new GoogleGenerativeAI(Google_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -118,7 +135,7 @@ export const generateQuestionFromText = async (text,setIsNotificationVisible,set
         "Please Try Again Later"
       );
       return;
-    }else if(text.length<30){
+    } else if (text.length < 30) {
       handleNotification(
         setIsNotificationVisible,
         setResponse,
@@ -165,33 +182,43 @@ export const generateQuestionFromText = async (text,setIsNotificationVisible,set
 
 export const todayFormatDate = (timeZone = "Africa/Cairo") => {
   return Intl.DateTimeFormat("en-CA", {
-      timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 };
 
-
-export const getQuestionImage = async (question,setQuestionImgURL) => {
+export const getQuestionImage = async (question, setQuestionImgURL) => {
   if (question?.questionType === "image") {
-    const imgQuestionResponse = await imagesApi.getImageAsQuestion(
-      question.id
-    );
+    const imgQuestionResponse = await imagesApi.getImageAsQuestion(question.id);
     if (imgQuestionResponse) {
       setQuestionImgURL(imgQuestionResponse.url);
     }
   }
 };
 
-
 export const generateWrongChoicesFromText = async (
   text,
   correctAnswer,
   setIsNotificationVisible,
-  setResponse,
-  setWrongChoices
+  setResponse
 ) => {
+  const EMPTY_CHOICES = {
+    choice1: "",
+    choice2: "",
+    choice3: "",
+  };
+
+  if (text.length < 1 || correctAnswer.trim() === "") {
+    handleNotification(
+      setIsNotificationVisible,
+      setResponse,
+      "Please Enter Valid Text and Answer"
+    );
+    return EMPTY_CHOICES;
+  }
+
   try {
     const genAI = new GoogleGenerativeAI(Google_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -208,50 +235,42 @@ export const generateWrongChoicesFromText = async (
       Correct Answer: "${correctAnswer}"
     `;
 
-    const response = await model.generateContent(prompt);
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
 
-    if (!response || !response.response) {
-      handleNotification(
-        setIsNotificationVisible,
-        setResponse,
-        "Please Try Again Later"
-      );
-      return;
-    } else if (text.length < 4 || correctAnswer.trim() === "") {
-      handleNotification(
-        setIsNotificationVisible,
-        setResponse,
-        "Please Enter Valid Text and Answer"
-      );
-      return;
+    // Extract JSON from markdown-wrapped response
+    let cleanText = responseText.trim();
+
+    // If wrapped in ```json ... ```
+    if (cleanText.startsWith("```json")) {
+      cleanText = cleanText
+        .replace(/^```json/, "")
+        .replace(/```$/, "")
+        .trim();
     }
 
-    let responseText = response.response.text().trim();
-
-    if (responseText.startsWith("```json")) {
-      responseText = responseText.slice(7, -3).trim();
+    // Fallback regex-based JSON extraction
+    const match = cleanText.match(/{[\s\S]*}/);
+    if (!match) {
+      throw new Error("No valid JSON found");
     }
 
-    let extractedChoices;
-    try {
-      extractedChoices = JSON.parse(responseText);
-    } catch (jsonError) {
-      handleNotification(
-        setIsNotificationVisible,
-        setResponse,
-        "Please Try Again Later"
-      );
-      return;
-    }
+    const jsonString = match[0];
+    const extractedChoices = JSON.parse(jsonString);
 
-    if (extractedChoices?.choice1 && extractedChoices?.choice2 && extractedChoices?.choice3) {
-      setWrongChoices(extractedChoices);
+    if (
+      extractedChoices?.choice1 &&
+      extractedChoices?.choice2 &&
+      extractedChoices?.choice3
+    ) {
+      return extractedChoices;
     } else {
       handleNotification(
         setIsNotificationVisible,
         setResponse,
         "Failed to Generate Wrong Choices"
       );
+      return extractedChoices;
     }
   } catch (error) {
     handleNotification(
@@ -259,5 +278,20 @@ export const generateWrongChoicesFromText = async (
       setResponse,
       "Please Try Again Later"
     );
+    return extractedChoices;
   }
+};
+
+export const shuffle = (array) => {
+  let currentIndex = array.length,
+    randomIndex;
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
+  }
+  return array;
 };

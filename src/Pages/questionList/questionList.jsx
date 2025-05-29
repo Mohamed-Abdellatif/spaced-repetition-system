@@ -48,7 +48,6 @@ const QuestionList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showAddToListModal, setShowAddToListModal] = useState(false);
-  const [wrongChoices, setWrongChoices] = useState();
 
   const [image, setImage] = useState(null);
   const [questionAsImage, setQuestionAsImage] = useState(null);
@@ -114,7 +113,22 @@ const QuestionList = () => {
       !genre == " "
     ) {
       try {
-        const response = await questionsApi.updateQuestion(toEdit.id, toEdit);
+        if (
+          toEdit.questionType === "MCQ" &&
+          Object.values(toEdit.choices).includes("")
+        ) {
+          await generateWrongChoicesFromText(
+            question,
+            answer,
+            setIsNotificationVisible,
+            setResponse,
+          );
+        }
+
+        const response = await questionsApi.updateQuestion(toEdit.id, {
+          ...toEdit,
+          choices: wrongChoices,
+        });
 
         if (image !== null) {
           if (toEdit.img) {
@@ -163,6 +177,7 @@ const QuestionList = () => {
   };
 
   const handleAddSubmit = async () => {
+    let wrongChoicesObj;
     const { question, answer, difficulty, genre, questionType } = questionObj;
     if (
       !question == " " &&
@@ -172,27 +187,26 @@ const QuestionList = () => {
       (questionType === "image" ? questionAsImage !== null : true)
     ) {
       if (questionType === "MCQ") {
-        await generateWrongChoicesFromText(
+        wrongChoicesObj= await generateWrongChoicesFromText(
           question,
           answer,
           setIsNotificationVisible,
           setResponse,
           setWrongChoices
         );
-      
       }
       const created = todayFormatDate();
       const nextTest = created;
       const response = await questionsApi.createQuestion({
         ...questionObj,
-        choices:wrongChoices,
+        choices:  wrongChoicesObj,
         created,
         nextTest,
       });
       if (questionType === "image") {
         handleQuestionAsImageSubmit(response.id);
       }
-      
+
       handleImageSubmit(response.id);
       setImage(null);
       setQuestionAsImage(null);

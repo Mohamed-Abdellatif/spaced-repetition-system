@@ -109,8 +109,8 @@ const NavBar = () => {
                     <FontAwesomeIcon icon={faQuestionCircle} className="me-2" />
                     {uniqueGenreArray
                       .concat("General")
-                      .includes(currentPath.slice(5))
-                      ? currentPath.slice(5)
+                      .includes(currentPath.slice(5)?.replaceAll("%20", " "))
+                      ? currentPath.slice(5)?.replaceAll("%20", " ")
                       : "Choose Quiz Genre"}
                   </>
                 }
@@ -129,7 +129,7 @@ const NavBar = () => {
                       onClick={() => navigate(`/quiz/${genre}`)}
                       active={currentPath === `quiz/${genre}`}
                     >
-                      {genre}
+                      {genre?.replaceAll("%20", " ")}
                     </NavDropdown.Item>
                   ))}
                 <NavDropdown.Divider />

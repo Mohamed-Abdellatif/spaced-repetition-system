@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faSync } from "@fortawesome/free-solid-svg-icons";
-import { getQuestionImage, todayFormatDate } from "../../Utils/helperfunctions";
+import { getQuestionImage, shuffle, todayFormatDate } from "../../Utils/helperfunctions";
 import { questionsApi } from "../../services/api";
 import QuestionQuizAnswerInput from "../../components/QuestionQuizAnswerInput/QuestionQuizAnswerInput";
 
@@ -26,6 +26,9 @@ const QuestionsQuiz = () => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [response, setResponse] = useState("");
   const today = todayFormatDate();
+
+
+
   useEffect(() => {
     if (!currentUser) return;
 
@@ -53,13 +56,14 @@ const QuestionsQuiz = () => {
 
     getData();
   }, [genre, currentUser, today]);
-
+ 
   useEffect(() => {
     if (questions.length > 0) {
       setCurrentQuestion(questions[currentIndex]);
     }
 
-    getQuestionImage(questions[currentIndex], setQuestionImgURL);
+     getQuestionImage(questions[currentIndex], setQuestionImgURL);
+    
   }, [questions, currentIndex]);
 
   const setCurrentQuestion = (question) => {
@@ -124,19 +128,7 @@ const QuestionsQuiz = () => {
     }, 2000);
   };
 
-  const shuffle = (array) => {
-    let currentIndex = array.length,
-      randomIndex;
-    while (currentIndex !== 0) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex],
-        array[currentIndex],
-      ];
-    }
-    return array;
-  };
+  
 
   return (
     <Container className="quiz-container">
