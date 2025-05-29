@@ -191,8 +191,7 @@ const QuestionList = () => {
           question,
           answer,
           setIsNotificationVisible,
-          setResponse,
-          setWrongChoices
+          setResponse
         );
       }
       const created = todayFormatDate();
