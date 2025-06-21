@@ -42,6 +42,14 @@ const App = () => {
             }
           />
           <Route
+            path="test/:listName"
+            element={
+              <Container fluid="lg" className="py-4">
+                <QuestionsQuiz />
+              </Container>
+            }
+          />
+          <Route
             path="schedule"
             element={
               <Container fluid="lg" className="py-4">

@@ -75,7 +75,8 @@ const NavBar = () => {
       if (currentUser) {
         setCurrentUser(currentUser);
       } else {
-        navigate("/login");
+        if(!currentPath.includes("test")){
+         navigate("/login");}
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

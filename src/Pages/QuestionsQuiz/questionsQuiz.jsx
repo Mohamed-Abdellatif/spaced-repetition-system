@@ -3,21 +3,19 @@ import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../../contexts/user.context";
 import moment from "moment";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Form,
-} from "react-bootstrap";
+import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faSync } from "@fortawesome/free-solid-svg-icons";
-import { getQuestionImage, shuffle, todayFormatDate } from "../../Utils/helperfunctions";
-import { questionsApi } from "../../services/api";
+import {
+  getQuestionImage,
+  shuffle,
+  todayFormatDate,
+} from "../../Utils/helperfunctions";
+import { listsApi, questionsApi } from "../../services/api";
 import QuestionQuizAnswerInput from "../../components/QuestionQuizAnswerInput/QuestionQuizAnswerInput";
 
 const QuestionsQuiz = () => {
-  const { genre } = useParams();
+  const { genre, listName } = useParams();
   const { currentUser } = useContext(UserContext);
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -27,24 +25,34 @@ const QuestionsQuiz = () => {
   const [response, setResponse] = useState("");
   const today = todayFormatDate();
 
-
-
   useEffect(() => {
-    if (!currentUser) return;
-
+    if (!currentUser && !listName) return;
     const getData = async () => {
       try {
+        if (listName) {
+          const publicListQuestionsResponse =
+            await listsApi.getPublicListQuestions(listName);
+
+            
+          const questionsByIdResponse = await questionsApi.getQuestionsByIds(
+            publicListQuestionsResponse[0].questions
+          );
+
+          setQuestions(questionsByIdResponse);
+          return;
+        }
+
+        //////////////////////////////////////////////
         const questionsResponse = await questionsApi.getQuestions(
           currentUser.uid
         );
-
         if (genre === "General") {
           setQuestions(questionsResponse);
         } else if (genre === "Due-Today") {
           setQuestions(
             questionsResponse.filter((question) => question.nextTest === today)
           );
-        } else {
+        } else if (genre) {
           setQuestions(
             questionsResponse.filter((question) => question.genre === genre)
           );
@@ -55,15 +63,14 @@ const QuestionsQuiz = () => {
     };
 
     getData();
-  }, [genre, currentUser, today]);
- 
+  }, [genre, listName, currentUser, today]);
+
   useEffect(() => {
     if (questions.length > 0) {
       setCurrentQuestion(questions[currentIndex]);
     }
 
-     getQuestionImage(questions[currentIndex], setQuestionImgURL);
-    
+    getQuestionImage(questions[currentIndex], setQuestionImgURL);
   }, [questions, currentIndex]);
 
   const setCurrentQuestion = (question) => {
@@ -128,8 +135,6 @@ const QuestionsQuiz = () => {
     }, 2000);
   };
 
-  
-
   return (
     <Container className="quiz-container">
       <Row className="w-100">
@@ -171,8 +176,13 @@ const QuestionsQuiz = () => {
                         onSubmit={handleSubmit}
                         className="w-100 d-flex flex-column align-items-center"
                       >
-                        
-                        <QuestionQuizAnswerInput questions={questions} currentIndex={currentIndex} currentAnswer={currentAnswer} isFlipped={isFlipped} setCurrentAnswer={setCurrentAnswer}/>
+                        <QuestionQuizAnswerInput
+                          questions={questions}
+                          currentIndex={currentIndex}
+                          currentAnswer={currentAnswer}
+                          isFlipped={isFlipped}
+                          setCurrentAnswer={setCurrentAnswer}
+                        />
 
                         <Button
                           type="submit"
