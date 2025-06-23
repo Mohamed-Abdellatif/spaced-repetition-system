@@ -213,7 +213,7 @@ const ViewList = ({ listType }) => {
                     {listName}
                   </h4>
                 </Col>
-                { list?.creatorId &&<Col className="text-end" sm={3}>
+                { listType==="public" &&<Col className="text-end" sm={3}>
                   <Button onClick={() => handleCopy()}>Share Quiz</Button>
                 </Col>}
               </Row>
