@@ -9,10 +9,9 @@ import List from "../../components/ViewQuestionsList/List";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import "./viewList.css";
 import { listsApi, questionsApi } from "../../services/api";
-import ShareListQuizModal from "../../components/ShareListQuizModal/ShareListQuizModal";
+const SHARE_URL = import.meta.env.VITE_SHARE_LIST_URL;
 
 const ViewList = ({ listType }) => {
-  const [modalShow, setModalShow] = useState(false);
   const { listName } = useParams();
   const [toBeAdded, setToBeAdded] = useState({});
   const [lists, setLists] = useState([]);
@@ -186,6 +185,20 @@ const ViewList = ({ listType }) => {
     setToEdit(question);
     setShowEditModal(true);
   };
+
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(`${SHARE_URL}${listName}`);
+      setResponse("Link Copied To Clipboard");
+      setIsNotificationVisible(true);
+    } catch (err) {
+      setResponse("Failed to copy");
+      setIsNotificationVisible(true);
+    }
+  };
+
+
   const list = lists?.filter((list) => list.listName === listName)[0];
   
   return (
@@ -200,8 +213,8 @@ const ViewList = ({ listType }) => {
                     {listName}
                   </h4>
                 </Col>
-                { list?.creatorId &&<Col sm={2}>
-                  <Button onClick={() => setModalShow(true)}>Share</Button>
+                { list?.creatorId &&<Col className="text-end" sm={3}>
+                  <Button onClick={() => handleCopy()}>Share Quiz</Button>
                 </Col>}
               </Row>
               <Row className="my-2">
@@ -266,8 +279,6 @@ const ViewList = ({ listType }) => {
         newListName={newListName}
         createNewList={createNewList}
       />
-
-      <ShareListQuizModal show={modalShow} onHide={() => setModalShow(false)} listName={listName}/>
     </Container>
   );
 };
