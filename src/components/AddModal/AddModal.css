@@ -1,9 +1,6 @@
-.modal-add-body{
-    overflow-y: scroll;
-    
+.question-modal .modal-body {
+  max-height: 70vh; /* or any height that fits nicely on screen */
+  overflow-y: auto;
 }
 
-.modal-add-content{
-    height: 90vh;
-}
 

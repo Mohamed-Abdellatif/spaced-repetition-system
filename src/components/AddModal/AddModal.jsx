@@ -1,4 +1,5 @@
 import "./AddModal.css";
+import CreatableSelect from "react-select/creatable";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
@@ -27,6 +28,7 @@ const AddModal = ({
   show,
   onHide,
   image,
+  genres,
 }) => {
   const { question, answer, difficulty, genre, questionType } = questionObj;
 
@@ -62,7 +64,7 @@ const AddModal = ({
         </Modal.Title>
       </Modal.Header>
 
-      <Modal.Body className="p-4">
+      <Modal.Body className="p-4 ">
         <Form>
           <Row>
             <Col md={6}>
@@ -71,13 +73,22 @@ const AddModal = ({
                   <FontAwesomeIcon icon={faBrain} className="me-2" />
                   Genre
                 </Form.Label>
-                <Form.Control
-                  value={genre}
+                <CreatableSelect
+                  isClearable
+                  options={genres.map((genre) => {
+                    return {
+                      value: genre,
+                      label: genre,
+                      color: "#00B8D9",
+                      isFixed: true,
+                    };
+                  })}
+                  
                   onChange={updateInput}
                   name="genre"
                   type="text"
                   placeholder="Ex: Biology"
-                />
+                ></CreatableSelect>
               </Form.Group>
             </Col>
             <Col md={6}>

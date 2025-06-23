@@ -41,6 +41,7 @@ const QuestionList = () => {
     searchQuestions,
     loadMoreData,
     getData,
+    uniqueGenres,
   } = useQuestions(currentUser);
 
   // Modal state management
@@ -105,7 +106,7 @@ const QuestionList = () => {
   };
 
   const handleEditSubmit = async () => {
-    let wrongChoicesObj={};
+    let wrongChoicesObj = {};
     const { question, answer, difficulty, genre } = toEdit;
     if (
       !question == " " &&
@@ -114,15 +115,12 @@ const QuestionList = () => {
       !genre == " "
     ) {
       try {
-         
-        if (
-          toEdit.questionType === "MCQ"
-        ) {
-          wrongChoicesObj= await generateWrongChoicesFromText(
+        if (toEdit.questionType === "MCQ") {
+          wrongChoicesObj = await generateWrongChoicesFromText(
             question,
             answer,
             setIsNotificationVisible,
-            setResponse,
+            setResponse
           );
         }
 
@@ -142,11 +140,7 @@ const QuestionList = () => {
         handleNotification(setIsNotificationVisible, setResponse, response);
         setShowEditModal(false);
       } catch (err) {
-        handleNotification(
-          setIsNotificationVisible,
-          setResponse,
-          err.message
-        );
+        handleNotification(setIsNotificationVisible, setResponse, err.message);
       }
     } else {
       handleNotification(
@@ -158,14 +152,22 @@ const QuestionList = () => {
   };
 
   //add
-  const updateAddInput = (e) => {
+  const updateAddInput = (e, selectedOption) => {
     if (
-      questionObj.questionType === "true or false" &&
-      e.target.name === "answer"
+      selectedOption?.name === "genre" &&
+      selectedOption?.action !== "clear"
     ) {
+      const name = selectedOption.name;
       setQuestionObj({
         ...questionObj,
-        [e.target.name]: e.target.value,
+        [name]: e.value,
+        userId: currentUser?.uid,
+      });
+    } else if (selectedOption?.action === "clear") {
+      const name = selectedOption.name;
+      setQuestionObj({
+        ...questionObj,
+        [name]: "",
         userId: currentUser?.uid,
       });
     } else {
@@ -188,7 +190,7 @@ const QuestionList = () => {
       (questionType === "image" ? questionAsImage !== null : true)
     ) {
       if (questionType === "MCQ") {
-        wrongChoicesObj= await generateWrongChoicesFromText(
+        wrongChoicesObj = await generateWrongChoicesFromText(
           question,
           answer,
           setIsNotificationVisible,
@@ -199,7 +201,7 @@ const QuestionList = () => {
       const nextTest = created;
       const response = await questionsApi.createQuestion({
         ...questionObj,
-        choices:  wrongChoicesObj,
+        choices: wrongChoicesObj,
         created,
         nextTest,
       });
@@ -378,6 +380,7 @@ const QuestionList = () => {
         handleQuestionAsImageChange={handleQuestionAsImageChange}
         questionAsImage={questionAsImage}
         image={image}
+        genres={uniqueGenres}
       />
 
       <EditModal

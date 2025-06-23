@@ -85,7 +85,7 @@ const AddToListModal = ({ addToList, lists, updateInput, newListName, createNewL
                 variant="secondary"
                 onClick={() => setIsClicked(false)}
               >
-                <FontAwesomeIcon icon={faTimes} />
+                Cancel
               </Button>
             </div>
           </div>

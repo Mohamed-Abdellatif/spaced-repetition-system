@@ -5,3 +5,8 @@
 .modal-edit-content{
     height: 90vh;
 }
+
+#editModal .modal-body {
+  max-height: 70vh; /* or any height that fits nicely on screen */
+  overflow-y: auto;
+}

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { questionsApi, listsApi } from '../services/api';
-import { handleNotification } from '../Utils/helperfunctions';
+import { useState, useEffect } from "react";
+import { questionsApi, listsApi } from "../services/api";
+import { handleNotification } from "../Utils/helperfunctions";
 
 export const useQuestions = (currentUser) => {
   const [loading, setLoading] = useState(true);
@@ -79,6 +79,12 @@ export const useQuestions = (currentUser) => {
     }
   };
 
+  const uniqueGenres = [];
+  allQuestions.map(({ genre }) => {
+    if (!uniqueGenres.includes(genre)) {
+      uniqueGenres.push(genre);
+    }
+  });
   useEffect(() => {
     getData();
   }, [currentUser, questionsToShow, currentGenre]);
@@ -97,6 +103,7 @@ export const useQuestions = (currentUser) => {
     setResponse,
     searchQuestions,
     loadMoreData,
-    getData
+    getData,
+    uniqueGenres
   };
-}; 
+};

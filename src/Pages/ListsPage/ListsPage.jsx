@@ -109,7 +109,7 @@ const ListsPage = () => {
     try {
       setLoading(true);
       const listResponse = await listsApi.getLists(currentUser?.uid);
-      const publicListResponse = await listsApi.getPublicLists(
+      const publicListResponse = await listsApi.getPublicListsWithCreatorId(
         currentUser?.uid
       );
       const IdsResponse = await questionsApi.getIDs();

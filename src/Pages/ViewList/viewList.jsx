@@ -6,11 +6,13 @@ import DeleteModal from "../../components/DeleteModal/DeleteModal";
 import EditModal from "../../components/EditModal/editModal";
 import NotificationToast from "../../components/Toast/toast";
 import List from "../../components/ViewQuestionsList/List";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import "./viewList.css";
 import { listsApi, questionsApi } from "../../services/api";
+import ShareListQuizModal from "../../components/ShareListQuizModal/ShareListQuizModal";
 
 const ViewList = ({ listType }) => {
+  const [modalShow, setModalShow] = useState(false);
   const { listName } = useParams();
   const [toBeAdded, setToBeAdded] = useState({});
   const [lists, setLists] = useState([]);
@@ -185,19 +187,22 @@ const ViewList = ({ listType }) => {
     setShowEditModal(true);
   };
   const list = lists?.filter((list) => list.listName === listName)[0];
-
+  
   return (
     <Container fluid className="py-4">
       <Row className="justify-content-center">
         <Col xs={12} md={10} lg={8}>
           <Card className="shadow-sm">
             <Card.Body>
-              <Row className="my-2">
+              <Row className="my-2 ">
                 <Col>
                   <h4 className="mb-0 text-primary text-uppercase">
                     {listName}
                   </h4>
                 </Col>
+                { list?.creatorId &&<Col sm={2}>
+                  <Button onClick={() => setModalShow(true)}>Share</Button>
+                </Col>}
               </Row>
               <Row className="my-2">
                 <Col>
@@ -261,6 +266,8 @@ const ViewList = ({ listType }) => {
         newListName={newListName}
         createNewList={createNewList}
       />
+
+      <ShareListQuizModal show={modalShow} onHide={() => setModalShow(false)} listName={listName}/>
     </Container>
   );
 };
