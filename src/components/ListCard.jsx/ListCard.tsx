@@ -13,12 +13,12 @@ import type { IList } from "../../vite-env";
 
 interface ListCard {
   list: IList;
-  setToDelete: (list:IList) => void;
-  setToEdit: (list:IList) => void;
-  setToAdd: (list:IList) => void;
+  setToDelete?: (list: IList) => void;
+  setToEdit?: (list: IList) => void;
+  setToAdd?: (list: IList) => void;
 }
 
-const ListCard = ({ list, setToDelete, setToEdit, setToAdd }:ListCard) => {
+const ListCard = ({ list, setToDelete, setToEdit, setToAdd }: ListCard) => {
   const navigate = useNavigate();
   const { listName, questions } = list;
   return (
@@ -63,7 +63,7 @@ const ListCard = ({ list, setToDelete, setToEdit, setToAdd }:ListCard) => {
                   </Button>
                 </Col>
 
-                {setToDelete !== null && setToEdit !== null ? (
+                {setToDelete !== undefined && setToEdit !== undefined ? (
                   <>
                     <Col xs={12} sm={6} md={4}>
                       <Button
@@ -86,18 +86,20 @@ const ListCard = ({ list, setToDelete, setToEdit, setToAdd }:ListCard) => {
                     </Col>
                   </>
                 ) : (
-                  <>
-                    <Col xs={12} sm={8}>
-                      <Button
-                        onClick={() => setToAdd(list)}
-                        variant="outline-primary"
-                        className="w-100"
-                      >
-                        Add To My Lists
-                        <FontAwesomeIcon icon={faEdit} className="ms-2" />
-                      </Button>
-                    </Col>
-                  </>
+                  setToAdd && (
+                    <>
+                      <Col xs={12} sm={8}>
+                        <Button
+                          onClick={() => setToAdd(list)}
+                          variant="outline-primary"
+                          className="w-100"
+                        >
+                          Add To My Lists
+                          <FontAwesomeIcon icon={faEdit} className="ms-2" />
+                        </Button>
+                      </Col>
+                    </>
+                  )
                 )}
               </Row>
               <Row className="mt-2 g-2 me-1">

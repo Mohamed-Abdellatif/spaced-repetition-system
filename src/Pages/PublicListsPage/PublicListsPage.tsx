@@ -7,10 +7,8 @@ import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
 import ListsMapper from "../../components/ListsMapper/ListsMapper";
 import { imagesApi, listsApi, questionsApi } from "../../services/api";
-import { todayFormatDate } from "../../Utils/helperfunctions";
+import { handleNotification, todayFormatDate } from "../../Utils/helperfunctions";
 import type { IList } from "../../vite-env";
-
-
 
 const PublicListsPage = () => {
   const { currentUser } = useContext(UserContext);
@@ -36,9 +34,11 @@ const PublicListsPage = () => {
           query.text,
           currentUser.uid
         );
-        setLists(response.sort((a: { id: number; }, b: { id: number; }) => a.id - b.id));
-      } catch (err) {
-        console.log(err);
+        setLists(
+          response.sort((a: { id: number }, b: { id: number }) => a.id - b.id)
+        );
+      } catch (err:any) {
+        handleNotification(setIsNotificationVisible,setResponse,err.message)
       }
     }
   };
@@ -52,9 +52,11 @@ const PublicListsPage = () => {
       setLoading(true);
 
       const listResponse = await listsApi.getPublicLists();
-      setLists(listResponse.sort((a: { id: number; }, b: { id: number; }) => a.id - b.id));
+      setLists(
+        listResponse.sort((a: { id: number }, b: { id: number }) => a.id - b.id)
+      );
       setLoading(false);
-    } catch (error:any) {
+    } catch (error: any) {
       if ("Network Error" === error.message) {
         setLoading(false);
       }
@@ -62,14 +64,9 @@ const PublicListsPage = () => {
       setIsNotificationVisible(true);
     }
   };
-  const setToAdd = async (list:IList) => {
+  const setToAdd = async (list: IList) => {
     try {
-       await listsApi.createList({
-        listName: list.listName,
-        userId: currentUser?.uid,
-        description: list.description,
-        questions: list.questions,
-      });
+      let newQuestions: number[] = [];
 
       if (list?.questions?.length > 0) {
         for (const questionId of list.questions) {
@@ -77,6 +74,15 @@ const PublicListsPage = () => {
             const questionResponse = await questionsApi.getQuestionById(
               questionId
             );
+            const checkQuestionExistenceRes =
+              await questionsApi.checkQuestionById(
+                currentUser?.uid,
+                questionResponse.question,
+                questionResponse.answer
+              );
+            if (checkQuestionExistenceRes) {
+              continue;
+            }
             const questionData = questionResponse;
 
             const created = todayFormatDate();
@@ -89,7 +95,9 @@ const PublicListsPage = () => {
               nextTest,
             });
 
-            if (questionData.img ) {
+            newQuestions.push(newQuestionResponse.id);
+
+            if (questionData.img) {
               try {
                 const imageResponse = await imagesApi.getImageDirect(
                   questionId
@@ -114,7 +122,10 @@ const PublicListsPage = () => {
                 if (imageResponse) {
                   const formData = new FormData();
                   formData.append("image", imageResponse);
-                  await imagesApi.uploadImageAsQuestion(newQuestionResponse.id, formData);
+                  await imagesApi.uploadImageAsQuestion(
+                    newQuestionResponse.id,
+                    formData
+                  );
                 }
               } catch (imageError) {
                 setResponse("Please Try Again");
@@ -127,6 +138,12 @@ const PublicListsPage = () => {
           }
         }
       }
+      await listsApi.createList({
+        listName: list.listName,
+        userId: currentUser?.uid,
+        description: list.description,
+        questions: newQuestions,
+      });
 
       getData();
       setResponse("Added Successfully");
@@ -173,10 +190,7 @@ const PublicListsPage = () => {
           <Spinner animation="border" variant="primary" />
         </div>
       ) : (
-        <ListsMapper
-          lists={lists}
-          setToAdd={setToAdd}
-        />
+        <ListsMapper lists={lists} setToAdd={setToAdd} />
       )}
       <NotificationToast
         setShow={setIsNotificationVisible}

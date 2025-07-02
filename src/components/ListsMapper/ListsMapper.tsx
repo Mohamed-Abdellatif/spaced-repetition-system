@@ -19,9 +19,9 @@ const ListsMapper = ({ lists, setToDelete, setToEdit, setToAdd }:ListsMapper) =>
               {" "}
               <ListCard
                 list={list}
-                setToDelete={setToDelete?setToDelete:()=>{}}
-                setToEdit={setToEdit?setToEdit:()=>{}}
-                setToAdd={setToAdd?setToAdd:()=>{}}
+                setToDelete={setToDelete?setToDelete:undefined}
+                setToEdit={setToEdit?setToEdit:undefined}
+                setToAdd={setToAdd?setToAdd:undefined}
               />
             </Col>
           );
