@@ -27,14 +27,18 @@ const SpacedSchedule = () => {
       setQuestions(response);
 
       const eventList = response
-        .filter((q:IQuestion) => q.nextTest !== null)
-        .map((q:IQuestion) => ({
+        .filter((q: IQuestion) => q.nextTest !== null)
+        .map((q: IQuestion) => ({
           title: q.question,
           start: moment(q.nextTest).format("YYYY-MM-DD"),
           backgroundColor: "var(--bs-primary)",
           textColor: "white",
           borderColor: "var(--bs-primary)",
-          extendedProps: { questionText: q.question, questionId: q.id },
+          extendedProps: {
+            questionText: q.question,
+            questionId: q.id,
+            question: q,
+          },
         }));
 
       setEvents(eventList);
@@ -47,28 +51,40 @@ const SpacedSchedule = () => {
     getData();
   }, [currentUser]);
 
-  const handleDateClick = (info:any) => {
+  const handleDateClick = (info: any) => {
     const dateClicked = info.dateStr;
     setSelectedDate(moment(dateClicked).format("MMMM Do YYYY"));
 
     const filteredQuestions = questions.filter(
-      (q:IQuestion) => moment(q.nextTest).format("YYYY-MM-DD") === dateClicked
+      (q: IQuestion) => moment(q.nextTest).format("YYYY-MM-DD") === dateClicked
     );
 
     setSelectedQuestions(filteredQuestions);
     setShowModal(true);
   };
 
-  const handleEventClick = (info:any) => {
+  const handleEventClick = (info: any) => {
     const eventDate = moment(info.event.start).format("YYYY-MM-DD");
     setSelectedDate(moment(eventDate).format("MMMM Do YYYY"));
 
     const filteredQuestions = questions.filter(
-      (q:IQuestion) => moment(q.nextTest).format("YYYY-MM-DD") === eventDate
+      (q: IQuestion) => moment(q.nextTest).format("YYYY-MM-DD") === eventDate
     );
 
     setSelectedQuestions(filteredQuestions);
     setShowModal(true);
+  };
+
+  const updateQuestionDate = async (
+    questionId: number,
+    date: Date | null,
+    question: IQuestion
+  ) => {
+    if (!date) return;
+    await questionsApi.updateQuestion(questionId, {
+      ...question,
+      nextTest: moment(date).format(),
+    });
   };
 
   return (
@@ -102,6 +118,14 @@ const SpacedSchedule = () => {
                   center: "title",
                   right: "dayGridMonth,dayGridWeek",
                 }}
+                editable={true} // enables dragging and resizing
+                eventDrop={(info) => {
+                  updateQuestionDate(
+                    info.event.extendedProps.questionId,
+                    info.event.start,
+                    info.event.extendedProps.question
+                  );
+                }}
               />
             </Card.Body>
           </Card>
@@ -123,7 +147,7 @@ const SpacedSchedule = () => {
         <Modal.Body>
           {selectedQuestions.length > 0 ? (
             <div className="questions-list">
-              {selectedQuestions.map((q:IQuestion, index) => (
+              {selectedQuestions.map((q: IQuestion, index) => (
                 <Card key={q.id} className="question-card mb-3">
                   <Card.Body>
                     <div className="d-flex align-items-start">
