@@ -1,5 +1,5 @@
 import moment from "moment";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { UserContext } from "../../contexts/user.context";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -10,46 +10,62 @@ import { faCalendar, faBook } from "@fortawesome/free-solid-svg-icons";
 import "./spacedSchedule.css";
 import { questionsApi } from "../../services/api";
 import type { IQuestion } from "../../vite-env";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const SpacedSchedule = () => {
   const { currentUser } = useContext(UserContext);
-  const [questions, setQuestions] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [selectedQuestions, setSelectedQuestions] = useState([]);
+  const [selectedQuestions, setSelectedQuestions] = useState<IQuestion[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
 
-  const getData = async () => {
-    if (!currentUser) return;
-    try {
-      const response = await questionsApi.getQuestions(currentUser.uid);
+  const queryClient = useQueryClient();
 
-      setQuestions(response);
+  const { data: questions = [] } = useQuery<IQuestion[]>({
+    queryKey: ["questions", currentUser?.uid],
+    queryFn: () => {
+      if (!currentUser) return Promise.resolve([]);
+      return questionsApi.getQuestions(currentUser.uid);
+    },
+    enabled: !!currentUser,
+  });
 
-      const eventList = response
-        .filter((q: IQuestion) => q.nextTest !== null)
-        .map((q: IQuestion) => ({
-          title: q.question,
-          start: moment(q.nextTest).format("YYYY-MM-DD"),
-          backgroundColor: "var(--bs-primary)",
-          textColor: "white",
-          borderColor: "var(--bs-primary)",
-          extendedProps: {
-            questionText: q.question,
-            questionId: q.id,
-            question: q,
-          },
-        }));
+  const updateMutation = useMutation({
+    mutationFn: ({
+      questionId,
+      date,
+      question,
+    }: {
+      questionId: number;
+      date: Date;
+      question: IQuestion;
+    }) =>
+      questionsApi.updateQuestion(questionId, {
+        ...question,
+        nextTest: moment(date).format(),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["questions", currentUser?.uid],
+      });
+    },
+  });
 
-      setEvents(eventList);
-    } catch (err) {
-      console.error("Error fetching spaced repetition schedule:", err);
-    }
-  };
-
-  useEffect(() => {
-    getData();
-  }, [currentUser]);
+  const events = useMemo(() => {
+    return questions
+      .filter((q) => q.nextTest !== null)
+      .map((q) => ({
+        title: q.question,
+        start: moment(q.nextTest).format("YYYY-MM-DD"),
+        backgroundColor: "var(--bs-primary)",
+        textColor: "white",
+        borderColor: "var(--bs-primary)",
+        extendedProps: {
+          questionText: q.question,
+          questionId: q.id,
+          question: q,
+        },
+      }));
+  }, [questions]);
 
   const handleDateClick = (info: any) => {
     const dateClicked = info.dateStr;
@@ -75,15 +91,15 @@ const SpacedSchedule = () => {
     setShowModal(true);
   };
 
-  const updateQuestionDate = async (
-    questionId: number,
-    date: Date | null,
-    question: IQuestion
-  ) => {
-    if (!date) return;
-    await questionsApi.updateQuestion(questionId, {
-      ...question,
-      nextTest: moment(date).format(),
+  const handleEventDrop = async (info: any) => {
+    const { questionId, question } = info.event.extendedProps;
+    const newDate = info.event.start;
+
+    if (!newDate) return;
+    updateMutation.mutate({
+      questionId,
+      date: newDate,
+      question,
     });
   };
 
@@ -120,11 +136,7 @@ const SpacedSchedule = () => {
                 }}
                 editable={true} // enables dragging and resizing
                 eventDrop={(info) => {
-                  updateQuestionDate(
-                    info.event.extendedProps.questionId,
-                    info.event.start,
-                    info.event.extendedProps.question
-                  );
+                  handleEventDrop(info);
                 }}
               />
             </Card.Body>
