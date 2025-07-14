@@ -4,65 +4,64 @@ import { UserContext } from "../../contexts/user.context";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { Modal, Button, Container, Row, Col, Card } from "react-bootstrap";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendar, faBook } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import "./spacedSchedule.css";
-import { questionsApi } from "../../services/api";
+
 import type { IQuestion } from "../../vite-env";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import useCalendarQuestions from "../../hooks/useCalendarQuestions";
+import useEditQuestion from "../../hooks/useEditQuestion";
+import EditModal from "../../components/EditModal/editModal";
+import { ToEditQuestionObj } from "../../Utils/constants";
+import { handleImageChange } from "../../Utils/helperfunctions";
+import NotificationToast from "../../components/Toast/toast";
+import useDeleteQuestion from "../../hooks/useDeleteQuestion";
+import DeleteModal from "../../components/DeleteModal/DeleteModal";
+import CalendarQuestionsModal from "../../components/CalendarQuestionsModal/CalendarQuestionsModal";
 
 const SpacedSchedule = () => {
   const { currentUser } = useContext(UserContext);
+  const [response, setResponse] = useState("");
+  const [isNotificationVisible, setIsNotificationVisible] = useState(false);
   const [selectedQuestions, setSelectedQuestions] = useState<IQuestion[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
+  const { questions, updateQuestionDate, refetch } =
+    useCalendarQuestions(currentUser);
 
-  const queryClient = useQueryClient();
+  const {
+    showEditModal,
+    setShowEditModal,
+    toEdit,
+    updateInput,
+    handleEditSubmit,
+    setToEdit,
+    setEditImage,
+    handleEditClick,
+  } = useEditQuestion(refetch, setIsNotificationVisible, setResponse);
 
-  const { data: questions = [] } = useQuery<IQuestion[]>({
-    queryKey: ["questions", currentUser?.uid],
-    queryFn: () => {
-      if (!currentUser) return Promise.resolve([]);
-      return questionsApi.getQuestions(currentUser.uid);
-    },
-    enabled: !!currentUser,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({
-      questionId,
-      date,
-      question,
-    }: {
-      questionId: number;
-      date: Date;
-      question: IQuestion;
-    }) =>
-      questionsApi.updateQuestion(questionId, {
-        ...question,
-        nextTest: moment(date).format(),
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["questions", currentUser?.uid],
-      });
-    },
-  });
+  const {
+    handleDeleteClick,
+    showDeleteModal,
+    setShowDeleteModal,
+    deleteQuestion,
+    toDelete,
+  } = useDeleteQuestion(refetch, setIsNotificationVisible, setResponse);
 
   const events = useMemo(() => {
     return questions
-      .filter((q) => q.nextTest !== null)
-      .map((q) => ({
-        title: q.question,
-        start: moment(q.nextTest).format("YYYY-MM-DD"),
+      .filter((question) => question.nextTest !== null)
+      .map((question) => ({
+        title: question.question,
+        start: moment(question.nextTest).format("YYYY-MM-DD"),
         backgroundColor: "var(--bs-primary)",
         textColor: "white",
         borderColor: "var(--bs-primary)",
         extendedProps: {
-          questionText: q.question,
-          questionId: q.id,
-          question: q,
+          questionText: question.question,
+          questionId: question.id,
+          question: question,
         },
       }));
   }, [questions]);
@@ -72,7 +71,8 @@ const SpacedSchedule = () => {
     setSelectedDate(moment(dateClicked).format("MMMM Do YYYY"));
 
     const filteredQuestions = questions.filter(
-      (q: IQuestion) => moment(q.nextTest).format("YYYY-MM-DD") === dateClicked
+      (question: IQuestion) =>
+        moment(question.nextTest).format("YYYY-MM-DD") === dateClicked
     );
 
     setSelectedQuestions(filteredQuestions);
@@ -80,14 +80,9 @@ const SpacedSchedule = () => {
   };
 
   const handleEventClick = (info: any) => {
-    const eventDate = moment(info.event.start).format("YYYY-MM-DD");
-    setSelectedDate(moment(eventDate).format("MMMM Do YYYY"));
+    const question = info.event.extendedProps.question;
 
-    const filteredQuestions = questions.filter(
-      (q: IQuestion) => moment(q.nextTest).format("YYYY-MM-DD") === eventDate
-    );
-
-    setSelectedQuestions(filteredQuestions);
+    setSelectedQuestions([question]);
     setShowModal(true);
   };
 
@@ -96,7 +91,7 @@ const SpacedSchedule = () => {
     const newDate = info.event.start;
 
     if (!newDate) return;
-    updateMutation.mutate({
+    updateQuestionDate.mutate({
       questionId,
       date: newDate,
       question,
@@ -144,51 +139,34 @@ const SpacedSchedule = () => {
         </Col>
       </Row>
 
-      <Modal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        centered
-        className="schedule-modal"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            <FontAwesomeIcon icon={faBook} className="me-2" />
-            Questions for {selectedDate}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedQuestions.length > 0 ? (
-            <div className="questions-list">
-              {selectedQuestions.map((q: IQuestion, index) => (
-                <Card key={q.id} className="question-card mb-3">
-                  <Card.Body>
-                    <div className="d-flex align-items-start">
-                      <div className="question-number me-3">{index + 1}</div>
-                      <div>
-                        <h5 className="question-text mb-2">{q.question}</h5>
-                        <p className="answer-text mb-0">
-                          <strong>Answer:</strong> {q.answer}
-                        </p>
-                      </div>
-                    </div>
-                  </Card.Body>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-4">
-              <p className="text-muted mb-0">
-                No questions scheduled for this date.
-              </p>
-            </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <CalendarQuestionsModal
+        showModal={showModal}
+        selectedDate={selectedDate}
+        selectedQuestions={selectedQuestions}
+        handleEditClick={handleEditClick}
+        setShowModal={setShowModal}
+        handleDeleteClick={handleDeleteClick}
+      />
+      <EditModal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        questionObj={toEdit ? toEdit : ToEditQuestionObj}
+        updateInput={updateInput}
+        handleSubmit={handleEditSubmit}
+        setQuestionObj={setToEdit}
+        handleImageChange={(e) => handleImageChange(e, setEditImage)}
+      />
+      <NotificationToast
+        setShow={setIsNotificationVisible}
+        show={isNotificationVisible}
+        response={response}
+      />
+      <DeleteModal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        deleteQuestion={deleteQuestion}
+        toDelete={toDelete ? toDelete : ToEditQuestionObj}
+      />
     </Container>
   );
 };

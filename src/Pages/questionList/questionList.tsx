@@ -15,6 +15,8 @@ import {
   addQuestionToList,
   generateQuestionFromText,
   generateWrongChoicesFromText,
+  handleImageChange,
+  handleImageSubmit,
   handleNotification,
   todayFormatDate,
 } from "../../Utils/helperfunctions";
@@ -23,6 +25,8 @@ import SearchBar from "../../components/SearchBar/SearchBar";
 import GenreFilter from "../../components/GenreFilter/GenreFilter";
 import { QuestionObj, ToEditQuestionObj } from "../../Utils/constants";
 import type { IList, IQuestion } from "../../vite-env";
+import useEditQuestion from "../../hooks/useEditQuestion";
+import useDeleteQuestion from "../../hooks/useDeleteQuestion";
 
 const QuestionList = () => {
   const { currentUser } = useContext(UserContext);
@@ -45,19 +49,34 @@ const QuestionList = () => {
     uniqueGenres,
   } = useQuestions(currentUser);
 
+  const {
+    showEditModal,
+    setShowEditModal,
+    toEdit,
+    updateInput,
+    handleEditSubmit,
+    setToEdit,
+    setEditImage,
+    handleEditClick,
+  } = useEditQuestion(getData, setIsNotificationVisible, setResponse);
+
+  const {
+    handleDeleteClick,
+    showDeleteModal,
+    setShowDeleteModal,
+    deleteQuestion,
+    toDelete,
+  } = useDeleteQuestion(getData, setIsNotificationVisible, setResponse);
+
   // Modal state management
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const [showAddToListModal, setShowAddToListModal] = useState(false);
 
   const [image, setImage] = useState<any | null>(null);
   const [questionAsImage, setQuestionAsImage] = useState<any | null>(null);
-  const [toEdit, setToEdit] = useState<IQuestion | null>({
-    ...ToEditQuestionObj,
-  });
-  const [toDelete, setToDelete] = useState<IQuestion | null>(null);
-  const [toBeAdded, setToBeAdded] = useState<IQuestion >(ToEditQuestionObj);
+
+  const [toBeAdded, setToBeAdded] = useState<IQuestion>(ToEditQuestionObj);
   const [newListName, setNewListName] = useState("");
   const [questionObj, setQuestionObj] = useState<IQuestion | null>({
     ...QuestionObj,
@@ -67,104 +86,13 @@ const QuestionList = () => {
     setShowAddModal(true);
   };
 
-  const handleEditClick = (question: IQuestion) => {
-    setToEdit(question);
-    setShowEditModal(true);
-  };
-
-  const handleDeleteClick = (question: IQuestion) => {
-    setToDelete(question);
-    setShowDeleteModal(true);
-  };
-
   const handleAddToListClick = (question: IQuestion) => {
     setToBeAdded(question);
     setShowAddToListModal(true);
   };
 
-  // delete
-  const deleteQuestion = async () => {
-    try {
-      if (!toDelete?.id) {
-        return;
-      }
-      const response = await questionsApi.deleteQuestion(toDelete?.id);
-      await imagesApi.deleteImage(toDelete?.id);
-      if (toDelete?.questionType === "image") {
-        await imagesApi.deleteQuestionAsImage(toDelete.id);
-      }
-      getData();
-      handleNotification(setIsNotificationVisible, setResponse, response);
-      setShowDeleteModal(false);
-    } catch {
-      handleNotification(
-        setIsNotificationVisible,
-        setResponse,
-        "Error please try again later"
-      );
-    }
-  };
-
-  // edit
-  const updateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setToEdit({
-      ...(toEdit as IQuestion),
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleEditSubmit = async () => {
-    let wrongChoicesObj = { choice1: "", choice2: "", choice3: "" };
-    if (!toEdit) {
-      return;
-    }
-    const { question, answer, difficulty, genre } = toEdit;
-    if (question != " " && answer != " " && difficulty && genre != " ") {
-      try {
-        if (!toEdit.id) {
-          return;
-        }
-        if (toEdit.questionType === "MCQ") {
-          wrongChoicesObj = await generateWrongChoicesFromText(
-            question,
-            answer,
-            setIsNotificationVisible,
-            setResponse
-          );
-        }
-
-        const response = await questionsApi.updateQuestion(toEdit.id, {
-          ...toEdit,
-          choices: wrongChoicesObj,
-        });
-
-        if (image !== null && toEdit.id) {
-          if (toEdit?.img) {
-            await imagesApi.deleteImage(toEdit.id);
-          }
-          handleImageSubmit(toEdit.id);
-        }
-        setImage(null);
-        getData();
-        handleNotification(setIsNotificationVisible, setResponse, response);
-        setShowEditModal(false);
-      } catch (err: any) {
-        handleNotification(setIsNotificationVisible, setResponse, err.message);
-      }
-    } else {
-      handleNotification(
-        setIsNotificationVisible,
-        setResponse,
-        "Please complete the blanks"
-      );
-    }
-  };
-
   //add
-  const updateAddInput = (
-    e: any,
-    selectedOption:any=null
-  ) => {
+  const updateAddInput = (e: any, selectedOption: any = null) => {
     if (
       selectedOption?.name === "genre" &&
       selectedOption?.action !== "clear"
@@ -224,7 +152,7 @@ const QuestionList = () => {
         handleQuestionAsImageSubmit(response.id);
       }
 
-      handleImageSubmit(response.id);
+      handleImageSubmit(response.id, image);
       setImage(null);
       setQuestionAsImage(null);
       getData();
@@ -283,10 +211,6 @@ const QuestionList = () => {
     }
   };
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) return;
-    setImage(event.target.files[0]);
-  };
   const handleQuestionAsImageChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -294,13 +218,6 @@ const QuestionList = () => {
     setQuestionAsImage(event.target.files[0]);
   };
 
-  const handleImageSubmit = async (questionID: number) => {
-    if (image) {
-      const formData = new FormData();
-      formData.append("image", image);
-      await imagesApi.uploadImage(questionID, formData);
-    }
-  };
   const handleQuestionAsImageSubmit = async (questionID: number) => {
     if (questionAsImage) {
       const formData = new FormData();
@@ -394,11 +311,11 @@ const QuestionList = () => {
         generateQuestionFromText={handleGenerateQuestionFromText}
         show={showAddModal}
         onHide={() => setShowAddModal(false)}
-        questionObj={questionObj?questionObj:ToEditQuestionObj}
+        questionObj={questionObj ? questionObj : ToEditQuestionObj}
         updateInput={updateAddInput}
         handleSubmit={handleAddSubmit}
         setQuestionObj={setQuestionObj}
-        handleImageChange={handleImageChange}
+        handleImageChange={(e) => handleImageChange(e, setImage)}
         handleQuestionAsImageChange={handleQuestionAsImageChange}
         questionAsImage={questionAsImage}
         image={image}
@@ -412,7 +329,7 @@ const QuestionList = () => {
         updateInput={updateInput}
         handleSubmit={handleEditSubmit}
         setQuestionObj={setToEdit}
-        handleImageChange={handleImageChange}
+        handleImageChange={(e) => handleImageChange(e, setEditImage)}
       />
 
       <DeleteModal

@@ -309,3 +309,19 @@ export const shuffle = (array: any[]) => {
   }
   return array;
 };
+
+
+export const handleImageSubmit = async (questionID: number,image:any) => {
+    if (image) {
+      const formData = new FormData();
+      formData.append("image", image);
+      await imagesApi.uploadImage(questionID, formData);
+    }
+  };
+
+export const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>,setImage:any) => {
+    if (!event.target.files) return;
+    setImage(event.target.files[0]);
+  };
+  
+
