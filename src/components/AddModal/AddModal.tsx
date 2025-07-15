@@ -19,7 +19,7 @@ import type { IQuestion } from "../../vite-env";
 
 interface AddModal {
   generateQuestionFromText: (text: string) => void;
-  questionObj:IQuestion;
+  questionObj: IQuestion;
   updateInput: (e: any, selectedOption?: any) => void;
   handleSubmit: () => void;
   setQuestionObj: (question: IQuestion) => void;
@@ -45,7 +45,7 @@ const AddModal = ({
   onHide,
   image,
   genres,
-}:AddModal) => {
+}: AddModal) => {
   const { question, answer, difficulty, genre, questionType } = questionObj;
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const AddModal = ({
     }
   }, [questionType]);
 
-  const handleQuestionTypeChange = (questionType:string) => {
+  const handleQuestionTypeChange = (questionType: string) => {
     setQuestionObj({ ...questionObj, questionType: questionType });
   };
 
@@ -101,6 +101,14 @@ const AddModal = ({
                   })}
                   onChange={updateInput}
                   name="genre"
+                  value={
+                    genre && {
+                      value: genre,
+                      label: genre,
+                      color: "#00B8D9",
+                      isFixed: true,
+                    }
+                  }
                   placeholder="Ex: Biology"
                 ></CreatableSelect>
               </Form.Group>

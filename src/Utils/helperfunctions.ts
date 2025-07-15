@@ -119,7 +119,7 @@ export const generateQuestionFromText = async (
 ) => {
   try {
     const genAI = new GoogleGenerativeAI(Google_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const prompt = `
       Extract a question from the following text and return it as a **valid JSON object** ONLY.
       No explanations, no Markdown, just plain JSON.  you must complete the question with info extracted from the text below

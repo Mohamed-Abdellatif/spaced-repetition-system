@@ -10,23 +10,21 @@ import NotificationToast from "../../components/Toast/toast";
 import EditModal from "../../components/EditModal/editModal";
 import { UserContext } from "../../contexts/user.context";
 import AddToListModal from "../../components/AddToListModal/AddToListModal";
-import { imagesApi, listsApi, questionsApi } from "../../services/api";
+import { listsApi } from "../../services/api";
 import {
   addQuestionToList,
   generateQuestionFromText,
-  generateWrongChoicesFromText,
   handleImageChange,
-  handleImageSubmit,
-  handleNotification,
-  todayFormatDate,
 } from "../../Utils/helperfunctions";
 import { useQuestions } from "../../hooks/useQuestions";
 import SearchBar from "../../components/SearchBar/SearchBar";
 import GenreFilter from "../../components/GenreFilter/GenreFilter";
-import { QuestionObj, ToEditQuestionObj } from "../../Utils/constants";
+import { ToEditQuestionObj } from "../../Utils/constants";
 import type { IList, IQuestion } from "../../vite-env";
 import useEditQuestion from "../../hooks/useEditQuestion";
 import useDeleteQuestion from "../../hooks/useDeleteQuestion";
+import useAddQuestion from "../../hooks/useAddQuestion";
+import QuestionsInfo from "../../components/QuestionsInfo/QuestionsInfo";
 
 const QuestionList = () => {
   const { currentUser } = useContext(UserContext);
@@ -50,6 +48,25 @@ const QuestionList = () => {
   } = useQuestions(currentUser);
 
   const {
+    setQuestionAsImage,
+    setQuestionObj,
+    handleAddClick,
+    showAddModal,
+    setShowAddModal,
+    questionObj,
+    updateAddInput,
+    handleAddSubmit,
+    setImage,
+    questionAsImage,
+    image,
+  } = useAddQuestion(
+    currentUser,
+    setIsNotificationVisible,
+    setResponse,
+    getData
+  );
+
+  const {
     showEditModal,
     setShowEditModal,
     toEdit,
@@ -68,117 +85,14 @@ const QuestionList = () => {
     toDelete,
   } = useDeleteQuestion(getData, setIsNotificationVisible, setResponse);
 
-  // Modal state management
-  const [showAddModal, setShowAddModal] = useState(false);
-
   const [showAddToListModal, setShowAddToListModal] = useState(false);
-
-  const [image, setImage] = useState<any | null>(null);
-  const [questionAsImage, setQuestionAsImage] = useState<any | null>(null);
 
   const [toBeAdded, setToBeAdded] = useState<IQuestion>(ToEditQuestionObj);
   const [newListName, setNewListName] = useState("");
-  const [questionObj, setQuestionObj] = useState<IQuestion | null>({
-    ...QuestionObj,
-  });
-  // Modal handlers
-  const handleAddClick = () => {
-    setShowAddModal(true);
-  };
 
   const handleAddToListClick = (question: IQuestion) => {
     setToBeAdded(question);
     setShowAddToListModal(true);
-  };
-
-  //add
-  const updateAddInput = (e: any, selectedOption: any = null) => {
-    if (
-      selectedOption?.name === "genre" &&
-      selectedOption?.action !== "clear"
-    ) {
-      const name = selectedOption.name;
-      setQuestionObj({
-        ...(questionObj as IQuestion),
-        [name]: e.value,
-        userId: currentUser?.uid,
-      });
-    } else if (selectedOption?.action === "clear") {
-      const name = selectedOption.name;
-      setQuestionObj({
-        ...(questionObj as IQuestion),
-        [name]: "",
-        userId: currentUser?.uid,
-      });
-    } else {
-      setQuestionObj({
-        ...(questionObj as IQuestion),
-        [e.target.name]: e.target.value,
-        userId: currentUser?.uid,
-      });
-    }
-  };
-
-  const handleAddSubmit = async () => {
-    let wrongChoicesObj;
-    if (!questionObj) {
-      return;
-    }
-    const { question, answer, difficulty, genre, questionType } = questionObj;
-    if (
-      question != " " &&
-      answer != " " &&
-      difficulty &&
-      genre != " " &&
-      (questionType === "image" ? questionAsImage !== null : true)
-    ) {
-      if (questionType === "MCQ") {
-        wrongChoicesObj = await generateWrongChoicesFromText(
-          question,
-          answer,
-          setIsNotificationVisible,
-          setResponse
-        );
-      }
-      const created = todayFormatDate();
-      const nextTest = created;
-      const response = await questionsApi.createQuestion({
-        ...questionObj,
-        choices: wrongChoicesObj,
-        created,
-        nextTest,
-      });
-      if (questionType === "image") {
-        handleQuestionAsImageSubmit(response.id);
-      }
-
-      handleImageSubmit(response.id, image);
-      setImage(null);
-      setQuestionAsImage(null);
-      getData();
-
-      setQuestionObj({ ...QuestionObj });
-      handleNotification(
-        setIsNotificationVisible,
-        setResponse,
-        response.message
-      );
-      setShowAddModal(false);
-    } else {
-      if (questionType === "image" && questionAsImage === null) {
-        handleNotification(
-          setIsNotificationVisible,
-          setResponse,
-          "Please upload an image"
-        );
-      } else {
-        handleNotification(
-          setIsNotificationVisible,
-          setResponse,
-          "Please complete the blanks"
-        );
-      }
-    }
   };
 
   const addToList = async (list: IList) => {
@@ -218,14 +132,6 @@ const QuestionList = () => {
     setQuestionAsImage(event.target.files[0]);
   };
 
-  const handleQuestionAsImageSubmit = async (questionID: number) => {
-    if (questionAsImage) {
-      const formData = new FormData();
-      formData.append("image", questionAsImage);
-      await imagesApi.uploadImageAsQuestion(questionID, formData);
-    }
-  };
-
   const handleGenerateQuestionFromText = async (text: string) => {
     await generateQuestionFromText(
       text,
@@ -262,23 +168,11 @@ const QuestionList = () => {
         </Col>
       </Row>
       {currentUser?.uid && (
-        <Row>
-          <Col xs={12}>
-            <h6>
-              {questions.length} Question{questions.length > 1 ? "s" : ""}
-              {currentGenre && currentGenre !== "ALL GENRES" ? ` in ` : ""}
-              <span className="text-primary">
-                {" "}
-                {currentGenre && currentGenre !== "ALL GENRES"
-                  ? `"${currentGenre}"`
-                  : ""}
-              </span>
-            </h6>
-            <h6>
-              Total: {questionsLength} Question{questionsLength > 1 ? "s" : ""}
-            </h6>
-          </Col>
-        </Row>
+        <QuestionsInfo
+          questions={questions}
+          currentGenre={currentGenre}
+          questionsLength={questionsLength}
+        />
       )}
 
       {loading ? (
