@@ -11,7 +11,9 @@ import { imagesApi, questionsApi } from "../services/api";
 const useEditQuestion = (
   getData: () => void,
   setIsNotificationVisible: Dispatch<SetStateAction<boolean>>,
-  setResponse: Dispatch<SetStateAction<string>>
+  setResponse: Dispatch<
+    SetStateAction<{ message: string; isSuccess?: boolean | undefined }>
+  >
 ) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editImage, setEditImage] = useState<any | null>(null);
@@ -67,13 +69,19 @@ const useEditQuestion = (
         handleNotification(setIsNotificationVisible, setResponse, response);
         setShowEditModal(false);
       } catch (err: any) {
-        handleNotification(setIsNotificationVisible, setResponse, err.message);
+        handleNotification(
+          setIsNotificationVisible,
+          setResponse,
+          err.message,
+          false
+        );
       }
     } else {
       handleNotification(
         setIsNotificationVisible,
         setResponse,
-        "Please complete the blanks"
+        "Please complete the blanks",
+        false
       );
     }
   };

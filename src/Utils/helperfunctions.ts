@@ -5,18 +5,31 @@ const Google_API_KEY = import.meta.env.VITE_API_KEY;
 
 export const handleNotification = (
   setIsNotificationVisible: (bool: boolean) => void,
-  setResponse: (text: string) => void,
-  response: string
+  setResponse: ({
+    message,
+    isSuccess,
+  }: {
+    message: string;
+    isSuccess: boolean;
+  }) => void,
+  response: string,
+  isSuccess: boolean = true
 ) => {
   setIsNotificationVisible(true);
-  setResponse(response);
+  setResponse({ message: response, isSuccess: isSuccess });
 };
 
 export const addQuestionToList = async (
   list: IList,
   toBeAdded: IQuestion,
   lists: IList[],
-  setResponse: (text: string) => void,
+  setResponse: ({
+    message,
+    isSuccess,
+  }: {
+    message: string;
+    isSuccess: boolean;
+  }) => void,
   setIsNotificationVisible: (bool: boolean) => void,
   currentUser: ICurrentUser
 ) => {
@@ -47,7 +60,8 @@ export const addQuestionToList = async (
           handleNotification(
             setIsNotificationVisible,
             setResponse,
-            "Question already exists in the list"
+            "Question already exists in the list",
+            false
           );
         }
       } else {
@@ -89,7 +103,8 @@ export const addQuestionToList = async (
           handleNotification(
             setIsNotificationVisible,
             setResponse,
-            "Question already exists in the list"
+            "Question already exists in the list",
+            false
           );
         }
       } else {
@@ -106,14 +121,25 @@ export const addQuestionToList = async (
       }
     }
   } catch (err: any) {
-    handleNotification(setIsNotificationVisible, setResponse, err.message);
+    handleNotification(
+      setIsNotificationVisible,
+      setResponse,
+      err.message,
+      false
+    );
   }
 };
 
 export const generateQuestionFromText = async (
   text: string | any[],
   setIsNotificationVisible: (bool: boolean) => void,
-  setResponse: (text: string) => void,
+  setResponse: ({
+    message,
+    isSuccess,
+  }: {
+    message: string;
+    isSuccess: boolean;
+  }) => void,
   setQuestionObj: (question: IQuestion) => void,
   currentUser: ICurrentUser
 ) => {
@@ -141,14 +167,16 @@ export const generateQuestionFromText = async (
       handleNotification(
         setIsNotificationVisible,
         setResponse,
-        "Please Try Again Later"
+        "Please Try Again Later",
+        false
       );
       return;
     } else if (text.length < 30) {
       handleNotification(
         setIsNotificationVisible,
         setResponse,
-        "Please Enter a Longer Text"
+        "Please Enter a Longer Text",
+        false
       );
       return;
     }
@@ -166,7 +194,8 @@ export const generateQuestionFromText = async (
       handleNotification(
         setIsNotificationVisible,
         setResponse,
-        "Please Try Again Later"
+        "Please Try Again Later",
+        false
       );
       return;
     }
@@ -177,14 +206,16 @@ export const generateQuestionFromText = async (
       handleNotification(
         setIsNotificationVisible,
         setResponse,
-        "Please Try Again Later"
+        "Please Try Again Later",
+        false
       );
     }
   } catch (error) {
     handleNotification(
       setIsNotificationVisible,
       setResponse,
-      "Please Try Again Later"
+      "Please Try Again Later",
+      false
     );
   }
 };
@@ -216,7 +247,13 @@ export const generateWrongChoicesFromText = async (
   text: string,
   correctAnswer: string,
   setIsNotificationVisible: (bool: boolean) => void,
-  setResponse: (text: string) => void
+  setResponse: ({
+    message,
+    isSuccess,
+  }: {
+    message: string;
+    isSuccess: boolean;
+  }) => void
 ) => {
   const EMPTY_CHOICES = {
     choice1: "",
@@ -228,7 +265,8 @@ export const generateWrongChoicesFromText = async (
     handleNotification(
       setIsNotificationVisible,
       setResponse,
-      "Please Enter Valid Text and Answer"
+      "Please Enter Valid Text and Answer",
+      false
     );
     return EMPTY_CHOICES;
   }
@@ -282,7 +320,8 @@ export const generateWrongChoicesFromText = async (
       handleNotification(
         setIsNotificationVisible,
         setResponse,
-        "Failed to Generate Wrong Choices"
+        "Failed to Generate Wrong Choices",
+        false
       );
       return extractedChoices;
     }
@@ -290,7 +329,8 @@ export const generateWrongChoicesFromText = async (
     handleNotification(
       setIsNotificationVisible,
       setResponse,
-      "Please Try Again Later"
+      "Please Try Again Later",
+      false
     );
     return { choice1: "", choice2: "", choice3: "" };
   }
@@ -310,18 +350,18 @@ export const shuffle = (array: any[]) => {
   return array;
 };
 
+export const handleImageSubmit = async (questionID: number, image: any) => {
+  if (image) {
+    const formData = new FormData();
+    formData.append("image", image);
+    await imagesApi.uploadImage(questionID, formData);
+  }
+};
 
-export const handleImageSubmit = async (questionID: number,image:any) => {
-    if (image) {
-      const formData = new FormData();
-      formData.append("image", image);
-      await imagesApi.uploadImage(questionID, formData);
-    }
-  };
-
-export const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>,setImage:any) => {
-    if (!event.target.files) return;
-    setImage(event.target.files[0]);
-  };
-  
-
+export const handleImageChange = (
+  event: React.ChangeEvent<HTMLInputElement>,
+  setImage: any
+) => {
+  if (!event.target.files) return;
+  setImage(event.target.files[0]);
+};

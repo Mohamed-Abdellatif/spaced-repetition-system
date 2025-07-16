@@ -7,14 +7,20 @@ import { useContext } from "react";
 import { UserContext } from "../../contexts/user.context";
 import ListsMapper from "../../components/ListsMapper/ListsMapper";
 import { imagesApi, listsApi, questionsApi } from "../../services/api";
-import { handleNotification, todayFormatDate } from "../../Utils/helperfunctions";
+import {
+  handleNotification,
+  todayFormatDate,
+} from "../../Utils/helperfunctions";
 import type { IList } from "../../vite-env";
 
 const PublicListsPage = () => {
   const { currentUser } = useContext(UserContext);
 
   const [loading, setLoading] = useState(true);
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState<{
+    message: string;
+    isSuccess?: boolean;
+  }>({ message: "", isSuccess: true });
   const [lists, setLists] = useState([]);
   const [query, setQuery] = useState({ text: "" });
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
@@ -37,8 +43,13 @@ const PublicListsPage = () => {
         setLists(
           response.sort((a: { id: number }, b: { id: number }) => a.id - b.id)
         );
-      } catch (err:any) {
-        handleNotification(setIsNotificationVisible,setResponse,err.message)
+      } catch (err: any) {
+        handleNotification(
+          setIsNotificationVisible,
+          setResponse,
+          err.message,
+          false
+        );
       }
     }
   };
@@ -60,7 +71,7 @@ const PublicListsPage = () => {
       if ("Network Error" === error.message) {
         setLoading(false);
       }
-      setResponse("Network Error");
+      setResponse({ message: "Network Error", isSuccess: false });
       setIsNotificationVisible(true);
     }
   };
@@ -109,7 +120,10 @@ const PublicListsPage = () => {
                   await imagesApi.uploadImage(newQuestionResponse.id, formData);
                 }
               } catch (imageError) {
-                setResponse("Please Try Again");
+                setResponse({
+                  message: "Error please try again later",
+                  isSuccess: false,
+                });
                 setIsNotificationVisible(true);
               }
             }
@@ -128,12 +142,18 @@ const PublicListsPage = () => {
                   );
                 }
               } catch (imageError) {
-                setResponse("Please Try Again");
+                setResponse({
+                  message: "Error please try again later",
+                  isSuccess: false,
+                });
                 setIsNotificationVisible(true);
               }
             }
           } catch (questionError) {
-            setResponse("Please Try Again");
+            setResponse({
+              message: "Error please try again later",
+              isSuccess: false,
+            });
             setIsNotificationVisible(true);
           }
         }
@@ -146,11 +166,14 @@ const PublicListsPage = () => {
       });
 
       getData();
-      setResponse("Added Successfully");
+      setResponse({ message: "Added Successfully" });
       setIsNotificationVisible(true);
     } catch (err) {
       console.error("Error adding list:", err);
-      setResponse("Error please try again later");
+      setResponse({
+        message: "Error please try again later",
+        isSuccess: false,
+      });
       setIsNotificationVisible(true);
     }
   };

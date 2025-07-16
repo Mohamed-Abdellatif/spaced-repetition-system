@@ -22,7 +22,10 @@ import CalendarQuestionsModal from "../../components/CalendarQuestionsModal/Cale
 
 const SpacedSchedule = () => {
   const { currentUser } = useContext(UserContext);
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState<{
+    message: string;
+    isSuccess?: boolean;
+  }>({ message: "", isSuccess: true });
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
   const [selectedQuestions, setSelectedQuestions] = useState<IQuestion[]>([]);
   const [showModal, setShowModal] = useState(false);

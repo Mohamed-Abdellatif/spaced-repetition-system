@@ -25,7 +25,10 @@ const ViewList = ({ listType }: { listType: string }) => {
   });
   const [toDelete, setToDelete] = useState<IQuestion | null>(null);
   const [newListName, setNewListName] = useState("");
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState<{
+    message: string;
+    isSuccess?: boolean;
+  }>({ message: "", isSuccess: true });
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
 
   // Add modal state management
@@ -97,10 +100,13 @@ const ViewList = ({ listType }: { listType: string }) => {
       });
       await getData();
       setIsNotificationVisible(true);
-      setResponse("Deleted from the list");
+      setResponse({ message: "Deleted from the list" });
     } catch (err) {
       console.log(err);
-      setResponse("Error please try again later");
+      setResponse({
+        message: "Error please try again later",
+        isSuccess: false,
+      });
       setIsNotificationVisible(true);
     }
   };
@@ -137,11 +143,14 @@ const ViewList = ({ listType }: { listType: string }) => {
         setIsNotificationVisible(true);
       } catch (err) {
         console.log(err);
-        setResponse("Error please try again later");
+        setResponse({
+          message: "Error please try again later",
+          isSuccess: false,
+        });
         setIsNotificationVisible(true);
       }
     } else {
-      setResponse("Please complete the blanks");
+      setResponse({ message: "Please complete the blanks", isSuccess: false });
       setIsNotificationVisible(true);
     }
   };
@@ -180,10 +189,13 @@ const ViewList = ({ listType }: { listType: string }) => {
             questions: requestions.concat(id),
             userId: currentUser?.uid,
           });
-          setResponse(`Question Added To ${listNameToAdd}`);
+          setResponse({ message: `Question Added To ${listNameToAdd}` });
           setIsNotificationVisible(true);
         } else {
-          setResponse(`Question Already Exists in ${listNameToAdd}`);
+          setResponse({
+            message: `Question Already Exists in ${listNameToAdd}`,
+            isSuccess: false,
+          });
           setIsNotificationVisible(true);
         }
       } else {
@@ -192,7 +204,7 @@ const ViewList = ({ listType }: { listType: string }) => {
           questions: [id],
           userId: currentUser?.uid,
         });
-        setResponse(`Question Added To ${listNameToAdd}`);
+        setResponse({ message: `Question Added To ${listNameToAdd}` });
         setIsNotificationVisible(true);
       }
     } catch (err) {
@@ -235,10 +247,10 @@ const ViewList = ({ listType }: { listType: string }) => {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(`${SHARE_URL}${listName}`);
-      setResponse("Link Copied To Clipboard");
+      setResponse({ message: "Link Copied To Clipboard" });
       setIsNotificationVisible(true);
     } catch (err) {
-      setResponse("Failed to copy");
+      setResponse({ message: "Failed to copy", isSuccess: false });
       setIsNotificationVisible(true);
     }
   };

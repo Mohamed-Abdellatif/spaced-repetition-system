@@ -6,7 +6,9 @@ import type { IQuestion } from "../vite-env";
 const useDeleteQuestion = (
   getData: () => void,
   setIsNotificationVisible: Dispatch<SetStateAction<boolean>>,
-  setResponse: Dispatch<SetStateAction<string>>
+  setResponse: Dispatch<
+    SetStateAction<{ message: string; isSuccess?: boolean | undefined }>
+  >
 ) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [toDelete, setToDelete] = useState<IQuestion | null>(null);
@@ -33,7 +35,8 @@ const useDeleteQuestion = (
       handleNotification(
         setIsNotificationVisible,
         setResponse,
-        "Error please try again later"
+        "Error please try again later",
+        false
       );
     }
   };

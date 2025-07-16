@@ -53,7 +53,7 @@ const CalendarQuestionsModal = ({
                       </p>
                     </div>
                   </div>
-                  <Row>
+                  <Row className="mt-3">
                     <Col sm={6} className="d-flex justify-content-center">
                       <Button
                         variant="primary"

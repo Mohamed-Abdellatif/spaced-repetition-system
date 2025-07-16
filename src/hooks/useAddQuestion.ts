@@ -12,7 +12,9 @@ import {
 const useAddQuestion = (
   currentUser: ICurrentUser,
   setIsNotificationVisible: Dispatch<SetStateAction<boolean>>,
-  setResponse: Dispatch<SetStateAction<string>>,
+  setResponse: Dispatch<
+    SetStateAction<{ message: string; isSuccess?: boolean | undefined }>
+  >,
   getData: () => void
 ) => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -113,13 +115,15 @@ const useAddQuestion = (
         handleNotification(
           setIsNotificationVisible,
           setResponse,
-          "Please upload an image"
+          "Please upload an image",
+          false
         );
       } else {
         handleNotification(
           setIsNotificationVisible,
           setResponse,
-          "Please complete the blanks"
+          "Please complete the blanks",
+          false
         );
       }
     }

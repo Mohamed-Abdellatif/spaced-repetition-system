@@ -4,11 +4,12 @@ import Toast from "react-bootstrap/Toast";
 import { ToastContainer } from "react-bootstrap";
 
 interface NotificationToast {
-  show:boolean;
-  setShow:(bool:boolean)=>void;
-  response: string;}
+  show: boolean;
+  setShow: (bool: boolean) => void;
+  response: { message: string; isSuccess?: boolean };
+}
 
-const NotificationToast = ({ show, setShow, response }:NotificationToast) => {
+const NotificationToast = ({ show, setShow, response }: NotificationToast) => {
   return (
     <>
       <Row>
@@ -19,6 +20,11 @@ const NotificationToast = ({ show, setShow, response }:NotificationToast) => {
               show={show}
               delay={3000}
               autohide
+              className={
+                response.isSuccess || response.isSuccess === undefined
+                  ? "bg-success"
+                  : "bg-danger"
+              }
             >
               <Toast.Header>
                 <img
@@ -30,7 +36,7 @@ const NotificationToast = ({ show, setShow, response }:NotificationToast) => {
                 <small>1 second ago</small>
               </Toast.Header>
               <Toast.Body className="bg-light">
-                <strong>{response}</strong>
+                <strong>{response.message}</strong>
               </Toast.Body>
             </Toast>
           </ToastContainer>

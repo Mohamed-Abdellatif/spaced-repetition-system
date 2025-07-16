@@ -10,30 +10,35 @@ import type { IQuestion } from "../../vite-env";
 
 const ViewQuestion = () => {
   const { questionId } = useParams();
-  const [questionObj, setQuestionObj] = useState<IQuestion >();
+  const [questionObj, setQuestionObj] = useState<IQuestion>();
   const [imageURL, setImageURL] = useState(null);
   const [questionImgURL, setQuestionImgURL] = useState(null);
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState<{
+    message: string;
+    isSuccess?: boolean;
+  }>({ message: "", isSuccess: true });
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
 
   const getData = async () => {
     try {
       if (!questionId) {
-          return;
-        }
+        return;
+      }
 
-      
       const response = await questionsApi.getQuestionById(parseInt(questionId));
       setQuestionObj(response);
-      getQuestionImage(response,setQuestionImgURL);
-      
+      getQuestionImage(response, setQuestionImgURL);
+
       const imgResponse = await imagesApi.getImage(parseInt(questionId));
       if (imgResponse) {
         setImageURL(imgResponse.url);
       }
     } catch (err) {
-      setResponse("Error, please try again later");
+      setResponse({
+        message: "Error please try again later",
+        isSuccess: false,
+      });
       setIsNotificationVisible(true);
     }
   };
@@ -44,10 +49,10 @@ const ViewQuestion = () => {
     getData();
   }, [questionId]);
 
-  if(!questionObj){
-    return
+  if (!questionObj) {
+    return;
   }
-  const { question, answer, difficulty,questionType,img } = questionObj;
+  const { question, answer, difficulty, questionType, img } = questionObj;
 
   return (
     <div className="container mt-5 d-flex justify-content-center">
@@ -59,7 +64,7 @@ const ViewQuestion = () => {
       >
         {!isFlipped ? (
           <div className="card-body front text-center">
-            {questionType==="image" && (
+            {questionType === "image" && (
               <img
                 src={`${questionImgURL}?t=${Date.now()}`}
                 className="card-img-top flashcard-image"
@@ -68,12 +73,10 @@ const ViewQuestion = () => {
                 height={"300px"}
               />
             )}
-            <h5 className={"card-title mt-3"}>Question: <br /> {question}</h5>
-            <span
-              className={`badge bg-secondary`}
-            >
-              {difficulty}
-            </span>
+            <h5 className={"card-title mt-3"}>
+              Question: <br /> {question}
+            </h5>
+            <span className={`badge bg-secondary`}>{difficulty}</span>
           </div>
         ) : (
           <div className="card-body back text-center d-flex align-items-center justify-content-center">
@@ -86,12 +89,15 @@ const ViewQuestion = () => {
                 height={"300px"}
               />
             )}
-            <p className="answer-text">Answer: <br />{answer}</p>
+            <p className="answer-text">
+              Answer: <br />
+              {answer}
+            </p>
           </div>
         )}
       </motion.div>
       <NotificationToast
-        setShow={(bool:boolean)=>setIsNotificationVisible(bool)}
+        setShow={(bool: boolean) => setIsNotificationVisible(bool)}
         show={isNotificationVisible}
         response={response}
       />

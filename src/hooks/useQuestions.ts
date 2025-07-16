@@ -12,7 +12,10 @@ export const useQuestions = (currentUser: ICurrentUser) => {
   const [questionsLength, setQuestionsLength] = useState(0);
   const [currentGenre, setCurrentGenre] = useState("ALL GENRES");
   const [lists, setLists] = useState<IList[]>([ListObj]);
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState<{
+    message: string;
+    isSuccess?: boolean;
+  }>({ message: "", isSuccess: true });
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
 
   const getData = async () => {
@@ -56,7 +59,8 @@ export const useQuestions = (currentUser: ICurrentUser) => {
       handleNotification(
         setIsNotificationVisible,
         setResponse,
-        "Please Try Again Later"
+        "Please Try Again Later",
+        false
       );
     }
   };

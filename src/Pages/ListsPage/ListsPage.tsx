@@ -14,8 +14,6 @@ import { listsApi, questionsApi } from "../../services/api";
 import type { IList, IQuestion } from "../../vite-env";
 import { ListObj } from "../../Utils/constants";
 
-
-
 const ListsPage = () => {
   const { currentUser } = useContext(UserContext);
 
@@ -25,10 +23,17 @@ const ListsPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [toEdit, setToEdit] = useState<IList | null>(null);
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState<{
+    message: string;
+    isSuccess?: boolean;
+  }>({ message: "", isSuccess: true });
   const [toDelete, setToDelete] = useState<IList | null>(null);
   const [lists, setLists] = useState<any[] | null>(null);
-  const [newList, setNewList] = useState({ listName: "", description: "" ,questions:[]});
+  const [newList, setNewList] = useState({
+    listName: "",
+    description: "",
+    questions: [],
+  });
   const [query, setQuery] = useState({ text: "" });
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
   const [questionIDs, setQuestionIDs] = useState<IQuestion[] | null>(null);
@@ -80,31 +85,35 @@ const ListsPage = () => {
   const handleAddSubmit = async (isListPublic: boolean) => {
     try {
       let response = "";
-      const displayName: Record<string, string> = await getDisplayNameFromDocument();
+      const displayName: Record<string, string> =
+        await getDisplayNameFromDocument();
 
-      if (isListPublic && currentUser?.email ) {
+      if (isListPublic && currentUser?.email) {
         response = await listsApi.createPublicList({
           listName: newList.listName,
           creatorId: currentUser?.uid,
           description: newList.description,
           creator: displayName[currentUser.email],
-          questions:[]
+          questions: [],
         });
       } else {
         response = await listsApi.createList({
           listName: newList.listName,
           userId: currentUser?.uid,
           description: newList.description,
-          questions:[]
+          questions: [],
         });
       }
       setShowAddModal(false);
-      setNewList({ listName: "", description: "" ,questions:[]});
+      setNewList({ listName: "", description: "", questions: [] });
       getData();
-      setResponse(response);
+      setResponse({ message: response });
       setIsNotificationVisible(true);
     } catch (err) {
-      setResponse("Error please try again later");
+      setResponse({
+        message: "Error please try again later",
+        isSuccess: false,
+      });
       setIsNotificationVisible(true);
       setShowAddModal(false);
     }
@@ -139,7 +148,7 @@ const ListsPage = () => {
       if ("Network Error" === error.message) {
         setLoading(false);
       }
-      setResponse("Network Error");
+      setResponse({ message: "Network Error", isSuccess: false });
       setIsNotificationVisible(true);
     }
   };
@@ -162,17 +171,20 @@ const ListsPage = () => {
   const deleteList = async () => {
     try {
       if (!toDelete?.id) {
-          return;
-        }
+        return;
+      }
       const response = toDelete?.creatorId
         ? await listsApi.deletePublicList(toDelete.id)
         : await listsApi.deleteList(toDelete?.id);
       getData();
       setIsNotificationVisible(true);
-      setResponse(response);
+      setResponse({ message: response });
       setShowDeleteModal(false);
     } catch {
-      setResponse("Error please try again later");
+      setResponse({
+        message: "Error please try again later",
+        isSuccess: false,
+      });
       setIsNotificationVisible(true);
     }
   };
@@ -184,8 +196,8 @@ const ListsPage = () => {
   const handleEditSubmit = async () => {
     try {
       if (!toEdit?.id) {
-          return;
-        }
+        return;
+      }
       const response =
         toEdit?.creatorId !== currentUser?.uid
           ? await listsApi.updateList(toEdit?.id, {
@@ -202,10 +214,13 @@ const ListsPage = () => {
             });
       getData();
       setShowEditModal(false);
-      setResponse(response);
+      setResponse({ message: response });
       setIsNotificationVisible(true);
     } catch {
-      setResponse("Error please try again later");
+      setResponse({
+        message: "Error please try again later",
+        isSuccess: false,
+      });
       setIsNotificationVisible(true);
       setShowEditModal(false);
     }
@@ -263,7 +278,7 @@ const ListsPage = () => {
         </div>
       ) : (
         <ListsMapper
-          lists={lists?lists:[]}
+          lists={lists ? lists : []}
           setToDelete={handleDeleteClick}
           setToEdit={handleEditClick}
         />
@@ -277,12 +292,12 @@ const ListsPage = () => {
         show={showDeleteModal}
         onHide={() => setShowDeleteModal(false)}
         deleteList={deleteList}
-        toDelete={toDelete?toDelete:ListObj}
+        toDelete={toDelete ? toDelete : ListObj}
       />
       <EditListModal
         show={showEditModal}
         onHide={() => setShowEditModal(false)}
-        toEdit={toEdit?toEdit:ListObj}
+        toEdit={toEdit ? toEdit : ListObj}
         handleSubmit={handleEditSubmit}
         updateInput={updateEditInput}
       />
