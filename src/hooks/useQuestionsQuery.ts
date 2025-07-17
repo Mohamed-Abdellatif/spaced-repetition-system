@@ -3,14 +3,14 @@ import type { ICurrentUser, IQuestion } from "../vite-env";
 import { questionsApi } from "../services/api";
 import moment from "moment";
 
-const useQuestionsQuery = (currentUser: ICurrentUser) => {
+const useQuestionsQuery = (currentUser: ICurrentUser,questionsLength:number=10) => {
   const queryClient = useQueryClient();
 
-  const { data: questions = [], refetch } = useQuery<IQuestion[]>({
+  const { data: questions = [], refetch,isLoading } = useQuery<IQuestion[]>({
     queryKey: ["questions", currentUser?.uid],
     queryFn: () => {
       if (!currentUser) return Promise.resolve([]);
-      return questionsApi.getQuestions(currentUser.uid);
+      return questionsApi.getQuestions(currentUser?.uid,questionsLength);
     },
     enabled: !!currentUser,
   });
@@ -50,6 +50,7 @@ const useQuestionsQuery = (currentUser: ICurrentUser) => {
     AddQuestion,
     updateQuestionDate,
     refetch,
+    isLoading
   };
 };
 

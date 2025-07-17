@@ -1,10 +1,10 @@
 import moment from "moment";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { UserContext } from "../../contexts/user.context";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { Row, Col, Card, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import "./spacedSchedule.css";
@@ -20,6 +20,7 @@ import useDeleteQuestion from "../../hooks/useDeleteQuestion";
 import DeleteModal from "../../components/DeleteModal/DeleteModal";
 import CalendarQuestionsModal from "../../components/CalendarQuestionsModal/CalendarQuestionsModal";
 import useQuestionsQuery from "../../hooks/useQuestionsQuery";
+import { useQuestions } from "../../hooks/useQuestions";
 
 const SpacedSchedule = () => {
   const { currentUser } = useContext(UserContext);
@@ -31,8 +32,13 @@ const SpacedSchedule = () => {
   const [selectedQuestions, setSelectedQuestions] = useState<IQuestion[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
-  const { questions, updateQuestionDate, refetch } =
-    useQuestionsQuery(currentUser);
+
+  const { questionsLength, loading } = useQuestions(currentUser);
+
+  const { questions, updateQuestionDate, refetch } = useQuestionsQuery(
+    currentUser,
+    questionsLength
+  );
 
   const {
     showEditModal,
@@ -101,9 +107,20 @@ const SpacedSchedule = () => {
       question,
     });
   };
+  useEffect(() => {
+    refetch();
+  }, [questionsLength]);
+
+  if (loading) {
+    return(
+      <Row className="d-flex justify-content-center mt-5">
+        <Spinner/>
+      </Row>
+    )
+  };
 
   return (
-    <Container className="py-4">
+    <>
       <Row className="mb-4">
         <Col>
           <h1 className="page-title">
@@ -122,7 +139,7 @@ const SpacedSchedule = () => {
             <Card.Body>
               <FullCalendar
                 plugins={[dayGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
+                initialView="dayGridDay"
                 events={events}
                 dateClick={handleDateClick}
                 eventClick={handleEventClick}
@@ -131,7 +148,7 @@ const SpacedSchedule = () => {
                 headerToolbar={{
                   left: "prev,next today",
                   center: "title",
-                  right: "dayGridMonth,dayGridWeek",
+                  right: "dayGridMonth,dayGridWeek,dayGridDay",
                 }}
                 editable={true} // enables dragging and resizing
                 eventDrop={(info) => {
@@ -171,7 +188,7 @@ const SpacedSchedule = () => {
         deleteQuestion={deleteQuestion}
         toDelete={toDelete ? toDelete : ToEditQuestionObj}
       />
-    </Container>
+    </>
   );
 };
 
