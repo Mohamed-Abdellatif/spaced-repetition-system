@@ -10,7 +10,7 @@ import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import "./spacedSchedule.css";
 
 import type { IQuestion } from "../../vite-env";
-import useCalendarQuestions from "../../hooks/useCalendarQuestions";
+
 import useEditQuestion from "../../hooks/useEditQuestion";
 import EditModal from "../../components/EditModal/editModal";
 import { ToEditQuestionObj } from "../../Utils/constants";
@@ -19,6 +19,7 @@ import NotificationToast from "../../components/Toast/toast";
 import useDeleteQuestion from "../../hooks/useDeleteQuestion";
 import DeleteModal from "../../components/DeleteModal/DeleteModal";
 import CalendarQuestionsModal from "../../components/CalendarQuestionsModal/CalendarQuestionsModal";
+import useQuestionsQuery from "../../hooks/useQuestionsQuery";
 
 const SpacedSchedule = () => {
   const { currentUser } = useContext(UserContext);
@@ -31,7 +32,7 @@ const SpacedSchedule = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const { questions, updateQuestionDate, refetch } =
-    useCalendarQuestions(currentUser);
+    useQuestionsQuery(currentUser);
 
   const {
     showEditModal,

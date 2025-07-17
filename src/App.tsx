@@ -11,6 +11,7 @@ import ListsPage from "./Pages/ListsPage/ListsPage";
 import StudyCards from "./Pages/StudyPage/StudyCards";
 import PublicListsPage from "./Pages/PublicListsPage/PublicListsPage";
 import ViewQuestion from "./Pages/viewQuestion/viewQuestion";
+import CSVFileReader from "./Pages/CSVFileReader/CSVFileReader";
 
 const App = () => {
   return (
@@ -102,6 +103,14 @@ const App = () => {
             element={
               <Container fluid="lg" className="py-4">
                 <StudyCards />
+              </Container>
+            }
+          />
+          <Route
+            path="import"
+            element={
+              <Container fluid="lg" className="py-4">
+                <CSVFileReader />
               </Container>
             }
           />

@@ -21,6 +21,7 @@ import {
   faSignInAlt,
   faUser,
   faSearch,
+  faFileImport,
 } from "@fortawesome/free-solid-svg-icons";
 import { questionsApi } from "../../services/api";
 import { todayFormatDate } from "../../Utils/helperfunctions";
@@ -187,6 +188,16 @@ const NavBar = () => {
               >
                 <FontAwesomeIcon icon={faSearch} className="me-2" />
                 Browse
+              </Nav.Link>
+              <Nav.Link
+                className={`nav-link ${
+                  currentPath === "import" ? "active" : ""
+                }`}
+                onClick={() => navigate("/import")}
+                disabled={currentUser === null}
+              >
+                <FontAwesomeIcon icon={faFileImport} className="me-2" />
+                Import
               </Nav.Link>
             </Nav>
 
