@@ -47,7 +47,7 @@ const QuestionsQuiz = () => {
           return;
         }
         //////////////////////////////////////////////
-        const questionsResponse = await questionsApi.getQuestions(
+        const questionsResponse = await questionsApi.getAllQuestions(
           currentUser?.uid
         );
         if (genre === "General") {

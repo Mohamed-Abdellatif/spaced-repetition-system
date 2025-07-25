@@ -8,8 +8,13 @@ export const questionsApi = {
   // Get questions
   getQuestions: async (userId: string, questionsNumber = 10) => {
     const params = { userId, questionsNumber };
-    if (questionsNumber) questionsNumber = questionsNumber;
     const response = await axios.post(`${dataURL}/getQuestions`, params);
+    return response.data;
+  },
+
+  getAllQuestions: async (userId: string) => {
+    const params = { userId };
+    const response = await axios.post(`${dataURL}/getAllQuestions`, params);
     return response.data;
   },
 

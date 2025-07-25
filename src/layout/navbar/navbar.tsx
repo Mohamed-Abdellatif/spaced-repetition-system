@@ -47,7 +47,7 @@ const NavBar = () => {
   const getData = async () => {
     if (!currentUser) return;
     try {
-      const response = await questionsApi.getQuestions(currentUser.uid);
+      const response = await questionsApi.getAllQuestions(currentUser.uid);
       setQuestions(response);
     } catch (error) {
       console.log(error);

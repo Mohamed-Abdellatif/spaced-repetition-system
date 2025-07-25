@@ -30,7 +30,7 @@ export const useQuestions = (currentUser: ICurrentUser) => {
         currentUser?.uid,
         questionsToShow
       );
-      const allResponse = await questionsApi.getQuestions(currentUser?.uid);
+      const allResponse = await questionsApi.getAllQuestions(currentUser?.uid);
       const lengthResponse = await questionsApi.getQuestionsLength(
         currentUser?.uid
       );
